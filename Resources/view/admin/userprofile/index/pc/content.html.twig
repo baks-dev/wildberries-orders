@@ -1,0 +1,58 @@
+{# Тюлбар #}
+{{ include(_self|replace({ "content.html.twig": "_breadcrumb.html.twig" })) }}
+
+<div class="d-flex flex-column-fluid align-items-start container mt-3">
+	
+	<div class="clearfix position-absolute w-100 start-0 separator mt-3"></div>
+	
+	<div class="content flex-row-fluid mt-10">
+		<div class="card card-flush">
+			
+			{# Форма поиска #}
+			{{ include(_self|replace({ "content.html.twig": "_search.html.twig" })) }}
+			
+			<div class="card-body pt-0">
+				
+				<div class="table-responsive">
+					
+					{# Список #}
+					<table class="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer mb-5">
+						
+						{{ include(_self|replace({ "content.html.twig": "_table.thead.html.twig" })) }}
+						
+						<tbody class="fw-bold text-gray-600">
+						{% for item in query.data %}
+							{{ include(_self|replace({ "content.html.twig": "_table.tbody.html.twig" })) }}
+						{% endfor %}
+						</tbody>
+					</table>
+					
+					{# Chackbox EseCase #}
+					<div class="card-footer position-sticky bg-body pb-3" style="bottom: 0rem;">
+						<div class="d-flex d-none pb-5" id="all_usecase">
+							
+							{# <a href="#" class="modal-link btn btn-danger btn-sm fw-bolder"
+							   data-bs-toggle="modal" data-bs-target="#modal">
+							#}{# Удалить #}{#
+							{{ 'btn.delete'|trans({}, 'core.btn') }}
+						</a> #}
+							
+							{# <a href="#" class="modal-link btn btn btn-sm fw-bolder"
+							   data-bs-toggle="modal" data-bs-target="#modal">
+							#}{# Удалить #}{#
+							{{ 'btn.delete'|trans({}, 'core.btn') }}
+						</a> #}
+						
+						</div>
+						<div class="d-flex justify-content-between">
+							{# Пагинация #}
+							{{ include('@Template/_includes/pagination.html.twig') }}
+						</div>
+					</div>
+				
+				</div>
+			
+			</div>
+		</div>
+	</div>
+</div>

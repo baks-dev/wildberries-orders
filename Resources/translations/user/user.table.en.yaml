@@ -1,0 +1,33 @@
+user:
+  page:
+    index: 'Profiles'
+    new: 'Add profile'
+    edit: 'Edit profile'
+    delete: 'Delete profile'
+  breadcrumb:
+    index: 'User profiles'
+    new: 'Add user profiles'
+    edit: 'Edit user profiles'
+    delete: 'Delete user profiles'
+  form:
+    label:
+      username: 'Profile name'
+      url: 'Profile URL'
+      sort: 'Sort'
+    header:
+      basic: 'Basic settings'
+      personal: 'Personal data'
+    delete:
+      header: 'Delete profile'
+      h4: 'Are you sure you want to delete the profile "%name%"?'
+
+  success:
+    new: 'Profile added successfully'
+    update: 'Profile updated successfully'
+    delete: 'Profile deleted successfully'
+    activate: 'Profile applied successfully'
+  danger:
+    new: '%s: Error adding profile'
+    update: '%s: Error updating profile'
+    delete: '%s: Error deleting profile'
+    activate: '%s: Error applying profile'

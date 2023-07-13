@@ -1,0 +1,45 @@
+{% trans_default_domain 'admin.user.profile' %}
+
+{% set section = null %}
+
+{% for value in form.value %}
+	
+	
+	{% if section != value.vars.data.section %}
+		{% set section = value.vars.data.section %}
+		
+		{# Закрываем секцию, eсли она не первая в цикле #}
+		{% if loop.first != true %}
+			</div></div>
+		{% endif %}
+		
+		
+		{# Открываем новую секцию #}
+		<div class="card border-light">
+		
+		<div class="card-header border-light bg-body">
+			<div class="card-title">
+				<h4>
+					{# Название секции #}
+					{{ value.vars.data.sectionName }}
+				</h4>
+			</div>
+		</div>
+		
+		<div class="card-body">
+	
+	{% endif %}
+	
+	
+	
+	{# РЕНДЕР ПОЛЕЙ #}
+	{#{{ render_field(value.vars.data.type, value.value) }}#}
+	
+	{{ form_widget(value) }}
+	
+	
+	
+	{# Закрываем секцию, eсли цикл последний #}
+	{% if loop.last %}</div></div>{% endif %}
+
+{% endfor %}

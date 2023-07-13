@@ -1,0 +1,13 @@
+ROLE_USERPROFILE:
+  name: 'User profiles'
+  desc: 'User profiles'
+
+
+ROLE_USERPROFILE_NEW:
+  name: 'Add'
+
+ROLE_USERPROFILE_EDIT:
+  name: 'Edit'
+
+ROLE_USERPROFILE_DELETE:
+  name: 'Delete'

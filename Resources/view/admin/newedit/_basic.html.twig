@@ -1,0 +1,18 @@
+{% trans_default_domain 'admin.user.profile' %}
+
+{# Имя профиля #}
+{{ form_row(form.personal.username, {  label : 'admin.form.label.username'|trans }) }}
+
+{# URL Адрес профиля #}
+{{ form_row(form.info.url, {  label : 'admin.form.label.url'|trans }) }}
+
+
+{{ form_label(form.info.discount, 'admin.form.label.discount'|trans ) }}
+<div class="input-group mb-3">
+	<span class="input-group-text" id="basic-addon1">%</span>
+	{{ form_widget(form.info.discount) }}
+</div>
+
+
+{# Сортировка #}
+{{ form_row(form.sort, { label: 'admin.form.label.sort'|trans }) }}

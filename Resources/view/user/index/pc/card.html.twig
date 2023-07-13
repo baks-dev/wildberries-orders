@@ -1,0 +1,84 @@
+<tr class="vertical-middle">
+	
+	
+	<td class="text-nowrap">
+		{# Пользовательское меню #}
+		{{ include(_self|replace({ "card.html.twig": "_usecase.html.twig" })) }}
+	</td>
+	
+	<td class="text-center">
+		{{ item.sort }}
+	</td>
+	
+	
+	<td class="w-50">
+		
+		<div class="d-flex">
+			{# Превью  #}
+			
+			{% set img_path = item.avatar_cdn == true ? cdn_host : '' %}
+			{% set img_min = item.avatar_cdn == true ? 'small.' : '' %}
+			
+			<a href="{{ path('UserProfile:user.newedit.edit', { id: item.event }) }}" class="pe-3">
+				<div class="rounded-circle bg-contain lazy p-1" style="width: 50px; height: 50px;"
+						data-bg="{{ item.avatar_name ? img_path ~ users_profile_avatar ~ item.avatar_dir ~'/'~ item.avatar_name ~'.'~ img_min ~ item.avatar_ext : '/assets/img/blank.svg' }}">
+				</div>
+			</a>
+			
+			
+			<div class="ms-0">
+				{# Название #}
+				<a href="{{ path('UserProfile:user.newedit.edit', { id: item.event }) }}"
+						class=""
+				>{{ item.username }}</a>
+				
+				{# Описание #}
+				<div class="text-muted">
+					{{ item.location }}
+				</div>
+			
+			</div>
+		</div>
+		
+		{# Описание #}
+		<div class="text-muted small">
+			{# {{ string_width(item.description, 150)|raw }} #}
+		</div>
+	
+	</td>
+	
+	<td class="text-center">
+		{{ item.profile_type }}
+	</td>
+	
+	
+	<td class="text-center">
+		{% if item.active %}
+			{# <div class="badge bg-success px-2"> #}
+			{# {{ 'user.active.label'|trans }} #}{# &nbsp; #}
+			{# <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="text-success" viewBox="0 0 16 16">
+                    <path d="M2.5 8a5.5 5.5 0 0 1 8.25-4.764.5.5 0 0 0 .5-.866A6.5 6.5 0 1 0 14.5 8a.5.5 0 0 0-1 0 5.5 5.5 0 1 1-11 0z"/>
+                    <path d="M15.354 3.354a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l7-7z"/>
+                </svg> #}
+			
+			<svg xmlns="http://www.w3.org/2000/svg"
+					width="16"
+					height="16"
+					fill="currentColor"
+					class="text-success"
+					viewBox="0 0 16 16">
+				<path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
+			</svg>
+			{# </div> #}
+		{% else %}
+			---
+		{% endif %}
+	</td>
+	
+	
+
+	<td class="text-center">
+		{{ user_profile_status(item.status) }}
+	</td>
+
+</tr>

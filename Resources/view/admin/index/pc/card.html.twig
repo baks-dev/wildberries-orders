@@ -1,0 +1,110 @@
+
+<tr class="vertical-middle">
+
+	{#
+	* id - дентификатор профиля
+	* event - дентификатор события профиля
+	* user_profile_url - адрес персональной страницы
+	* user_id - идентификатор пользовтаеля
+
+	* user_profile_status - статус модерации пролфиля
+	* user_profile_active - статус текущей активности профиля
+	* user_profile_username - username пользователя
+	* user_profile_location - местоположение
+	* user_profile_avatar_name - название файла аватарки профиля
+	* user_profile_avatar_dir - директория файла прафиля
+	* user_profile_avatar_ext - расширение файла
+	* user_profile_avatar_cdn - флаг загрузки CDN
+	*
+	* account_id - идентификтаор аккаунта
+	* account_email - email аккаунта
+	* user_profile_type - тип профиля пользователя
+	#}
+
+
+	<td class="text-nowrap">
+		{# Пользовательское меню #}
+		{{ include(_self|replace({ "card.html.twig": "_usecase.html.twig" })) }}
+	</td>
+
+
+	<td class="w-25">
+
+		<div class="d-flex">
+			{# Превью #}
+			{% set img_path = item.user_profile_avatar_cdn == true ? cdn_host : '' %}
+			{% set img_min = item.user_profile_avatar_cdn == true ? 'small.' : '' %}
+
+			<a href="{{ path('UserProfile:admin.newedit.edit', { id: item.event }) }}" class="pe-3">
+				<div class="rounded-circle bg-contain lazy p-1" style="width: 50px; height: 50px;"
+						data-bg="{{ item.user_profile_avatar_name ?
+						img_path ~ users_profile_avatar ~ item.user_profile_avatar_dir ~'/'~ item.user_profile_avatar_name ~'.'~ img_min ~ item.user_profile_avatar_ext :
+						'/assets/img/blank.svg' }}">
+				</div>
+			</a>
+
+			<div class="ms-0">
+				{# Username #}
+				<a href="{{ path('UserProfile:admin.newedit.edit', { id: item.event }) }}"
+						class="text-decoration-none"
+				>{{ item.user_profile_username }}</a>
+				{# Описание #}
+				<div class="text-muted small d-flex align-items-center gap-1">
+					<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor"
+							viewBox="0 0 16 16">
+						<path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A31.493 31.493 0 0 1 8 14.58a31.481 31.481 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94zM8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10z" />
+						<path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
+					</svg>
+					{{ item.user_profile_location }}
+				</div>
+
+			</div>
+		</div>
+	</td>
+
+	<td>
+		{{ item.user_profile_type }}
+	</td>
+
+	<td>
+
+		<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+			<path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1 11.105l4.708-2.897L1 5.383v5.722Z" />
+		</svg>
+
+		<a href="{{ path('AuthEmail:admin.newedit.edit', { id: item.account_id }) }}"
+				class="text-decoration-none ms-2"
+		>{{ item.account_email }}</a>
+	</td>
+
+	<td class="text-center">
+		{% if item.user_profile_active %}
+			{# <div class="badge bg-success px-2"> #}
+			{# {{ 'user.active.label'|trans }} #}{# &nbsp; #}
+			{# <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="text-success" viewBox="0 0 16 16">
+                    <path d="M2.5 8a5.5 5.5 0 0 1 8.25-4.764.5.5 0 0 0 .5-.866A6.5 6.5 0 1 0 14.5 8a.5.5 0 0 0-1 0 5.5 5.5 0 1 1-11 0z"/>
+                    <path d="M15.354 3.354a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l7-7z"/>
+                </svg> #}
+
+			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="text-success"
+					viewBox="0 0 16 16">
+				<path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
+			</svg>
+			{# </div> #}
+		{% else %}
+			---
+		{% endif %}
+	</td>
+
+	<td class="text-center">
+		{{ user_profile_status(item.user_profile_status) }}
+	</td>
+	{% if is_granted('ROLE_ADMIN') %}
+		<td class="text-center">
+			{# Прейти в режим пользователя #}
+			<a href='{{ path('Pages:user.homepage', {'_switch_user' : item.user_id }) }}'
+					class="badge bg-light text-dark">Авторизоваться</a>
+		</td>
+	{% endif %}
+
+</tr>

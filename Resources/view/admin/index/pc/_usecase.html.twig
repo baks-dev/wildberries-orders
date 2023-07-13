@@ -1,0 +1,66 @@
+{# Пользовательское меню #}
+
+<button class="btn btn-link btn-sm p-0"
+		id="usecase-{{ item.event }}"
+		data-bs-container="body"
+		data-bs-toggle="popover"
+		data-bs-placement="right"
+		data-bs-trigger="click"
+>
+	<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+			fill="currentColor" class="text-muted"
+			viewBox="0 0 16 16">
+		<path fill-rule="evenodd"
+				d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z" />
+	</svg>
+</button>
+
+
+{# Чекбокс #}
+<label>
+	<input class="form-check-input ms-3 p-2" type="checkbox"
+			{# onchange=checkedItem(); #}
+			value="{{ item.event }}">
+</label>
+
+
+<div id="usecase-{{ item.event }}-content" class="d-none">
+	<ul class="leader list-group list-group-flush ">
+		
+		
+		{# Активировать #}
+		{# {% if item.active == false and item.status == 'act' %}
+			<li class="list-group-item d-flex justify-content-between bg-transparent border-0 text-truncate rounded-5">
+				<a href="{{ path('UserProfile:user.activate', {id: item.event }) }}"
+				   class="text-decoration-none text-dark w-100"
+				   title="{{ 'btn.apply'|trans({}, 'messages') }}">
+					{{ 'btn.apply'|trans }}
+				</a>
+			</li>
+		{% endif %} #}
+		
+		{# Редактировать #}
+		{# <li class="list-group-item d-flex justify-content-between bg-transparent border-0 text-truncate rounded-5">
+			<a href="{{ path('UserProfile:user.newedit.edit', {id: item.event }) }}"
+			   class="text-decoration-none text-dark w-100"
+			   title="{{ 'btn.edit'|trans({}, 'core.btn') }}">
+				{{ 'btn.edit'|trans({}, 'core.btn') }}
+			</a>
+		</li> #}
+		
+		{# Удалить #}
+		{# <li class="list-group-item d-flex justify-content-between bg-transparent border-0 text-truncate rounded-5">
+				<a href="{{ path('UserProfile:user.delete', { id: item.event }) }}"
+				   class="text-decoration-none text-dark w-100 modal-link"
+				   data-bs-toggle="modal"
+				   data-bs-target="#modal"
+				   title="{{ 'btn.delete'|trans({}, 'core.btn') }}">
+					{{ 'btn.delete'|trans({}, 'core.btn') }}
+				</a>
+			</li> #}
+	
+	</ul>
+</div>
+
+
+

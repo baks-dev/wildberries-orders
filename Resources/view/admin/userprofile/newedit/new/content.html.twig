@@ -1,0 +1,17 @@
+{{ include(_self|replace({ "content.html.twig": "_breadcrumb.html.twig" })) }}
+
+<div class="d-flex flex-column-fluid align-items-start container mt-3">
+	
+	<div class="clearfix position-absolute w-100 start-0 separator mt-3"></div>
+	
+	<div class="content flex-row-fluid mt-10">
+		{{ form_start(form) }}
+		<div class="d-flex flex-column w-100">
+			{{ include(_self|replace({ "new/content.html.twig": "form.html.twig" })) }}
+			
+			{# Блок кнопок #}
+			{{ include(_self|replace({ "content.html.twig": "_btn.html.twig" })) }}
+		</div>
+		{{ form_end(form) }}
+	</div>
+</div>

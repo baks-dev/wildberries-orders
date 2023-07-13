@@ -1,0 +1,18 @@
+# Роль
+
+ROLE_USERPROFILE:
+  name: 'Профили пользователей'
+  desc: 'Профили пользователей'
+
+# Правила
+
+ROLE_USERPROFILE_NEW:
+  name: 'Добавить'
+
+ROLE_USERPROFILE_EDIT:
+  name: 'Редактировать'
+
+ROLE_USERPROFILE_DELETE:
+  name: 'Удалить'
+
+

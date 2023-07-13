@@ -1,0 +1,64 @@
+{% trans_default_domain 'userprofile' %}
+
+<div class="d-flex flex-column w-100">
+	<div class="d-flex">
+		<div class="d-flex flex-column gap-2 w-50 mb-5 me-2">
+			
+			<div class="card card-flush">
+				<div class="card-header">
+					<div class="card-title">
+						<h2>
+							{# Администрирование #}
+							{{ 'user.profile.form.administration.header'|trans }}
+						</h2>
+					</div>
+				</div>
+				
+				{# Администрирование #}
+				{{ include(_self|replace({ "form.html.twig": "_administration.html.twig" })) }}
+			
+			</div>
+			
+			
+			{# Настройки локали #}
+			<div class="card card-flush">
+				
+				<div class="card-header">
+					<div class="card-title">
+						<h2>
+							{# Основные настройки #}
+							{{ 'user.profile.form.basic.header'|trans }}
+						</h2>
+					</div>
+				</div>
+				
+				<div class="card-body pt-0">
+					
+					<div class="d-flex pt-5">
+						<div class="w-50">
+							{# Файл аватарки #}
+							{{ include(_self|replace({ "form.html.twig": "_avatar.html.twig" })) }}
+						</div>
+						<div class="w-50">
+							{# Основные настройки #}
+							{{ include(_self|replace({ "form.html.twig": "_basic.html.twig" })) }}
+						</div>
+					</div>
+					
+					{{ form_row(form.sort, { label: 'admin.form.sort.label'|trans }) }}
+				</div>
+			</div>
+			
+			{# Личные данные #}
+			{{ include(_self|replace({ "form.html.twig": "_personal.html.twig" })) }}
+		</div>
+		
+		
+		<div class="d-flex flex-column gap-2 w-50 mb-7 me-2">
+			{# Динамические поля формы #}
+			{{ include(_self|replace({ "form.html.twig": "_fields.html.twig" })) }}
+		</div>
+	
+	</div>
+
+</div>

@@ -1,0 +1,7 @@
+{% trans_default_domain 'userprofile' %}
+
+{# Имя пользователя #}
+{{ form_row(form.personal.username, {  label : 'Имя профиля'|trans }) }}
+
+{# URL Адрес профиля #}
+{{ form_row(form.info.url, {  label : 'user.profile.form.info.label.url'|trans }) }}

@@ -1,0 +1,62 @@
+{% trans_default_domain('admin.user.profile') %}
+
+{# ---- ШАБЛОН ------------------------------------------------------------ #}
+{% extends Template('/admin/base.html.twig') %}
+
+
+{% block title %}
+	{# Редактировать профиль пользователя #}
+	{{ 'admin.page.edit'|trans }}
+{% endblock %}
+
+{# ---- CSS ------------------------------------------------------------ #}
+{% block stylesheets %}
+	<link href="/assets/plugins/datepicker/datepicker.min.css" rel="stylesheet">
+{% endblock %}
+
+{# ---- HEADER-БЛОК ------------------------------------------------------------ #}
+{# {% block header %}
+    {{ include(_self|replace({ "template.html.twig": "header.html.twig" })) }}
+{% endblock %} #}
+
+{# ---- LEFT-БЛОК ------------------------------------------------------------ #}
+{# {% block left %} #}
+{#   {% include '@Template/flowers/left.html.twig' %} #}
+{# {% endblock %} #}
+
+
+{# ---- КОНТЕНТ-БЛОК ------------------------------------------------------------ #}
+{% block content %}
+	{{ include(_self|replace({ "template.html.twig": "content.html.twig" })) }}
+{% endblock %}
+
+
+{# ---- FOOTER-БЛОК ------------------------------------------------------------ #}
+{#
+{% block footer %}
+    {{ include(_self|replace({ "template.html.twig": "footer.html.twig" })) }}
+{% endblock %}
+#}
+
+
+{% block javascript %}
+
+<script nonce="{{ csp_nonce() }}" data-src="/assets/js/image.input.min.js?v={{ version }}" defer class="lazy"></script>
+<script nonce="{{ csp_nonce() }}" data-src="/assets/js/radio.input.min.js?v={{ version }}" defer class="lazy"></script>
+<script nonce="{{ csp_nonce() }}" data-src="/assets/plugins/semantic/semantic.min.js?v={{ version }}" defer class="lazy"></script>
+<script nonce="{{ csp_nonce() }}" data-src="/assets/plugins/datepicker/datepicker.min.js?v={{ version }}" defer class="lazy"></script>
+<script nonce="{{ csp_nonce() }}" data-src="/assets/plugins/geocountry/geocountry.min.js?v={{ version }}" defer class="lazy pointer"></script>
+<script nonce="{{ csp_nonce() }}" data-src="/assets/plugins/inputmask/inputmask.min.js?v={{ version }}" defer class="lazy"></script>
+<script nonce="{{ csp_nonce() }}" data-src="/assets/profile_user/script.min.js?v={{ version }}" defer class="lazy"></script>
+
+{% if MAPS_YANDEX_API is defined %}
+    <script nonce="{{ csp_nonce() }}" data-src="https://api-maps.yandex.ru/2.1/?apikey={{ MAPS_YANDEX_API }}&lang={{ app.request.locale|lower }}" defer class="lazy"></script>
+{% endif %}
+
+<script nonce="{{ csp_nonce() }}">
+$profileCity.addEventListener('input', getCountry.debounce(500));
+	</script>
+
+{% endblock %}
+
+
