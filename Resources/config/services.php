@@ -23,7 +23,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
-return static function (ContainerConfigurator $configurator) {
+return static function(ContainerConfigurator $configurator) {
     $services = $configurator->services()
         ->defaults()
         ->autowire()      // Automatically injects dependencies in your services.
@@ -38,5 +38,9 @@ return static function (ContainerConfigurator $configurator) {
     $services->load($namespace.'\Controller\\', __DIR__.'/../../Controller')
         ->tag('controller.service_arguments')
         ->exclude(__DIR__.'/../../Controller/**/*Test.php');
+
+
+    $services->load($namespace.'\Type\OrderStatus\Status\\', __DIR__.'/../../Type/OrderStatus/Status');
+    $services->load($namespace.'\Type\WildberriesStatus\Status\\', __DIR__.'/../../Type/WildberriesStatus/Status');
 
 };
