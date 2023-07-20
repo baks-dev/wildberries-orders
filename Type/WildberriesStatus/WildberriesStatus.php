@@ -2,7 +2,7 @@
 
 namespace BaksDev\Wildberries\Orders\Type\WildberriesStatus;
 
-use BaksDev\Wildberries\Orders\Type\OrderStatus\Status\Collection\WbOrderStatusInterface;
+
 use BaksDev\Wildberries\Orders\Type\WildberriesStatus\Status\Collection\WildberriesStatusInterface;
 use InvalidArgumentException;
 
@@ -28,7 +28,7 @@ final class WildberriesStatus
 
         if($status instanceof $this)
         {
-            $this->status = $status->getValue();
+            $this->status = $status->getStatus();
             return;
         }
 
@@ -40,7 +40,7 @@ final class WildberriesStatus
                 if($class::equals($status))
                 {
                     $this->status = new $class;
-                    break;
+                    return;
                 }
             }
         }
@@ -57,7 +57,7 @@ final class WildberriesStatus
 
 
     /** Возвращает значение ColorsInterface */
-    public function getStatus(): WbOrderStatusInterface
+    public function getStatus(): WildberriesStatusInterface
     {
         return $this->status;
     }
@@ -88,78 +88,8 @@ final class WildberriesStatus
     public static function getDeclaredWildberriesStatus(): array
     {
         return array_filter(get_declared_classes(), static function($className) {
-            return in_array(WbOrderStatusInterface::class, class_implements($className), true);
+            return in_array(WildberriesStatusInterface::class, class_implements($className), true);
         });
     }
-
-
-
-    //	/**
-    //	 * @var WbClientStatusEnum
-    //	 */
-    //	private WbClientStatusEnum $status;
-    //
-    //
-    //	public function __construct(int|self|WbClientStatusEnum $status)
-    //	{
-    //		if($status instanceof self)
-    //		{
-    //			$this->status = WbClientStatusEnum::from($status->getValue());
-    //		}
-    //		else if($status instanceof WbClientStatusEnum)
-    //		{
-    //			$this->status = $status;
-    //		}
-    //		else
-    //		{
-    //			$this->status = WbClientStatusEnum::from($status);
-    //		}
-    //	}
-    //
-    //
-    //	/**
-    //	 * @return string
-    //	 */
-    //	public function __toString() : string
-    //	{
-    //		return $this->status->value;
-    //	}
-    //
-    //
-    //	public function getValue() : int
-    //	{
-    //		return $this->status->value;
-    //	}
-    //
-    //
-    //	/**
-    //	 * @return string
-    //	 */
-    //	public function getName() : string
-    //	{
-    //		return $this->status->name;
-    //	}
-    //
-    //
-    //	/**
-    //	 * @return array
-    //	 */
-    //	public static function cases() : array
-    //	{
-    //		$case = null;
-    //
-    //		foreach(WbClientStatusEnum::cases() as $status)
-    //		{
-    //			$case[] = new self($status);
-    //		}
-    //
-    //		return $case;
-    //	}
-    //
-    //
-    //	public function equals(WbClientStatusEnum $status) : bool
-    //	{
-    //		return $this->status === $status;
-    //	}
 
 }

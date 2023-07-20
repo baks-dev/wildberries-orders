@@ -25,8 +25,8 @@ declare(strict_types=1);
 
 namespace BaksDev\Wildberries\Orders\Listeners\Event;
 
-use BaksDev\Wildberries\Orders\Type\OrderStatus\WbOrderStatusType;
 use BaksDev\Wildberries\Orders\Type\WildberriesStatus\Status\Collection\WildberriesStatusCollection;
+use BaksDev\Wildberries\Orders\Type\WildberriesStatus\WildberriesStatusType;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
@@ -52,7 +52,7 @@ final class WildberriesStatusListener
     public function onKernelController(ControllerEvent $event): void
     {
         // Инициируем статусы
-        if(in_array(WbOrderStatusType::class, get_declared_classes(), true))
+        if(in_array(WildberriesStatusType::class, get_declared_classes(), true))
         {
             $this->collection->cases();
         }

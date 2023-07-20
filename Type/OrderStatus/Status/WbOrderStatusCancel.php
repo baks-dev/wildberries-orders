@@ -53,7 +53,7 @@ final class WbOrderStatusCancel implements WbOrderStatusInterface
      */
     public static function sort(): int
     {
-        return 100;
+        return 400;
     }
 
 

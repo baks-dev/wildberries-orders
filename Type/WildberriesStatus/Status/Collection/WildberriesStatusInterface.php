@@ -25,7 +25,7 @@ namespace BaksDev\Wildberries\Orders\Type\WildberriesStatus\Status\Collection;
 
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
-#[AutoconfigureTag('baks.wb.order.status')]
+#[AutoconfigureTag('baks.wb.status')]
 interface WildberriesStatusInterface
 {
     /**

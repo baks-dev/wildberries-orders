@@ -118,10 +118,10 @@ class WbOrdersModify extends EntityEvent
     }
 
 
-    public function upModifyAgent(IpAddress $ipAddress, string $userAgent): void
+    public function upModifyAgent(IpAddress $ipAddress, ?string $userAgent): void
     {
         $this->ipAddress = $ipAddress;
-        $this->userAgent = $userAgent;
+        $this->userAgent = $userAgent ?: 'console';
         $this->modDate = new DateTimeImmutable();
     }
 

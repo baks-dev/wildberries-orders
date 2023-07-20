@@ -1,13 +1,16 @@
-ROLE_USERPROFILE:
-  name: 'User profiles'
-  desc: 'User profiles'
+# Role
 
+ROLE_WB_ORDERS:
+  name: 'Orders'
+  desc: 'Wildberries orders'
 
-ROLE_USERPROFILE_NEW:
+# Rules
+
+ROLE_WB_ORDERS_NEW:
   name: 'Add'
 
-ROLE_USERPROFILE_EDIT:
+ROLE_WB_ORDERS_EDIT:
   name: 'Edit'
 
-ROLE_USERPROFILE_DELETE:
+ROLE_WB_ORDERS_DELETE:
   name: 'Delete'

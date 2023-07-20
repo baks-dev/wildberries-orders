@@ -3,17 +3,17 @@
 namespace BaksDev\Wildberries\Orders\Type\OrderStatus;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Types\IntegerType;
+use Doctrine\DBAL\Types\StringType;
 use InvalidArgumentException;
 
-final class WbOrderStatusType extends IntegerType
+final class WbOrderStatusType extends StringType
 {
 
     public function convertToDatabaseValue($value, AbstractPlatform $platform): mixed
     {
         return $value instanceof WbOrderStatus ? $value->getStatusValue() : (new WbOrderStatus($value))->getStatusValue();
     }
-    
+
 
     public function convertToPHPValue($value, AbstractPlatform $platform): mixed
     {

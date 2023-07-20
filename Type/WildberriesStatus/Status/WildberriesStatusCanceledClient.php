@@ -52,7 +52,7 @@ final class WildberriesStatusCanceledClient implements WildberriesStatusInterfac
      */
     public static function sort(): int
     {
-        return 100;
+        return 600;
     }
 
 

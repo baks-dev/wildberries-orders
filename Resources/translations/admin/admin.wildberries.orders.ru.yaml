@@ -1,38 +1,24 @@
 admin:
   page:
-    index: 'Табель учета'
-    new: 'Добавить профиль пользователя'
-    edit: 'Редактировать профиль пользователя'
+    index: 'Заказы Wildberries'
+
   breadcrumb:
-    index: 'Профили пользователей'
-    edit: 'Редактировать профиль'
-  form:
-    header:
-      administration: 'Администрирвоание'
-      basic: 'Основные настройки'
-      personal: 'Личные данные'
-    label:
-      info:
-        user: 'Пользователь'
-        status: 'Статус модерации профиля'
-      birthday: 'Дата рождения'
-      location: 'Местоположение'
-      avatar: 'Принимаются только файлы изображений .png, .jpg, .jpeg и .webp'
-      username: 'Имя профиля'
-      url: 'URL Адрес профиля'
-      sort: 'Сортировка'
-      discount: 'Персональная скидка'
+    index: 'Заказы Wildberries'
 
-    placeholder:
-      info:
-        user: 'Выберите пользователя из списка...'
-  success:
-    update: 'Профиль успешно обновлен'
-    new: 'Профиль успешно добавлен'
-    delete: 'Профиль успешно удален'
-  danger:
-    update: '%s: Ошибка при обновлении профиля'
-    new: '%s: Ошибка при добавлении профиля'
-    delete: '%s: Ошибка при удалении профиля'
 
+unknown:  'Неизвестный'
+
+new:  'Новый'
+confirm:  'Собран'
+complete:  'Выполнен'
+cancel: 'Отменено'
+
+
+waiting: 'Ожидаеет'
+sorted: 'Отсортировано'
+ready_for_pickup: 'ПВЗ'
+sold: 'Доставлен'
+canceled: 'Отмена'
+canceled_by_client: 'Отмена покупателем'
+defect: 'Брак'
 

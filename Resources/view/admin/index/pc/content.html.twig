@@ -1,115 +1,204 @@
-{% trans_default_domain('admin.user.profile') %}
+{% trans_default_domain('admin.wildberries.orders') %}
 
 
 <main class="main ">
-	
-	<section class="container px-4 mb-5">
-		
-		<div class="mt-3 d-flex justify-content-between">
-			{{ include(_self|replace({ "content.html.twig": "_breadcrumb.html.twig" })) }}
-		</div>
-		
-		<div class="d-flex justify-content-between align-items-center mb-3">
-			
-			<div class="w-100">
-				<h1 class="h4 text-uppercase fw-bolder mb-0">
-					{{ 'admin.page.index'|trans }}
-					
-					
-					{# Обновить #}
-					<a href="/refresh" class="btn  btn-link text-muted">
-						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
-								class="mb-1" viewBox="0 0 16 16">
-							<path fill-rule="evenodd"
-									d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"></path>
-							<path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"></path>
-						</svg>
-					</a>
-				</h1>
-			</div>
-			
-			
-			<div class="w-100 d-flex align-items-center gap-3 justify-content-end">
-			
-			
-			</div>
-			
-			{# Добавить #}
-			{# {% if is_granted(ROLE~'_NEW') or is_granted('ROLE_ADMIN') %}
+
+    <section class="container px-4 mb-5">
+
+        <div class="mt-3 d-flex justify-content-between">
+            {{ include(_self|replace({ "content.html.twig": "_breadcrumb.html.twig" })) }}
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center mb-3">
+
+            <div class="w-100">
+                <h1 class="h4 text-uppercase fw-bolder mb-0">
+                    {{ 'admin.page.index'|trans }}
+
+
+                    {# Обновить #}
+                    <a href="/refresh" class="btn  btn-link text-muted">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
+                             class="mb-1" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd"
+                                  d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"></path>
+                            <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"></path>
+                        </svg>
+                    </a>
+                </h1>
+            </div>
+
+
+            <div class="w-100 d-flex align-items-center gap-3 justify-content-end">
+                {{ form_start(profile) }}
+                <div class="d-flex justify-content-end position-relative my-1 gap-3">
+
+                    <div class="w-50">
+                        {{ form_widget(profile.profile, {
+                            placeholder: 'Выберите профиль из списка ...', attr: { 'data-select' : 'select2', class: 'mb-0' } }) }}
+                    </div>
+                </div>
+                {{ form_end(profile) }}
+            </div>
+
+            {# Добавить #}
+            {# {% if is_granted(ROLE~'_NEW') or is_granted('ROLE_ADMIN') %}
 				<a href="{{ path('ProfileType:admin.newedit.new') }}" class="btn btn-danger fw-bolder">
 					{{ 'btn.new'|trans({}, 'core.btn') }}
 				</a>
 			{% endif %} #}
-		
-		
-		</div>
-		
-		<div class="border  border-light  rounded-4 p-3 p-3">
-			
-			{# ПОИСК #}
-			<div class="col-3">
-				{% include Template('/_includes/'~baks_settings.device~'/search.html.twig') %}
-			</div>
-			
-			<table class="table table-striped table-borderless mt-3"
-					style='--bs-table-striped-bg: rgba(249,249,249,0.7);'>
-				<thead>
-				<tr class="text-muted">
-					<th>#</th>
-					
-					<th>
-						{# Профиль пользователя #}
-						Профиль пользователя
-					</th>
-					
-					<th>
-						{# Тип профиля #}
-						Тип профиля
-					</th>
-					
-					<th>
-						{# Аккаунт #}
-						Аккаунт
-					</th>
-					
-					<th class="text-center">
-						{# Состояние #}
-						Состояние
-					</th>
-					
-					<th class="text-center">
-						{# Статус #}
-						Статус
-					</th>
-					{% if is_granted('ROLE_ADMIN') %}
-						<th class="text-center">
-							{# Статус #}
-							Режим пользователя
-						</th>
-					{% endif %}
-				
-				</tr>
-				</thead>
-				<tbody>
-
-				{% for item in query.data %}
-
-					{{ include(_self|replace({ "content.html.twig": "card.html.twig" })) }}
-				{% endfor %}
 
 
-				</tbody>
-			</table>
-			
-			{% include Template('_includes/'~baks_settings.device~'/pagination.html.twig') with { 'pagination' : query } %}
-		
-		</div>
-	
-	</section>
+        </div>
+
+        <div class="border  border-light rounded-4 p-3 mb-3">
+
+            {# ПОИСК #}
+            <div class="d-flex justify-content-between align-items-start gap-3">
+
+                <div class="col-3 p-1">
+                    {% include Template('/_includes/'~baks_settings.device~'/search.html.twig') %}
+                </div>
+
+                <div class="w-100">
+                    {{ form_start(filter) }}
+                    <div class="d-flex justify-content-end align-items-center my-1 gap-3">
+
+                        <div class="w-25">
+                            {{ form_widget(filter.category, { placeholder: 'Все категории ...', attr: { 'data-select' : 'select2', class: 'mb-0' } }) }}
+                        </div>
+
+                        {% if filter.vars.data.category %}
+
+                            {% if filter.offer is defined %}
+
+                                <div class="w-25">
+                                    {{ form_widget(filter.offer, { placeholder: filter.offer.vars.label~' ...' , attr: { 'data-select' : 'select2', class: 'mb-0' } }) }}
+                                </div>
+                            {% endif %}
+
+
+                            {% if filter.variation is defined %}
+                                <div class="w-25">
+                                    {{ form_widget(filter.variation, { placeholder: filter.variation.vars.label~' ...', attr: { 'data-select' : 'select2', class: 'mb-0' } }) }}
+                                </div>
+                            {% endif %}
+
+                            {% if filter.modification is defined %}
+                                <div class="w-25">
+                                    {{ form_widget(filter.modification, { placeholder:  filter.modification.vars.label~' ...', attr: { 'data-select' : 'select2', class: 'mb-0' } }) }}
+                                </div>
+                            {% endif %}
+
+                        {% endif %}
+
+                        <button class="btn btn-primary"
+                                type="button"
+                                data-bs-toggle="collapse"
+                                data-bs-target="#multiCollapseExample2"
+                                aria-expanded="false"
+                                aria-controls="multiCollapseExample2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                 class="bi bi-filter" viewBox="0 0 16 16">
+                                <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>
+                            </svg>
+
+                        </button>
+
+                    </div>
+
+                    <div class="collapse multi-collapse" id="multiCollapseExample2" style="max-height: 50px;">
+                        <div class="d-flex justify-content-end align-items-center my-1 gap-3 mt-3">
+                            <div class="w-25">{{ form_widget(filter.status, { placeholder: 'Любой статус заказа', attr: { 'data-select' : 'select2', class: 'mb-0' } }) }}</div>
+
+                            <div class="w-25">{{ form_widget(filter.wildberries, { placeholder: 'Любой статус Wildberries', attr: { 'data-select' : 'select2', class: 'mb-0' } }) }}</div>
+
+                            <button class="btn btn-primary invisible"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#multiCollapseExample2"
+                                    aria-expanded="false"
+                                    aria-controls="multiCollapseExample2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-filter" viewBox="0 0 16 16">
+                                    <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>
+                                </svg>
+
+                            </button>
+                        </div>
+                    </div>
+
+
+                    {# <div class="collapse multi-collapse" id="multiCollapseExample2">
+                            <div class="d-flex justify-content-end align-items-center my-1 gap-3" style="clear: both;">
+
+                            </div>
+                        </div> #}
+
+
+                    {{ form_end(filter) }}
+                </div>
+
+
+            </div>
+
+
+            <div class="row cards-box-body mt-3">
+
+                <div class="d-flex gap-3">
+
+                    {% if filter.category.vars.data %}
+                        <div><small class="text-muted">Категория:</small>&nbsp;
+                            <strong>{{ filter.category.vars.data.options }}</strong>
+                        </div>
+                    {% endif %}
+
+                    {% if filter.offer is defined and filter.offer.vars.data %}
+                        <div><small class="text-muted small">{{ filter.offer.vars.label }}:</small>&nbsp;
+                            <strong> {{ filter.offer.vars.data|trans({}, 'reference.color') }}</strong>
+                        </div>
+                    {% endif %}
+
+                    {% if filter.variation is defined and filter.variation.vars.data %}
+                        <div><small class="text-muted small">{{ filter.variation.vars.label }}:</small>&nbsp;
+                            <strong>{{ filter.variation.vars.data }}</strong>
+                        </div>
+                    {% endif %}
+
+                    {% if filter.modification is defined and filter.modification.vars.data %}
+                        <div><small class="text-muted small">{{ filter.modification.vars.label }}:</small>&nbsp;
+                            <strong>{{ filter.modification.vars.data }}</strong>
+                        </div>
+                    {% endif %}
+
+
+                    {% if filter.status is defined and filter.status.vars.data %}
+                        <div><small class="text-muted small">Статус заказа:</small>&nbsp;
+                            <strong>{{ wb_order_status(filter.status.vars.data.value) }}</strong>
+                        </div>
+                    {% endif %}
+
+                    {% if filter.wildberries is defined and filter.wildberries.vars.data %}
+                        <div><small class="text-muted small">Статус Wildberries:</small>&nbsp;
+                            <strong>{{ wb_order_status(filter.wildberries.vars.data.value) }}</strong>
+                        </div>
+                    {% endif %}
+
+                </div>
+
+
+                {% for item in query.data %}
+                    {{ include(_self|replace({ "content.html.twig": "card.html.twig" })) }}
+                {% endfor %}
+            </div>
+
+        </div>
+
+        {% include Template('_includes/'~baks_settings.device~'/pagination.html.twig') with { 'pagination' : query } %}
+
+    </section>
 
 </main>
-
-
 
 
 {# Тюлбар #}

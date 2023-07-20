@@ -29,6 +29,12 @@ use BaksDev\Core\Controller\AbstractController;
 use BaksDev\Core\Form\Search\SearchDTO;
 use BaksDev\Core\Form\Search\SearchForm;
 use BaksDev\Core\Listeners\Event\Security\RoleSecurity;
+use BaksDev\Wildberries\Orders\Forms\WbFilterProfile\ProfileFilterDTO;
+use BaksDev\Wildberries\Orders\Forms\WbFilterProfile\ProfileFilterForm;
+use BaksDev\Wildberries\Orders\Forms\WbFilterProfile\ProfileFilterFormAdmin;
+use BaksDev\Wildberries\Orders\Forms\WbOrdersFilter\WbOrdersFilterDTO;
+use BaksDev\Wildberries\Orders\Forms\WbOrdersFilter\WbOrdersFilterForm;
+use BaksDev\Wildberries\Orders\Repository\AllWbOrders\AllWbOrdersInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -40,30 +46,74 @@ final class IndexController extends AbstractController
     #[Route('/admin/wb/orders/{page<\d+>}', name: 'admin.index', methods: ['GET', 'POST'])]
     public function index(
         Request $request,
-        //AllWbOrdersInterface $allWbOrders,
+        AllWbOrdersInterface $allWbOrders,
         int $page = 0,
     ): Response
     {
-        dd(654654545);
+        /**
+         * Поиск
+         */
 
-        // Поиск
         $search = new SearchDTO();
-        $searchForm = $this->createForm(SearchForm::class, $search);
+        $searchForm = $this->createForm(
+            SearchForm::class, $search, [
+                'action' => $this->generateUrl('WildberriesOrders:admin.index'),
+            ]
+        );
         $searchForm->handleRequest($request);
 
 
-        // Фильтр
-        // $filter = new ProductsStocksFilterDTO($request, $ROLE_ADMIN ? null : $this->getProfileUid());
-        // $filterForm = $this->createForm(ProductsStocksFilterForm::class, $filter);
-        // $filterForm->handleRequest($request);
+        /**
+         * Фильтр профиля пользователя
+         */
 
-        // Получаем список
-        $WbOrders = $allWbOrders->fetchAllWbOrdersAssociative($search);
+        $profile = new ProfileFilterDTO($request, $this->getProfileUid());
+        $ROLE_ADMIN = $this->isGranted('ROLE_ADMIN');
+
+        if($ROLE_ADMIN)
+        {
+            $profileForm = $this->createForm(ProfileFilterFormAdmin::class, $profile, [
+                'action' => $this->generateUrl('WildberriesOrders:admin.index'),
+            ]);
+        }
+        else
+        {
+            $profileForm = $this->createForm(ProfileFilterForm::class, $profile, [
+                'action' => $this->generateUrl('WildberriesOrders:admin.index'),
+            ]);
+        }
+
+        $profileForm->handleRequest($request);
+
+
+        /**
+         * Фильтр заказов
+         */
+
+        $filter = new WbOrdersFilterDTO($request);
+        $filterForm = $this->createForm(WbOrdersFilterForm::class, $filter, [
+            'action' => $this->generateUrl('WildberriesOrders:admin.index'),
+        ]);
+        $filterForm->handleRequest($request);
+
+        if($filterForm->isSubmitted())
+        {
+            $this->redirectToReferer();
+        }
+
+
+        /**
+         * Получаем список
+         */
+
+        $WbOrders = $allWbOrders->fetchAllWbOrdersAssociative($search, $profile, $filter);
 
         return $this->render(
             [
                 'query' => $WbOrders,
                 'search' => $searchForm->createView(),
+                'profile' => $profileForm->createView(),
+                'filter' => $filterForm->createView(),
             ]
         );
     }

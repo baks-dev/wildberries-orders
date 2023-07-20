@@ -35,12 +35,12 @@ class WbOrderClient extends EntityEvent
     public const TABLE = 'wb_orders_client';
 
     /**
-     * ID события
+     * Идентификатор события
      */
     #[Assert\NotBlank]
     #[ORM\Id]
     #[ORM\OneToOne(inversedBy: 'client', targetEntity: WbOrdersEvent::class)]
-    #[ORM\JoinColumn(name: 'event_id', referencedColumnName: 'id')]
+    #[ORM\JoinColumn(name: 'event', referencedColumnName: 'id')]
     private WbOrdersEvent $event;
 
     /**

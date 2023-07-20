@@ -19,6 +19,7 @@
 namespace BaksDev\Wildberries\Orders\Entity\Event;
 
 use BaksDev\Core\Entity\EntityEvent;
+use BaksDev\Orders\Order\Entity\Order;
 use BaksDev\Orders\Order\Type\Id\OrderUid;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Wildberries\Orders\Entity\Client\WbOrderClient;
@@ -39,7 +40,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'wb_orders_event')]
-#[ORM\Index(columns: ['orders'])]
+#[ORM\Index(columns: ['ord'])]
 #[ORM\Index(columns: ['barcode'])]
 #[ORM\Index(columns: ['profile'])]
 #[ORM\Index(columns: ['status'])]
@@ -52,7 +53,7 @@ class WbOrdersEvent extends EntityEvent
      * Идентификатор события
      */
     #[Assert\NotBlank]
-    #[Assert\NotBlank]
+    #[Assert\Uuid]
     #[ORM\Id]
     #[ORM\Column(type: WbOrdersEventUid::TYPE)]
     private WbOrdersEventUid $id;
@@ -138,6 +139,16 @@ class WbOrdersEvent extends EntityEvent
         return $this->id;
     }
 
+
+    public function getOrd(): ?OrderUid
+    {
+        return $this->ord;
+    }
+
+    public function setOrd(OrderUid|Order $ord): void
+    {
+        $this->ord = $ord instanceof Order ? $ord->getId() : $ord;
+    }
 
     public function getDto($dto): mixed
     {

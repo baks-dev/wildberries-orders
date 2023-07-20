@@ -1,7 +1,7 @@
 {# Пользовательское меню #}
 
 <button class="btn btn-link btn-sm p-0"
-		id="usecase-{{ item.event }}"
+		id="usecase-{{ item.wb_order_id }}"
 		data-bs-container="body"
 		data-bs-toggle="popover"
 		data-bs-placement="right"
@@ -17,48 +17,67 @@
 
 
 {# Чекбокс #}
-<label>
+{#<label>
 	<input class="form-check-input ms-3 p-2" type="checkbox"
-			{# onchange=checkedItem(); #}
+			#}{# onchange=checkedItem(); #}{#
 			value="{{ item.event }}">
-</label>
+</label>#}
 
 
-<div id="usecase-{{ item.event }}-content" class="d-none">
+<div id="usecase-{{ item.wb_order_id }}-content" class="d-none">
 	<ul class="leader list-group list-group-flush ">
-		
-		
-		{# Активировать #}
-		{# {% if item.active == false and item.status == 'act' %}
+
+
+		{% if constant('BaksDev\\Manufacture\\Part\\Entity\\ManufacturePart::TABLE') is defined %}
+
 			<li class="list-group-item d-flex justify-content-between bg-transparent border-0 text-truncate rounded-5">
-				<a href="{{ path('UserProfile:user.activate', {id: item.event }) }}"
-				   class="text-decoration-none text-dark w-100"
-				   title="{{ 'btn.apply'|trans({}, 'messages') }}">
-					{{ 'btn.apply'|trans }}
-				</a>
-			</li>
-		{% endif %} #}
-		
-		{# Редактировать #}
-		{# <li class="list-group-item d-flex justify-content-between bg-transparent border-0 text-truncate rounded-5">
-			<a href="{{ path('UserProfile:user.newedit.edit', {id: item.event }) }}"
-			   class="text-decoration-none text-dark w-100"
-			   title="{{ 'btn.edit'|trans({}, 'core.btn') }}">
-				{{ 'btn.edit'|trans({}, 'core.btn') }}
-			</a>
-		</li> #}
-		
-		{# Удалить #}
-		{# <li class="list-group-item d-flex justify-content-between bg-transparent border-0 text-truncate rounded-5">
-				<a href="{{ path('UserProfile:user.delete', { id: item.event }) }}"
+
+				{#<a href="{{ path('UsersTable:admin.action.delete', { id: item.event }) }}"
 				   class="text-decoration-none text-dark w-100 modal-link"
 				   data-bs-toggle="modal"
 				   data-bs-target="#modal"
 				   title="{{ 'btn.delete'|trans({}, 'core.btn') }}">
-					{{ 'btn.delete'|trans({}, 'core.btn') }}
+					Добавить партию производства
+				</a>#}
+
+				<a href="{{ path('ManufacturePart:admin.newedit.new', {
+					product: item.wb_product_event,
+					offer: item.wb_product_offer,
+					variation: item.wb_product_variation,
+					modification: item.wb_product_modification,
+				}) }}"
+				   class="text-decoration-none text-dark w-100 modal-link"
+				   title="На страницу товара WB"
+				   data-bs-toggle="modal"
+				   data-bs-target="#modal"
+				>
+					Добавить партию производства
 				</a>
-			</li> #}
-	
+			</li>
+
+		{% endif %}
+
+
+
+		<li class="list-group-item d-flex justify-content-between bg-transparent border-0 text-truncate rounded-5">
+			<a href="https://www.wildberries.ru/catalog/{{ item.wb_order_nomenclature }}/detail.aspx"
+			   class="text-decoration-none text-dark w-100"
+			   title="На страницу товара WB"
+			   target="_wildberries"
+			>
+				На страницу товара WB
+			</a>
+		</li>
+
+		<li class="list-group-item d-flex justify-content-between bg-transparent border-0 text-truncate rounded-5">
+			<a href="https://seller.wildberries.ru/new-goods/goods/new-product-card?vendorCode={{ item.product_article }}"
+			   class="text-decoration-none text-dark w-100"
+			   title="Редактировать карточку WB"
+			   target="_wildberries"
+			>
+				Редактировать карточку WB
+			</a>
+		</li>
 	</ul>
 </div>
 

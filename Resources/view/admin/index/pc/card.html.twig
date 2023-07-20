@@ -1,110 +1,207 @@
+{# {{ dd(item) }} #}
 
-<tr class="vertical-middle">
+<div class="col-2 p-1">
 
-	{#
-	* id - дентификатор профиля
-	* event - дентификатор события профиля
-	* user_profile_url - адрес персональной страницы
-	* user_id - идентификатор пользовтаеля
+    <div class="border-bottom border-4 rounded-4 bg-primary border-primary">
 
-	* user_profile_status - статус модерации пролфиля
-	* user_profile_active - статус текущей активности профиля
-	* user_profile_username - username пользователя
-	* user_profile_location - местоположение
-	* user_profile_avatar_name - название файла аватарки профиля
-	* user_profile_avatar_dir - директория файла прафиля
-	* user_profile_avatar_ext - расширение файла
-	* user_profile_avatar_cdn - флаг загрузки CDN
-	*
-	* account_id - идентификтаор аккаунта
-	* account_email - email аккаунта
-	* user_profile_type - тип профиля пользователя
-	#}
+        <div class="card bg-light-primary rounded-4">
 
 
-	<td class="text-nowrap">
-		{# Пользовательское меню #}
-		{{ include(_self|replace({ "card.html.twig": "_usecase.html.twig" })) }}
-	</td>
+            <div class="card-body small p-2">
+
+                <div class="d-flex justify-content-between">
+                    <span># {{ item.wb_order_id }}</span>
+                    <span class="small text-muted">{{ item.wb_order_date|date('d.m.Y H:i') }}</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-end">
+                    <span class="h5 mb-0">{{ money(item.order_price, item.order_currency) }}</span>
+                    <span class="small text-muted">1 шт</span>
+                </div>
+
+                <div class="d-flex justify-content-between mt-1">
+                    {{ wb_order_status_template(item.wb_order_status) }}
 
 
-	<td class="w-25">
+                    {% if item.wb_order_status == 'new' %}
 
-		<div class="d-flex">
-			{# Превью #}
-			{% set img_path = item.user_profile_avatar_cdn == true ? cdn_host : '' %}
-			{% set img_min = item.user_profile_avatar_cdn == true ? 'small.' : '' %}
+                        {% set dedline = date(item.wb_order_date)|date_modify("+48 hours") %}
+                        {% set difference = dedline.diff(date("now")) %}
+                        {% set hour = difference.d * 24 + difference.h %}
 
-			<a href="{{ path('UserProfile:admin.newedit.edit', { id: item.event }) }}" class="pe-3">
-				<div class="rounded-circle bg-contain lazy p-1" style="width: 50px; height: 50px;"
-						data-bg="{{ item.user_profile_avatar_name ?
-						img_path ~ users_profile_avatar ~ item.user_profile_avatar_dir ~'/'~ item.user_profile_avatar_name ~'.'~ img_min ~ item.user_profile_avatar_ext :
-						'/assets/img/blank.svg' }}">
-				</div>
-			</a>
+                        <small>
+                            {% if (dedline < date("now")) or (hour < 8) %}
 
-			<div class="ms-0">
-				{# Username #}
-				<a href="{{ path('UserProfile:admin.newedit.edit', { id: item.event }) }}"
-						class="text-decoration-none"
-				>{{ item.user_profile_username }}</a>
-				{# Описание #}
-				<div class="text-muted small d-flex align-items-center gap-1">
-					<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor"
-							viewBox="0 0 16 16">
-						<path d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A31.493 31.493 0 0 1 8 14.58a31.481 31.481 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94zM8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10z" />
-						<path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
-					</svg>
-					{{ item.user_profile_location }}
-				</div>
+                                {# {% if item.orders_alarms %}
+                                    <div class="small text-danger fw-bolder">
+                                        Срочные: {{ item.orders_alarms }}
+                                    </div>
+                                {% else %}
+                                    <div>&nbsp;</div>
+                                {% endif %} #}
 
-			</div>
-		</div>
-	</td>
+                                {% if dedline < date("now") %}
+                                    <strong class="blink">Опоздание</strong>
+                                    <strong class="blink">
+                                        {{ hour }} ч. {{ difference.i }} м.
+                                    </strong>
+                                {% else %}
+                                    <strong>Доставка:</strong>
+                                    <strong class="text-danger">
+                                        {{ hour }} ч. {{ difference.i }} м.
+                                    </strong>
+                                {% endif %}
 
-	<td>
-		{{ item.user_profile_type }}
-	</td>
+                            {% else %}
 
-	<td>
+                                {# {% if not item.orders_alarms %}
+                                    <div>&nbsp;</div>
+                                {% endif %} #}
 
-		<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-			<path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4Zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1H2Zm13 2.383-4.708 2.825L15 11.105V5.383Zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741ZM1 11.105l4.708-2.897L1 5.383v5.722Z" />
-		</svg>
+                                <strong>Доставка:</strong>
+                                <strong class="text-success">
+                                    {{ hour }} ч. {{ difference.i }} м.
+                                </strong>
+                            {% endif %}
 
-		<a href="{{ path('AuthEmail:admin.newedit.edit', { id: item.account_id }) }}"
-				class="text-decoration-none ms-2"
-		>{{ item.account_email }}</a>
-	</td>
+                        </small>
 
-	<td class="text-center">
-		{% if item.user_profile_active %}
-			{# <div class="badge bg-success px-2"> #}
-			{# {{ 'user.active.label'|trans }} #}{# &nbsp; #}
-			{# <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="text-success" viewBox="0 0 16 16">
-                    <path d="M2.5 8a5.5 5.5 0 0 1 8.25-4.764.5.5 0 0 0 .5-.866A6.5 6.5 0 1 0 14.5 8a.5.5 0 0 0-1 0 5.5 5.5 0 1 1-11 0z"/>
-                    <path d="M15.354 3.354a.5.5 0 0 0-.708-.708L8 9.293 5.354 6.646a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l7-7z"/>
-                </svg> #}
+                    {% else %}
+                        {{ wb_status_template(item.wb_order_wildberries) }}
+                    {% endif %}
 
-			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="text-success"
-					viewBox="0 0 16 16">
-				<path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
-			</svg>
-			{# </div> #}
-		{% else %}
-			---
-		{% endif %}
-	</td>
+                </div>
+            </div>
 
-	<td class="text-center">
-		{{ user_profile_status(item.user_profile_status) }}
-	</td>
-	{% if is_granted('ROLE_ADMIN') %}
-		<td class="text-center">
-			{# Прейти в режим пользователя #}
-			<a href='{{ path('Pages:user.homepage', {'_switch_user' : item.user_id }) }}'
-					class="badge bg-light text-dark">Авторизоваться</a>
-		</td>
-	{% endif %}
+            {# Превью  #}
 
-</tr>
+            {% set img_path = item.product_image_cdn == true ? CDN_HOST : '' %}
+            {% set product_image_ext = item.product_image_cdn == true ? 'small.'~item.product_image_ext : item.product_image_ext %}
+
+            <div class="d-flex flex-column small gap-1 p-2 bg-cover lazy col-2 w-100 position-relative"
+                 style=" height: 280px;"
+                 data-bg="{{ item.product_image ? img_path ~ item.product_image ~ product_image_ext : '/assets/img/blank.svg' }}"
+            >
+                <div
+                        class="icon rounded-circle bg-contain p-1 mb-2 shadow position-absolute"
+                        style="width: 25px; height: 25px;"
+                >
+                    {{ include(_self|replace({ "card.html.twig": "_usecase.html.twig" })) }}
+                </div>
+
+
+                {% if item.wb_order_sticker %}
+                    <button type="button"
+                            class="icon rounded-circle bg-cover btn btn-link bg-body shadow position-absolute bottom-0 mb-1 p-1 {{ item.wb_order_sticker ? : 'invisible_' }}"
+                            style="width: 25px; height: 25px;"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                             class="bg-body" viewBox="0 0 16 16">
+                            <path d="M2 2h2v2H2V2Z"/>
+                            <path d="M6 0v6H0V0h6ZM5 1H1v4h4V1ZM4 12H2v2h2v-2Z"/>
+                            <path d="M6 10v6H0v-6h6Zm-5 1v4h4v-4H1Zm11-9h2v2h-2V2Z"/>
+                            <path d="M10 0v6h6V0h-6Zm5 1v4h-4V1h4ZM8 1V0h1v2H8v2H7V1h1Zm0 5V4h1v2H8ZM6 8V7h1V6h1v2h1V7h5v1h-4v1H7V8H6Zm0 0v1H2V8H1v1H0V7h3v1h3Zm10 1h-1V7h1v2Zm-1 0h-1v2h2v-1h-1V9Zm-4 0h2v1h-1v1h-1V9Zm2 3v-1h-1v1h-1v1H9v1h3v-2h1Zm0 0h3v1h-2v1h-1v-2Zm-4-1v1h1v-2H7v1h2Z"/>
+                            <path d="M7 12h1v3h4v1H7v-4Zm9 2v2h-3v-1h2v-1h1Z"/>
+                        </svg>
+                    </button>
+                {% endif %}
+
+
+                {% if item.wb_order_analog > 1 %}
+
+                    <form method="post" class="position-absolute bottom-0 end-0 p-1">
+                        <input type="hidden" name="search_form[query]" value="{{ item.product_article }}">
+
+                        {#<button type="submit"
+                                            class="btn btn-link btn-sm small m-0 p-0 text-decoration-none text-nowrap lh-normal fw-normal"
+                                            value="{{ item.product_article }}"
+                                    ><small>{{ item.product_article }}</small>#}
+
+                        <div class="btn-group p-0" role="group">
+                            <button type="submit" class="btn btn-primary btn-sm py-0"
+                                    data-bs-toggle="tooltip"
+                                    data-bs-placement="bottom"
+                                    title='Общее количество аналогичных заказов'
+                            >
+                                {{ item.wb_order_analog }}
+                            </button>
+
+                            {% if item.wb_order_alarm  %}
+                                <button type="submit" class="btn btn-danger btn-sm py-0"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="bottom"
+                                        title='Количество срочных заказов'
+                                >
+                                    {{ item.wb_order_alarm }}
+                                </button>
+                            {% endif %}
+
+
+                        </div>
+
+                    </form>
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="card-body d-flex flex-column p-2">
+
+
+                <div>
+                    <a href="/admin/product/edit/06420615-8809-4662-9a2c-e3643dc95c48"
+                       class="fw-bolder mb-1 text-dark text-decoration-none">
+                        {{ item.product_name }}
+                    </a>
+                    <div class="text-muted fw-bolder">
+                        {{ item.product_offer_value|call_twig_func(item.product_offer_reference) }}
+                        {{ item.product_offer_postfix }}
+
+                        {{ item.product_variation_value|call_twig_func(item.product_variation_reference) }}
+                        {{ item.product_variation_postfix }}
+
+
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center small">
+                    <div>
+                        <div>
+                            ШК: {{ item.wb_order_barcode }}
+                        </div>
+                        <div class="d-flex ">
+                            Арт:
+
+                            &nbsp;
+                            {% if item.wb_order_analog > 1  %}
+
+                                <form method="post" class="p-0 small">
+                                    <input type="hidden" name="search_form[query]" value="{{ item.product_article }}">
+                                    <button type="submit"
+                                            class="btn btn-link btn-sm small m-0 p-0 text-decoration-none text-nowrap lh-normal fw-normal"
+
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="bottom"
+                                            title='{{ item.wb_order_analog }} аналогичных заказов'
+                                            value="{{ item.product_article }}"
+                                    ><small>{{ item.product_article }}</small></button>
+                                </form>
+                            {% else %}
+                                {{ item.product_article }}
+                            {% endif %}
+
+
+                            {# "wb_order_alarm" => 0
+                    "wb_order_old" => "2023-07-19 11:25:08" #}
+
+                        </div>
+                    </div>
+
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>

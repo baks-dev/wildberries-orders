@@ -32,10 +32,6 @@ $ php bin/console baks:assets:install
 $ php bin/phpunit --group=wildberries-orders
 ```
 
-## Журнал изменений ![Changelog](https://img.shields.io/badge/changelog-yellow)
-
-О том, что изменилось за последнее время, обратитесь к [CHANGELOG](CHANGELOG.md) за дополнительной информацией.
-
 ## Лицензия ![License](https://img.shields.io/badge/MIT-green)
 
 The MIT License (MIT). Обратитесь к [Файлу лицензии](LICENSE.md) за дополнительной информацией.

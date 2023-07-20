@@ -1,0 +1,45 @@
+{% trans_default_domain('admin.wildberries.orders') %}
+
+<span
+        class="pointer"
+        data-bs-toggle="tooltip"
+        data-bs-placement="bottom"
+        title='Статус сборочного задания'
+        {# статус сборочного задания в системе Wildberries. #}
+>
+
+
+{# Новый #}
+{% if value == 'new' %}
+    <span class="badge bg-primary">
+        {{ value|trans }}
+    </span>
+
+
+
+    {# Сборка  #}
+{% elseif value == 'confirm' %}
+    <span class="badge bg-warning text-dark">
+        {{ value|trans }}
+    </span>
+
+
+
+    {# Доставка #}
+{% elseif value == 'complete' %}
+    <span class="badge bg-success">{{ value|trans }}</span>
+
+
+    {# Отменено #}
+{% elseif value == 'cancel' %}
+    <span class="badge bg-danger">{{ value|trans }}</span>
+
+
+
+{% else %}
+    <span class="badge bg-light text-dark">{{ 'unknown'|trans }}</span>
+
+{% endif %}
+
+
+</span>

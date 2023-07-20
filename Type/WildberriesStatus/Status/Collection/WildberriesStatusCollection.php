@@ -48,8 +48,10 @@ final class WildberriesStatusCollection
 
         foreach($this->status as $status)
         {
-            $case[] = new $status();
+            $case[$status::sort()] = new $status();
         }
+
+        ksort($case);
 
         return $case;
     }

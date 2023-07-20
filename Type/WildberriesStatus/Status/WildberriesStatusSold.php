@@ -52,7 +52,7 @@ final class WildberriesStatusSold implements WildberriesStatusInterface
      */
     public static function sort(): int
     {
-        return 100;
+        return 400;
     }
 
 

@@ -3,10 +3,10 @@
 namespace BaksDev\Wildberries\Orders\Type\WildberriesStatus;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Types\IntegerType;
+use Doctrine\DBAL\Types\StringType;
 use InvalidArgumentException;
 
-final class WildberriesStatusType extends IntegerType
+final class WildberriesStatusType extends StringType
 {
 
     public function convertToDatabaseValue($value, AbstractPlatform $platform): mixed

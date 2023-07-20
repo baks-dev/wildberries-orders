@@ -27,7 +27,7 @@ final class WbOrderStatus
 
         if($status instanceof $this)
         {
-            $this->status = $status->getValue();
+            $this->status = $status->getStatus();
             return;
         }
 
@@ -94,79 +94,4 @@ final class WbOrderStatus
                 },
         );
     }
-
-
-
-
-
-
-
-
-
-
-
-    //    /**
-    //     * @var WbOrderStatusEnum
-    //     */
-    //    private WbOrderStatusEnum $status;
-    //
-    //
-    //    public function __construct(int|self|WbOrderStatusEnum $status)
-    //    {
-    //        if($status instanceof self)
-    //		{
-    //			$this->status = WbOrderStatusEnum::from($status->getValue());
-    //		}
-    //        else if($status instanceof WbOrderStatusEnum)
-    //        {
-    //            $this->status = $status;
-    //        }
-    //        else
-    //        {
-    //            $this->status = WbOrderStatusEnum::from($status);
-    //        }
-    //    }
-    //
-    //    /**
-    //     * @return string
-    //     */
-    //    public function __toString() : string
-    //    {
-    //        return $this->status->value;
-    //    }
-    //
-    //
-    //    public function getValue() : int
-    //    {
-    //        return $this->status->value;
-    //    }
-    //
-    //    /**
-    //     * @return string
-    //     */
-    //    public function getName() : string
-    //    {
-    //        return $this->status->name;
-    //    }
-    //
-    //    /**
-    //     * @return array
-    //     */
-    //    public static function cases() : array
-    //    {
-    //        $case = null;
-    //
-    //        foreach(WbOrderStatusEnum::cases() as $status)
-    //        {
-    //            $case[] = new self($status);
-    //        }
-    //
-    //        return $case;
-    //    }
-    //
-    //    public function equals(WbOrderStatusEnum $status) : bool
-    //    {
-    //        return $this->status === $status;
-    //    }
-    //
 }
