@@ -43,7 +43,31 @@ final class ProfileFilterDTO implements ProfileFilterInterface
     public function __construct(Request $request, ?UserProfileUid $profile)
     {
         $this->request = $request;
-        $this->profile = $profile;
+
+        if($this->request->isMethod('POST'))
+        {
+            if($this->request->get('profile_filter_form_admin'))
+            {
+                if(empty($this->request->get('profile_filter_form_admin')['profile']))
+                {
+                    $this->request->getSession()->remove(self::profile);
+                    $this->profile = $profile;
+                    return;
+                }
+            }
+
+            if($this->request->get('profile_filter_form'))
+            {
+                if(empty($this->request->get('profile_filter_form')['profile']))
+                {
+                    $this->request->getSession()->remove(self::profile);
+                    $this->profile = $profile;
+                    return;
+                }
+            }
+        }
+
+        $this->profile = $this->request->getSession()->get(self::profile) ?: $profile;
     }
 
     /**
@@ -51,7 +75,6 @@ final class ProfileFilterDTO implements ProfileFilterInterface
      */
     public function getProfile(): ?UserProfileUid
     {
-
         return $this->profile ?: $this->request->getSession()->get(self::profile);
     }
 
@@ -61,6 +84,7 @@ final class ProfileFilterDTO implements ProfileFilterInterface
         if($profile === null)
         {
             $this->request->getSession()->remove(self::profile);
+            return;
         }
 
         $this->profile = $profile;

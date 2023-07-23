@@ -35,7 +35,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 #[AutoconfigureTag('baks.menu.admin')]
 final class Role implements RoleFixturesInterface, MenuAdminInterface
 {
-    /** Транспорт доставки заказов */
+    
     public const ROLE = 'ROLE_WB_ORDERS';
 
     public function getRole(): string

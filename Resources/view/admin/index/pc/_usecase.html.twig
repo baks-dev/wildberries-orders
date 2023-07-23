@@ -28,7 +28,9 @@
 	<ul class="leader list-group list-group-flush ">
 
 
-		{% if constant('BaksDev\\Manufacture\\Part\\Entity\\ManufacturePart::TABLE') is defined %}
+		{% if constant('BaksDev\\Manufacture\\Part\\Entity\\ManufacturePart::TABLE') is defined
+		and (is_granted('ROLE_MANUFACTURE_PART_NEW') or is_granted('ROLE_ADMIN'))
+		%}
 
 			<li class="list-group-item d-flex justify-content-between bg-transparent border-0 text-truncate rounded-5">
 

@@ -25,10 +25,7 @@ declare(strict_types=1);
 
 namespace BaksDev\Wildberries\Orders\Forms\WbFilterProfile;
 
-use BaksDev\Products\Category\Repository\CategoryChoice\CategoryChoiceInterface;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
-use BaksDev\Wildberries\Orders\Type\OrderStatus\Status\Collection\WbOrderStatusCollection;
-use BaksDev\Wildberries\Orders\Type\WildberriesStatus\Status\Collection\WildberriesStatusCollection;
 use BaksDev\Wildberries\Repository\WbTokenChoice\WbTokenChoiceInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -50,9 +47,6 @@ final class ProfileFilterFormAdmin extends AbstractType
     public function __construct(
         WbTokenChoiceInterface $tokenChoice,
         RequestStack $request,
-        WbOrderStatusCollection $wbOrderStatusCollection,
-        WildberriesStatusCollection $wildberriesStatusCollection,
-        CategoryChoiceInterface $categoryChoice,
     )
     {
         $this->request = $request;
@@ -66,7 +60,6 @@ final class ProfileFilterFormAdmin extends AbstractType
          */
         $AccessProfileTokenCollection = $this->tokenChoice->getTokenCollection();
         $builder->add('profile', HiddenType::class);
-
 
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,

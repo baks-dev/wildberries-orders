@@ -34,15 +34,15 @@ use BaksDev\Orders\Order\Entity\Order;
 use BaksDev\Orders\Order\Entity\Products\OrderProduct;
 use BaksDev\Orders\Order\Entity\Products\Price\OrderPrice;
 use BaksDev\Products\Category\Entity\Offers\ProductCategoryOffers;
-use BaksDev\Products\Category\Entity\Offers\Variation\ProductCategoryOffersVariation;
+use BaksDev\Products\Category\Entity\Offers\Variation\ProductCategoryVariation;
 use BaksDev\Products\Category\Type\Id\ProductCategoryUid;
 use BaksDev\Products\Product\Entity\Category\ProductCategory;
 use BaksDev\Products\Product\Entity\Event\ProductEvent;
 use BaksDev\Products\Product\Entity\Info\ProductInfo;
 use BaksDev\Products\Product\Entity\Offers\Image\ProductOfferImage;
 use BaksDev\Products\Product\Entity\Offers\ProductOffer;
-use BaksDev\Products\Product\Entity\Offers\Variation\Image\ProductOfferVariationImage;
-use BaksDev\Products\Product\Entity\Offers\Variation\ProductOfferVariation;
+use BaksDev\Products\Product\Entity\Offers\Variation\Image\ProductVariationImage;
+use BaksDev\Products\Product\Entity\Offers\Variation\ProductVariation;
 use BaksDev\Products\Product\Entity\Photo\ProductPhoto;
 use BaksDev\Products\Product\Entity\Trans\ProductTrans;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
@@ -246,7 +246,7 @@ final class AllWbOrders implements AllWbOrdersInterface
         $qb->addSelect('product_variation.postfix as product_variation_postfix');
 
         $qb->leftJoin('order_product',
-            ProductOfferVariation::TABLE,
+            ProductVariation::TABLE,
             'product_variation',
             'product_variation.id = order_product.variation'
         );
@@ -262,7 +262,7 @@ final class AllWbOrders implements AllWbOrdersInterface
         $qb->addSelect('category_variation.reference as product_variation_reference');
         $qb->leftJoin(
             'product_variation',
-            ProductCategoryOffersVariation::TABLE,
+            ProductCategoryVariation::TABLE,
             'category_variation',
             'category_variation.id = product_variation.category_variation'
         );
@@ -299,7 +299,7 @@ final class AllWbOrders implements AllWbOrdersInterface
 
         $qb->leftJoin(
             'product_offer',
-            ProductOfferVariationImage::TABLE,
+            ProductVariationImage::TABLE,
             'product_variation_image',
             'product_variation_image.variation = order_product.variation AND product_variation_image.root = true'
         );
@@ -308,7 +308,7 @@ final class AllWbOrders implements AllWbOrdersInterface
         $qb->addSelect("
 			CASE
 			   WHEN product_variation_image.name IS NOT NULL THEN
-					CONCAT ( '/upload/".ProductOfferVariationImage::TABLE."' , '/', product_variation_image.dir, '/', product_variation_image.name, '.')
+					CONCAT ( '/upload/".ProductVariationImage::TABLE."' , '/', product_variation_image.dir, '/', product_variation_image.name, '.')
 			   WHEN product_offer_images.name IS NOT NULL THEN
 					CONCAT ( '/upload/".ProductOfferImage::TABLE."' , '/', product_offer_images.dir, '/', product_offer_images.name, '.')
 			   WHEN product_photo.name IS NOT NULL THEN
@@ -376,9 +376,9 @@ final class AllWbOrders implements AllWbOrdersInterface
 
 
         /* Поиск */
-        if($search->query)
+        if($search->getQuery())
         {
-            $search->query = (string) mb_strtolower($search->query);
+            $search->query = (string) mb_strtolower($search->getQuery());
 
             $searcher = $this->connection->createQueryBuilder();
 
@@ -408,8 +408,13 @@ final class AllWbOrders implements AllWbOrdersInterface
                 $searcher->orWhere('LOWER(product_info.article ) LIKE :query');
                 $searcher->orWhere('LOWER(product_info.article ) LIKE :switcher');
 
-                $integer = preg_replace("/[^0-9]/", "", $search->query) * 1;
-                $qb->setParameter('int', $integer < 2147483647 ?: 0);
+                $integer = preg_replace("/[^0-9]/", "", $search->query);
+
+                if($integer)
+                {
+                    $integer = $integer * 1;
+                    $qb->setParameter('int', $integer < 2147483647 ? $integer : 0);
+                }
                 
                 $qb->andWhere('('.$searcher->getQueryPart('where').')');
                 $qb->setParameter('query', '%'.$this->switcher->toRus($search->query).'%');

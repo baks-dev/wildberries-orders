@@ -55,6 +55,7 @@ final class ProfileFilterForm extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
 
+        /** Список профилей, доступных пользователю */
         $AccessProfileTokenCollection = $this->tokenChoice->getAccessProfileTokenCollection();
 
         if($AccessProfileTokenCollection)
@@ -81,7 +82,6 @@ final class ProfileFilterForm extends AbstractType
             function(FormEvent $event): void {
                 /** @var ProfileFilterDTO $data */
                 $data = $event->getData();
-                
 
                 $this->request->getSession()->set(ProfileFilterDTO::profile, $data->getProfile());
 

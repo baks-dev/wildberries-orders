@@ -54,7 +54,7 @@ final class IndexController extends AbstractController
          * Поиск
          */
 
-        $search = new SearchDTO();
+        $search = new SearchDTO($request);
         $searchForm = $this->createForm(
             SearchForm::class, $search, [
                 'action' => $this->generateUrl('WildberriesOrders:admin.index'),
@@ -84,6 +84,8 @@ final class IndexController extends AbstractController
         }
 
         $profileForm->handleRequest($request);
+        !$profileForm->isSubmitted()?:$this->redirectToReferer();
+
 
 
         /**
@@ -95,11 +97,7 @@ final class IndexController extends AbstractController
             'action' => $this->generateUrl('WildberriesOrders:admin.index'),
         ]);
         $filterForm->handleRequest($request);
-
-        if($filterForm->isSubmitted())
-        {
-            $this->redirectToReferer();
-        }
+        !$filterForm->isSubmitted()?:$this->redirectToReferer();
 
 
         /**

@@ -167,10 +167,10 @@ final class WbOrdersFilterForm extends AbstractType
 
                 $Category = $data->getCategory();
 
-                if(isset($this->request->getMainRequest()?->get('wb_orders_filter_form')['category']))
+                if(isset($this->request->getMainRequest()?->get($builder->getName())['category']))
                 {
-                    $Category = !empty($this->request->getMainRequest()?->get('wb_orders_filter_form')['category']) ?
-                        new ProductCategoryUid($this->request->getMainRequest()?->get('wb_orders_filter_form')['category']) : null;
+                    $Category = !empty($this->request->getMainRequest()?->get($builder->getName())['category']) ?
+                        new ProductCategoryUid($this->request->getMainRequest()?->get($builder->getName())['category']) : null;
 
                 }
 
@@ -271,6 +271,7 @@ final class WbOrdersFilterForm extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => WbOrdersFilterDTO::class,
+            'validation_groups' => false,
             'method' => 'POST',
             'attr' => ['class' => 'w-100'],
         ]);
