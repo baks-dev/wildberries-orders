@@ -27,13 +27,12 @@ use Symfony\Config\FrameworkConfig;
 
 return static function (FrameworkConfig $framework) {
 
-    /** Транспорт отправки сообщений */
     $messenger = $framework->messenger();
 
     $messenger
-        ->transport('wb_orders')
+        ->transport('wildberries-orders')
         ->dsn('%env(MESSENGER_TRANSPORT_DSN)%')
-        ->options(['queue_name' => 'wb_orders'])
+        ->options(['queue_name' => 'wildberries-orders'])
         ->retryStrategy()
         ->maxRetries(5)
         ->delay(1000)

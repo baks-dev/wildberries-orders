@@ -42,13 +42,13 @@ return static function(ContainerConfigurator $container, DoctrineConfig $doctrin
     $doctrine->dbal()->type(WbOrderStatus::TYPE)->class(WbOrderStatusType::class);
     $doctrine->dbal()->type(WildberriesStatus::TYPE)->class(WildberriesStatusType::class);
 
-    $emDefault = $doctrine->orm()->entityManager('default');
+    $emDefault = $doctrine->orm()->entityManager('default')->autoMapping(true);
 
-    $emDefault->autoMapping(true);
+    $MODULE = substr(__DIR__, 0, strpos(__DIR__, "Resources"));
 
     $emDefault->mapping('WildberriesOrders')
         ->type('attribute')
-        ->dir(__DIR__.'/../../Entity')
+        ->dir($MODULE.'Entity')
         ->isBundle(false)
         ->prefix('BaksDev\Wildberries\Orders')
         ->alias('WildberriesOrders');

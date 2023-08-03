@@ -269,25 +269,7 @@ class NewOrdersCommand extends Command
 
                 $io->text(sprintf('Добавили новый заказ %s', $order['id']));
 
-                //$OrderProductDTO->set
-
-                //
-                //
-                //                $ProductOrderDTO->setCreated($dateCreated);
-                //
-                //                $ProductPriceDTO = $ProductOrderDTO->getPrice();
-                //                $ProductPriceDTO->setPrice(($order['convertedPrice'] / 100));
-                //                $ProductPriceDTO->setTotal(1); /* Всегда количество 1 */
-                //
-                //                /* Сохраняем */
-                //                $OrderEntity = $this->orderAggregate->handle($ProductOrderDTO);
-
             }
-
-
-//            dd(current($orders));
-
-
         }
 
         $io->success('Заказы успешно обновлены');

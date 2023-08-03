@@ -25,9 +25,7 @@ namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use Symfony\Config\TwigConfig;
 
-return static function(TwigConfig $config, ContainerConfigurator $configurator) {
-
+return static function(TwigConfig $config) {
     $config->path(__DIR__.'/../view', 'WildberriesOrders');
-
 };
 

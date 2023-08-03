@@ -178,7 +178,7 @@ final class WbOrderHandler
         /* Отправляем сообщение в шину */
         $this->messageDispatch->dispatch(
             message: new WbOrderMessage($Main->getId(), $Main->getEvent(), $command->getEvent()),
-            transport: 'wb_orders'
+            transport: 'wildberries-orders'
         );
 
         // 'wb_order_high'

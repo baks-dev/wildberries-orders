@@ -26,10 +26,9 @@ declare(strict_types=1);
 namespace BaksDev\Wildberries\Orders\Repository\AllWbOrders;
 
 
+use BaksDev\Core\Doctrine\DBALQueryBuilder;
 use BaksDev\Core\Form\Search\SearchDTO;
 use BaksDev\Core\Services\Paginator\PaginatorInterface;
-use BaksDev\Core\Services\Switcher\SwitcherInterface;
-use BaksDev\Core\Type\Locale\Locale;
 use BaksDev\Orders\Order\Entity\Order;
 use BaksDev\Orders\Order\Entity\Products\OrderProduct;
 use BaksDev\Orders\Order\Entity\Products\Price\OrderPrice;
@@ -51,45 +50,39 @@ use BaksDev\Wildberries\Orders\Entity\Sticker\WbOrdersSticker;
 use BaksDev\Wildberries\Orders\Entity\WbOrders;
 use BaksDev\Wildberries\Orders\Entity\WbOrdersStatistics;
 use BaksDev\Wildberries\Orders\Forms\WbFilterProfile\ProfileFilterInterface;
-use BaksDev\Wildberries\Orders\Forms\WbOrdersFilter\WbOrdersFilterInterface;
+use BaksDev\Wildberries\Orders\Forms\WbOrdersProductFilter\WbOrdersProductFilterInterface;
+use BaksDev\Wildberries\Orders\Forms\WbOrdersStatusFilter\WbOrdersStatusFilterInterface;
 use BaksDev\Wildberries\Orders\Type\OrderStatus\WbOrderStatus;
 use BaksDev\Wildberries\Orders\Type\WildberriesStatus\WildberriesStatus;
 use BaksDev\Wildberries\Products\Entity\Cards\WbProductCardOffer;
 use BaksDev\Wildberries\Products\Entity\Cards\WbProductCardVariation;
-use Doctrine\DBAL\Connection;
-use Symfony\Contracts\Translation\TranslatorInterface;
 
 final class AllWbOrders implements AllWbOrdersInterface
 {
-    private Connection $connection;
 
     private PaginatorInterface $paginator;
 
-    private SwitcherInterface $switcher;
-
-    private TranslatorInterface $translator;
+    private DBALQueryBuilder $DBALQueryBuilder;
 
     public function __construct(
-        Connection $connection,
+        DBALQueryBuilder $DBALQueryBuilder,
         PaginatorInterface $paginator,
-        SwitcherInterface $switcher,
-        TranslatorInterface $translator,
     )
     {
-        $this->connection = $connection;
+
         $this->paginator = $paginator;
-        $this->switcher = $switcher;
-        $this->translator = $translator;
+        $this->DBALQueryBuilder = $DBALQueryBuilder;
     }
 
     /** Метод возвращает пагинатор WbOrders */
     public function fetchAllWbOrdersAssociative(
         SearchDTO $search,
         ProfileFilterInterface $profile,
-        WbOrdersFilterInterface $filter
+        WbOrdersProductFilterInterface $filter,
+        WbOrdersStatusFilterInterface $status,
     ): PaginatorInterface
     {
-        $qb = $this->connection->createQueryBuilder();
+        $qb = $this->DBALQueryBuilder->createQueryBuilder(self::class);
 
         /**
          * Wildberries заказ
@@ -113,17 +106,17 @@ final class AllWbOrders implements AllWbOrdersInterface
         $qb->setParameter('profile', $profile->getProfile(), UserProfileUid::TYPE);
 
 
-        if($filter->getStatus())
+        if($status->getStatus())
         {
             $qb->andWhere('wb_order_event.status = :status');
-            $qb->setParameter('status', $filter->getStatus()->getValue(), WbOrderStatus::TYPE);
+            $qb->setParameter('status', $status->getStatus()->getValue(), WbOrderStatus::TYPE);
         }
 
-        if($filter->getWildberries())
+        if($status->getWildberries())
         {
 
             $qb->andWhere('wb_order_event.wildberries = :wildberries');
-            $qb->setParameter('wildberries', $filter->getWildberries()->getValue(), WildberriesStatus::TYPE);
+            $qb->setParameter('wildberries', $status->getWildberries()->getValue(), WildberriesStatus::TYPE);
         }
 
 
@@ -146,12 +139,11 @@ final class AllWbOrders implements AllWbOrdersInterface
         );
 
 
-
         $qb->addSelect('order_product.product AS wb_product_event');
         $qb->addSelect('order_product.offer AS wb_product_offer');
         $qb->addSelect('order_product.variation AS wb_product_variation');
         $qb->addSelect('order_product.modification AS wb_product_modification');
-        
+
         $qb->leftJoin('ord',
             OrderProduct::TABLE,
             'order_product',
@@ -192,7 +184,6 @@ final class AllWbOrders implements AllWbOrdersInterface
                 'product_category.event = product_event.id AND product_category.category = :category AND product_category.root = true'
             );
 
-
             $qb->setParameter('category', $filter->getCategory(), ProductCategoryUid::TYPE);
         }
 
@@ -203,9 +194,8 @@ final class AllWbOrders implements AllWbOrdersInterface
             'product_trans',
             'product_trans.event = order_product.product AND product_trans.local = :local'
         );
-
-        $local = new Locale($this->translator->getLocale());
-        $qb->setParameter('local', $local, Locale::TYPE);
+        
+        $qb->bindLocal();
 
 
         /*
@@ -222,7 +212,7 @@ final class AllWbOrders implements AllWbOrdersInterface
         );
 
 
-        if($filter->getOffer())
+        if(!$search->getQuery() && $filter->getOffer())
         {
 
             $qb->andWhere('product_offer.value = :offer');
@@ -251,7 +241,7 @@ final class AllWbOrders implements AllWbOrdersInterface
             'product_variation.id = order_product.variation'
         );
 
-        if($filter->getVariation())
+        if(!$search->getQuery() && $filter->getVariation())
         {
             $qb->andWhere('product_variation.value = :variation');
             $qb->setParameter('variation', $filter->getVariation());
@@ -374,58 +364,25 @@ final class AllWbOrders implements AllWbOrdersInterface
         );
 
 
-
         /* Поиск */
         if($search->getQuery())
         {
-            $search->query = (string) mb_strtolower($search->getQuery());
-
-            $searcher = $this->connection->createQueryBuilder();
-
-            if($search->isUid())
-            {
-                $searcher->orWhere('wb_order.id = :query');
-                $searcher->orWhere('order_product.product = :query');
-                $searcher->orWhere('order_product.offer = :query');
-                $searcher->orWhere('order_product.variation = :query');
-
-                $qb->setParameter('query', $search->query);
-            }
-            else
-            {
-                $searcher->orWhere('LOWER(product_trans.name) LIKE :query');
-                $searcher->orWhere('LOWER(product_trans.name) LIKE :switcher');
-
-                $searcher->orWhere('LOWER(wb_order_event.barcode) LIKE :query');
-                $searcher->orWhere('LOWER(wb_order_event.barcode) LIKE :switcher');
-
-                $searcher->orWhere('LOWER(product_variation.article) LIKE :query');
-                $searcher->orWhere('LOWER(product_variation.article) LIKE :switcher');
-
-                $searcher->orWhere('LOWER(product_offer.article) LIKE :query');
-                $searcher->orWhere('LOWER(product_offer.article) LIKE :switcher');
-
-                $searcher->orWhere('LOWER(product_info.article ) LIKE :query');
-                $searcher->orWhere('LOWER(product_info.article ) LIKE :switcher');
-
-                $integer = preg_replace("/[^0-9]/", "", $search->query);
-
-                if($integer)
-                {
-                    $integer = $integer * 1;
-                    $qb->setParameter('int', $integer < 2147483647 ? $integer : 0);
-                }
-                
-                $qb->andWhere('('.$searcher->getQueryPart('where').')');
-                $qb->setParameter('query', '%'.$this->switcher->toRus($search->query).'%');
-                $qb->setParameter('switcher', '%'.$this->switcher->toEng($search->query).'%');
-            }
-
-
+            $qb
+                ->createSearchQueryBuilder($search)
+                ->addSearchEqualUid('wb_order.id')
+                ->addSearchEqualUid('order_product.product')
+                ->addSearchEqualUid('order_product.offer')
+                ->addSearchEqualUid('order_product.variation')
+                ->addSearchLike('product_trans.name')
+                ->addSearchLike('wb_order_event.barcode')
+                ->addSearchLike('product_variation.article')
+                ->addSearchLike('product_offer.article')
+                ->addSearchLike('product_info.article');
         }
 
         $qb->orderBy('wb_order_event.created', 'ASC');
 
         return $this->paginator->fetchAllAssociative($qb);
+
     }
 }

@@ -32,14 +32,17 @@ use BaksDev\Core\Listeners\Event\Security\RoleSecurity;
 use BaksDev\Wildberries\Orders\Forms\WbFilterProfile\ProfileFilterDTO;
 use BaksDev\Wildberries\Orders\Forms\WbFilterProfile\ProfileFilterForm;
 use BaksDev\Wildberries\Orders\Forms\WbFilterProfile\ProfileFilterFormAdmin;
-use BaksDev\Wildberries\Orders\Forms\WbOrdersFilter\WbOrdersFilterDTO;
-use BaksDev\Wildberries\Orders\Forms\WbOrdersFilter\WbOrdersFilterForm;
+use BaksDev\Wildberries\Orders\Forms\WbOrdersProductFilter\WbOrdersProductFilterDTO;
+use BaksDev\Wildberries\Orders\Forms\WbOrdersProductFilter\WbOrdersProductFilterForm;
+use BaksDev\Wildberries\Orders\Forms\WbOrdersStatusFilter\WbOrdersStatusFilterDTO;
+use BaksDev\Wildberries\Orders\Forms\WbOrdersStatusFilter\WbOrdersStatusFilterForm;
 use BaksDev\Wildberries\Orders\Repository\AllWbOrders\AllWbOrdersInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Annotation\Route;
 
-
+#[AsController]
 #[RoleSecurity('ROLE_WB_ORDERS')]
 final class IndexController extends AbstractController
 {
@@ -89,22 +92,39 @@ final class IndexController extends AbstractController
 
 
         /**
-         * Фильтр заказов
+         * Фильтр товаров
          */
 
-        $filter = new WbOrdersFilterDTO($request);
-        $filterForm = $this->createForm(WbOrdersFilterForm::class, $filter, [
+        $filter = new WbOrdersProductFilterDTO($request);
+        $filterForm = $this->createForm(WbOrdersProductFilterForm::class, $filter, [
             'action' => $this->generateUrl('WildberriesOrders:admin.index'),
         ]);
         $filterForm->handleRequest($request);
         !$filterForm->isSubmitted()?:$this->redirectToReferer();
 
 
+
+        /**
+         * Фильтр товаров
+         */
+
+        $status = new WbOrdersStatusFilterDTO($request);
+        $statusForm = $this->createForm(WbOrdersStatusFilterForm::class, $status, [
+            'action' => $this->generateUrl('WildberriesOrders:admin.index'),
+        ]);
+        $statusForm->handleRequest($request);
+        !$statusForm->isSubmitted()?:$this->redirectToReferer();
+
+
+
+
+
+
         /**
          * Получаем список
          */
 
-        $WbOrders = $allWbOrders->fetchAllWbOrdersAssociative($search, $profile, $filter);
+        $WbOrders = $allWbOrders->fetchAllWbOrdersAssociative($search, $profile, $filter, $status);
 
         return $this->render(
             [
@@ -112,6 +132,7 @@ final class IndexController extends AbstractController
                 'search' => $searchForm->createView(),
                 'profile' => $profileForm->createView(),
                 'filter' => $filterForm->createView(),
+                'status' => $statusForm->createView(),
             ]
         );
     }

@@ -11,23 +11,14 @@
 
         <div class="d-flex justify-content-between align-items-center mb-3">
 
-            <div class="w-100">
+            <div class="w-100 d-flex gap-3 align-items-center">
                 <h1 class="h4 text-uppercase fw-bolder mb-0">
                     {{ 'admin.page.index'|trans }}
-
-
-                    {# Обновить #}
-                    <a href="/refresh" class="btn  btn-link text-muted">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"
-                             class="mb-1" viewBox="0 0 16 16">
-                            <path fill-rule="evenodd"
-                                  d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"></path>
-                            <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"></path>
-                        </svg>
-                    </a>
                 </h1>
-            </div>
 
+                {{ include(_self|replace({ "content.html.twig": "_counter.html.twig" })) }}
+
+            </div>
 
             <div class="w-100 d-flex align-items-center gap-3 justify-content-end">
                 {{ form_start(profile) }}
@@ -52,19 +43,17 @@
         </div>
 
         <div class="border  border-light rounded-4 p-3 mb-3">
-
-            {# ПОИСК #}
             <div class="d-flex justify-content-between align-items-start gap-3">
 
-                <div class="col-3 p-1">
-                    {% include Template('/_includes/'~baks_settings.device~'/search.html.twig') %}
-                </div>
+                {# Форма поиска по разделу #}
+                {% include Template('/_includes/'~baks_settings.device~'/search.html.twig') %}
 
                 <div class="w-100">
                     {{ form_start(filter) }}
                     <div class="d-flex justify-content-end align-items-center my-1 gap-3">
 
-                        <div class="w-25">
+
+                        <div class="w-50">
                             {{ form_widget(filter.category, { placeholder: 'Все категории ...', attr: { 'data-select' : 'select2', class: 'mb-0' } }) }}
                         </div>
 
@@ -92,6 +81,9 @@
 
                         {% endif %}
 
+
+
+
                         <button class="btn btn-primary"
                                 type="button"
                                 data-bs-toggle="collapse"
@@ -106,27 +98,31 @@
                         </button>
 
                     </div>
+                    {{ form_end(filter) }}
 
-                    <div class="collapse multi-collapse" id="multiCollapseExample2" style="max-height: 50px;">
-                        <div class="d-flex justify-content-end align-items-center my-1 gap-3 mt-3">
-                            <div class="w-25">{{ form_widget(filter.status, { placeholder: 'Любой статус заказа', attr: { 'data-select' : 'select2', class: 'mb-0' } }) }}</div>
+                    {{ form_start(status) }}
+                        <div class="collapse multi-collapse" id="multiCollapseExample2" style="max-height: 50px;">
+                            <div class="d-flex justify-content-end align-items-center my-1 gap-3 mt-3">
 
-                            <div class="w-25">{{ form_widget(filter.wildberries, { placeholder: 'Любой статус Wildberries', attr: { 'data-select' : 'select2', class: 'mb-0' } }) }}</div>
+                                <div class="w-50">{{ form_widget(status.status, { placeholder: 'Любой статус заказа', attr: { 'data-select' : 'select2', class: 'mb-0' } }) }}</div>
 
-                            <button class="btn btn-primary invisible"
-                                    type="button"
-                                    data-bs-toggle="collapse"
-                                    data-bs-target="#multiCollapseExample2"
-                                    aria-expanded="false"
-                                    aria-controls="multiCollapseExample2">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                     class="bi bi-filter" viewBox="0 0 16 16">
-                                    <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>
-                                </svg>
+                                <div class="w-50">{{ form_widget(status.wildberries, { placeholder: 'Любой статус Wildberries', attr: { 'data-select' : 'select2', class: 'mb-0' } }) }}</div>
 
-                            </button>
+                                <button class="btn btn-primary invisible"
+                                        type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#multiCollapseExample2"
+                                        aria-expanded="false"
+                                        aria-controls="multiCollapseExample2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                         class="bi bi-filter" viewBox="0 0 16 16">
+                                        <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>
+                                    </svg>
+
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                    {{ form_start(status) }}
 
 
                     {# <div class="collapse multi-collapse" id="multiCollapseExample2">
@@ -136,17 +132,15 @@
                         </div> #}
 
 
-                    {{ form_end(filter) }}
                 </div>
 
 
             </div>
 
 
-            <div class="row cards-box-body mt-3">
+            <div class="row cards-box-body mt-3 ">
 
-                <div class="d-flex gap-3">
-
+                <div class="d-flex gap-3 align-items-center">
                     {% if filter.category.vars.data %}
                         <div><small class="text-muted">Категория:</small>&nbsp;
                             <strong>{{ filter.category.vars.data.options }}</strong>
@@ -186,7 +180,6 @@
 
                 </div>
 
-
                 {% for item in query.data %}
                     {{ include(_self|replace({ "content.html.twig": "card.html.twig" })) }}
                 {% endfor %}
@@ -199,65 +192,3 @@
     </section>
 
 </main>
-
-
-{# Тюлбар #}
-{#
-{{ include(_self|replace({ "content.html.twig": "_breadcrumb.html.twig" })) }}
-
-<div class="d-flex flex-column-fluid align-items-start container mt-3">
-
-	<div class="clearfix position-absolute w-100 start-0 separator mt-3"></div>
-
-	<div class="content flex-row-fluid mt-10">
-		<div class="card card-flush">
-#}
-{# Форма поиска #}{#
-{{ include(_self|replace({ "content.html.twig": "_search.html.twig" })) }}
-
-<div class="card-body pt-0">
-    <div class="table-responsive">
-#}
-{# Список #}{#
-<table class="align-middle table-row-dashed fs-6 gy-5 dataTable no-footer mb-5">
-
-    {{ include(_self|replace({ "content.html.twig": "_table.thead.html.twig" })) }}
-
-    <tbody class="fw-bold text-gray-600">
-    {% for item in query.data %}
-        {{ include(_self|replace({ "content.html.twig": "_table.tbody.html.twig" })) }}
-    {% endfor %}
-    </tbody>
-
-</table>
-
-<div class="card-footer position-sticky bg-body pb-3" style="bottom: 0rem;">
-    <div class="d-flex d-none pb-5" id="all_usecase">
-        <a href="#" class="modal-link btn btn-danger btn-sm fw-bolder"
-           data-bs-toggle="modal" data-bs-target="#modal">
-#}
-{# Удалить #}{#
-{{ 'btn.delete'|trans({}, 'core.btn') }}
-</a>
-
-<a href="#" class="modal-link btn btn btn-sm fw-bolder"
-data-bs-toggle="modal" data-bs-target="#modal">
-#}
-{# Удалить #}{#
-{{ 'btn.delete'|trans({}, 'core.btn') }}
-</a>
-
-</div>
-<div class="d-flex justify-content-between">
-#}
-{# Пагинация #}{#
-{{ include('@Template/_includes/pagination.html.twig') }}
-</div>
-</div>
-
-</div>
-
-</div>
-</div>
-</div>
-</div> #}
