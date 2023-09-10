@@ -25,6 +25,7 @@ namespace BaksDev\Wildberries\Orders\Repository\AllWbOrders;
 
 use BaksDev\Core\Form\Search\SearchDTO;
 use BaksDev\Core\Services\Paginator\PaginatorInterface;
+use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Wildberries\Orders\Forms\WbFilterProfile\ProfileFilterInterface;
 use BaksDev\Wildberries\Orders\Forms\WbOrdersProductFilter\WbOrdersProductFilterInterface;
 use BaksDev\Wildberries\Orders\Forms\WbOrdersStatusFilter\WbOrdersStatusFilterInterface;
@@ -34,7 +35,7 @@ interface AllWbOrdersInterface
     /** Метод возвращает пагинатор WbOrders */
     public function fetchAllWbOrdersAssociative(
         SearchDTO $search,
-        ProfileFilterInterface $profile,
+        UserProfileUid $profile,
         WbOrdersProductFilterInterface $filter,
         WbOrdersStatusFilterInterface $status
     ): PaginatorInterface;

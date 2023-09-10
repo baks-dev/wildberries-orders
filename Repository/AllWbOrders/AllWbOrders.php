@@ -77,7 +77,7 @@ final class AllWbOrders implements AllWbOrdersInterface
     /** Метод возвращает пагинатор WbOrders */
     public function fetchAllWbOrdersAssociative(
         SearchDTO $search,
-        ProfileFilterInterface $profile,
+        UserProfileUid $profile,
         WbOrdersProductFilterInterface $filter,
         WbOrdersStatusFilterInterface $status,
     ): PaginatorInterface
@@ -103,7 +103,7 @@ final class AllWbOrders implements AllWbOrdersInterface
         );
 
         $qb->andWhere('wb_order_event.profile = :profile');
-        $qb->setParameter('profile', $profile->getProfile(), UserProfileUid::TYPE);
+        $qb->setParameter('profile', $profile, UserProfileUid::TYPE);
 
 
         if($status->getStatus())

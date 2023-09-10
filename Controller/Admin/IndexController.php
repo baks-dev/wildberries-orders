@@ -70,24 +70,24 @@ final class IndexController extends AbstractController
          * Фильтр профиля пользователя
          */
 
-        $profile = new ProfileFilterDTO($request, $this->getProfileUid());
-        $ROLE_ADMIN = $this->isGranted('ROLE_ADMIN');
+//        $profile = new ProfileFilterDTO($request, $this->getProfileUid());
+//        $ROLE_ADMIN = $this->isGranted('ROLE_ADMIN');
+//
+//        if($ROLE_ADMIN)
+//        {
+//            $profileForm = $this->createForm(ProfileFilterFormAdmin::class, $profile, [
+//                'action' => $this->generateUrl('WildberriesOrders:admin.index'),
+//            ]);
+//        }
+//        else
+//        {
+//            $profileForm = $this->createForm(ProfileFilterForm::class, $profile, [
+//                'action' => $this->generateUrl('WildberriesOrders:admin.index'),
+//            ]);
+//        }
 
-        if($ROLE_ADMIN)
-        {
-            $profileForm = $this->createForm(ProfileFilterFormAdmin::class, $profile, [
-                'action' => $this->generateUrl('WildberriesOrders:admin.index'),
-            ]);
-        }
-        else
-        {
-            $profileForm = $this->createForm(ProfileFilterForm::class, $profile, [
-                'action' => $this->generateUrl('WildberriesOrders:admin.index'),
-            ]);
-        }
-
-        $profileForm->handleRequest($request);
-        !$profileForm->isSubmitted()?:$this->redirectToReferer();
+//        $profileForm->handleRequest($request);
+//        !$profileForm->isSubmitted()?:$this->redirectToReferer();
 
 
 
@@ -124,13 +124,13 @@ final class IndexController extends AbstractController
          * Получаем список
          */
 
-        $WbOrders = $allWbOrders->fetchAllWbOrdersAssociative($search, $profile, $filter, $status);
+        $WbOrders = $allWbOrders->fetchAllWbOrdersAssociative($search, $this->getProfileUid(), $filter, $status);
 
         return $this->render(
             [
                 'query' => $WbOrders,
                 'search' => $searchForm->createView(),
-                'profile' => $profileForm->createView(),
+                //'profile' => $profileForm->createView(),
                 'filter' => $filterForm->createView(),
                 'status' => $statusForm->createView(),
             ]

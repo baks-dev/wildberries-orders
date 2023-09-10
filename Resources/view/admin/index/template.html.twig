@@ -56,8 +56,11 @@
 <script nonce="{{ csp_nonce() }}">
 document.addEventListener("DOMContentLoaded", (event) => {
 
-	const form = document.forms.wb_orders_filter_form;
+	const form = document.forms.wb_orders_product_filter_form;
 	form.addEventListener('change', () => { form.submit(); });
+
+    	const  status = document.forms.wb_orders_status_filter_form;
+	status.addEventListener('change', () => { status.submit(); });
 
 	const profile_form = document.forms.profile_filter_form_admin ? document.forms.profile_filter_form_admin : document.forms.profile_filter_form;
 	profile_form.addEventListener('change', () => { profile_form.submit(); });

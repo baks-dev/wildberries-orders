@@ -79,11 +79,15 @@ final class WbOrdersProductFilterDTO implements WbOrdersProductFilterInterface
     }
 
 
-    public function getCategory(): ?ProductCategoryUid
+    public function getCategory(bool $readonly = false): ?ProductCategoryUid
     {
+        if($readonly)
+        {
+            return $this->category;
+        }
+
         return $this->category ?: $this->request->getSession()->get(self::category);
     }
-
 
     /** Торговое предложение */
 

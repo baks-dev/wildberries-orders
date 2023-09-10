@@ -46,9 +46,9 @@ final class WbOrderStatusCollection
     {
         $case = null;
 
-        foreach($this->status as $status)
+        foreach($this->status as $key => $status)
         {
-            $case[$status::sort()] = new $status();
+            $case[$status::sort().$key] = new $status();
         }
 
         ksort($case);

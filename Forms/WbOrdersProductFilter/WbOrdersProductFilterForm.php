@@ -33,6 +33,7 @@ use BaksDev\Products\Category\Repository\VariationFieldsCategoryChoice\Variation
 use BaksDev\Products\Category\Type\Id\ProductCategoryUid;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -71,23 +72,40 @@ final class WbOrdersProductFilterForm extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        //$data = $builder->getData();
-
         /**
          * Категория
          */
-        $builder->add('category', ChoiceType::class, [
-            'choices' => $this->categoryChoice->getCategoryCollection(),
-            'choice_value' => function(?ProductCategoryUid $category) {
-                return $category?->getValue();
-            },
-            'choice_label' => function(ProductCategoryUid $category) {
-                return $category->getOptions();
-            },
-            'label' => false,
-            'required' => false,
-            /*'attr' => ['onchange' => 'this.form.submit()'],*/
-        ]);
+
+        $builder->add('category', HiddenType::class);
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event): void {
+            /** @var WbOrdersProductFilterDTO $data */
+            $data = $event->getData();
+
+            /** Если жестко не указана категория - выводим список для выбора */
+            if($data && !$data->getCategory(true))
+            {
+                $builder = $event->getForm();
+
+
+                $builder->add('category', ChoiceType::class, [
+                    'choices' => $this->categoryChoice->getCategoryCollection(),
+                    'choice_value' => function(?ProductCategoryUid $category) {
+                        return $category?->getValue();
+                    },
+                    'choice_label' => function(ProductCategoryUid $category) {
+                        return $category->getOptions();
+                    },
+                    'label' => false,
+                    'required' => false,
+                    /*'attr' => ['onchange' => 'this.form.submit()'],*/
+                ]);
+
+            }
+
+        });
+
+
 
 
 

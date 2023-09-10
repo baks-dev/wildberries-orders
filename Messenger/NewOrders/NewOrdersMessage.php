@@ -21,25 +21,32 @@
  *  THE SOFTWARE.
  */
 
-namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+declare(strict_types=1);
 
-return static function(ContainerConfigurator $configurator) {
+namespace BaksDev\Wildberries\Orders\Messenger\NewOrders;
 
-    $services = $configurator->services()
-        ->defaults()
-        ->autowire()
-        ->autoconfigure()
-    ;
+use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 
-    $NAMESPACE = 'BaksDev\Wildberries\Orders\\';
 
-    $MODULE = substr(__DIR__, 0, strpos(__DIR__, "Resources"));
+final class NewOrdersMessage
+{
+    /**
+     * Идентификатор профиля
+     */
+    private UserProfileUid $profile;
 
-    $services->load($NAMESPACE, $MODULE)
-        ->exclude($MODULE.'{Entity,Resources,Type,*DTO.php,*Message.php}');
 
-    $services->load($NAMESPACE.'Type\OrderStatus\Status\\', $MODULE.'Type/OrderStatus/Status');
-    $services->load($NAMESPACE.'Type\WildberriesStatus\Status\\', $MODULE.'Type/WildberriesStatus/Status');
-    $services->load($NAMESPACE.'Type\ManufacturePartComplete\\', $MODULE.'Type/ManufacturePartComplete');
+    public function __construct(UserProfileUid $profile)
+    {
+        $this->profile = $profile;
+    }
 
-};
+    /**
+     * Profile
+     */
+    public function getProfile(): UserProfileUid
+    {
+        return $this->profile;
+    }
+
+}

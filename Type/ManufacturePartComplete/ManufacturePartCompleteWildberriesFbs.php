@@ -21,25 +21,34 @@
  *  THE SOFTWARE.
  */
 
-namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+declare(strict_types=1);
 
-return static function(ContainerConfigurator $configurator) {
+namespace BaksDev\Wildberries\Orders\Type\ManufacturePartComplete;
 
-    $services = $configurator->services()
-        ->defaults()
-        ->autowire()
-        ->autoconfigure()
-    ;
+use BaksDev\Manufacture\Part\Type\Complete\Collection\ManufacturePartCompleteInterface;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
-    $NAMESPACE = 'BaksDev\Wildberries\Orders\\';
+#[AutoconfigureTag('baks.part.complete')]
+final class ManufacturePartCompleteWildberriesFbs implements ManufacturePartCompleteInterface
+{
+    /**
+     * Ничего не делать
+     */
+    public const ACTION = 'wb_fbs';
 
-    $MODULE = substr(__DIR__, 0, strpos(__DIR__, "Resources"));
+    /**
+     * Возвращает значение (value)
+     */
+    public function getValue(): string
+    {
+        return self::ACTION;
+    }
 
-    $services->load($NAMESPACE, $MODULE)
-        ->exclude($MODULE.'{Entity,Resources,Type,*DTO.php,*Message.php}');
-
-    $services->load($NAMESPACE.'Type\OrderStatus\Status\\', $MODULE.'Type/OrderStatus/Status');
-    $services->load($NAMESPACE.'Type\WildberriesStatus\Status\\', $MODULE.'Type/WildberriesStatus/Status');
-    $services->load($NAMESPACE.'Type\ManufacturePartComplete\\', $MODULE.'Type/ManufacturePartComplete');
-
-};
+    /**
+     * Проверяет, относится ли строка цвета к данному объекту
+     */
+    public static function equals(string $action): bool
+    {
+        return mb_strtolower($action) === self::ACTION;
+    }
+}
