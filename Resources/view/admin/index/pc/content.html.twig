@@ -1,7 +1,7 @@
 {% trans_default_domain('admin.wildberries.orders') %}
 
 
-<main class="main ">
+<main class="main d-print-none ">
 
     <section class="container px-4 mb-5">
 
@@ -122,7 +122,7 @@
                                 </button>
                             </div>
                         </div>
-                    {{ form_start(status) }}
+                    {{ form_end(status) }}
 
 
                     {# <div class="collapse multi-collapse" id="multiCollapseExample2">

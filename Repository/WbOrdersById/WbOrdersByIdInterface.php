@@ -33,4 +33,9 @@ interface WbOrdersByIdInterface
      * Метод возвращает активное событие заказа по идентификатору системного заказа
      */
     public function getWbOrderByOrderUidOrNullResult(OrderUid $order): WbOrdersEvent;
+
+    /**
+     * Метод проверяет, имеется ли заказ по идентификатору заказа Wildberries
+     */
+    public function isExistWbOrder(int $order): bool;
 }

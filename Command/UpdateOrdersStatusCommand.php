@@ -11,189 +11,109 @@
 
 namespace BaksDev\Wildberries\Orders\Command;
 
-//use App\Module\User\Profile\UserProfile\Type\Id\UserProfileUid;
-//use App\Module\Wildberries\Orders\Order\Entity\Event\WbOrdersEvent;
-//use App\Module\Wildberries\Orders\Order\Repository\AllOrdersByStatus\AllOrdersByStatusInterface;
-//use App\Module\Wildberries\Orders\Order\Repository\WbOrdersById\WbOrdersByIdInterface;
-//use App\Module\Wildberries\Orders\Order\Type\Status\WbOrderStatusEnum;
-//use App\Module\Wildberries\Orders\Order\Type\StatusClient\WbClientStatusEnum;
-//use App\Module\Wildberries\Orders\Order\UseCase\Command\NewEdit\Wildberries\WbOrderDTO;
-//use App\Module\Wildberries\Orders\Order\UseCase\Command\UpdateStatus\WbUpdateOrderStatusDTO;
-//use App\Module\Wildberries\Orders\Order\UseCase\WbOrdersAggregate;
-//use App\Module\Wildberries\Orders\Supplys\Package\Entity\Orders\WbPackageOrder;
-//use App\Module\Wildberries\Rest\Api\Orders\Orders\WbOrders;
-//use App\Module\Wildberries\Rest\Auth\WbTokenAuth;
-//use App\Module\Wildberries\Rest\Authorization\WildberriesAuthorizationInterface;
-//use App\Module\Wildberries\Rest\OpenApi\Orders\PostOrderStatus;
-//use App\Module\Wildberries\Settings\Repository\AllShopSettingsToken\AllShopSettingsTokenInterface;
-//use App\Module\Wildberries\Rest\OpenApi\Orders\PostOrderStatus;
-use BaksDev\Wildberries\Api\Token\Orders\WildberriesOrdersStatus;
-use BaksDev\Wildberries\Orders\Entity\Event\WbOrdersEvent;
-use BaksDev\Wildberries\Orders\Repository\AllOrdersByStatus\AllOrdersByStatusInterface;
-use BaksDev\Wildberries\Orders\Type\OrderStatus\WbOrderStatus;
-use BaksDev\Wildberries\Orders\Type\WildberriesStatus\WildberriesStatus;
-use BaksDev\Wildberries\Orders\UseCase\Command\NewEdit\WbOrderDTO;
-use BaksDev\Wildberries\Orders\UseCase\Command\NewEdit\WbOrderHandler;
+use BaksDev\Core\Messenger\MessageDispatchInterface;
+use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
+use BaksDev\Wildberries\Orders\Messenger\UpdateOrdersStatus\UpdateOrderStatusMessage;
 use BaksDev\Wildberries\Repository\AllProfileToken\AllProfileTokenInterface;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+
+/**
+ * Получаем все заказы, и обновляем статус заказов которые изменились
+ */
 
 #[AsCommand(
-    name: 'baks:wb:orders:status',
+    name: 'baks:wildberries-orders:status',
     description: 'Получаем все заказы, и обновляем статус заказов которые изменились')
 ]
 class UpdateOrdersStatusCommand extends Command
 {
-    //
-    //	private AllShopSettingsTokenInterface $settingsTokens;
-    //
-    //	private AllOrdersByStatusInterface $allOrdersByStatus;
-    //
-    //	private WbOrdersByIdInterface $wbOrdersById;
-    //
-    //	private WbOrdersAggregate $wbOrdersAggregate;
-    //
-    //	private WildberriesAuthorizationInterface $wildberriesAuthorization;
-    //
-    //	private LoggerInterface $logger;
-    //
-    private EntityManagerInterface $entityManager;
-    private AllProfileTokenInterface $allProfileToken;
-    private iterable $WildberriesStatus;
-    private AllOrdersByStatusInterface $allOrdersByStatus;
-    private WildberriesOrdersStatus $wildberriesOrdersStatus;
-    private WbOrderHandler $WildberriesOrderHandler;
 
+    private AllProfileTokenInterface $allProfileToken;
+
+    private MessageDispatchInterface $messageDispatch;
 
     public function __construct(
-        //		AllShopSettingsTokenInterface $settingsTokens,
-        //		AllOrdersByStatusInterface $allOrdersByStatus,
-        //		WbOrdersByIdInterface $wbOrdersById,
-        //		WbOrdersAggregate $wbOrdersAggregate,
-        //		WildberriesAuthorizationInterface $wildberriesAuthorization,
-        //		LoggerInterface $logger,
-        EntityManagerInterface $entityManager,
         AllProfileTokenInterface $allProfileToken,
-        AllOrdersByStatusInterface $allOrdersByStatus,
-        WildberriesOrdersStatus $wildberriesOrdersStatus,
-        WbOrderHandler $WildberriesOrderHandler,
-        #[TaggedIterator('baks.wb.status')] iterable $WildberriesStatus,
-
+        MessageDispatchInterface $messageDispatch,
     )
     {
         parent::__construct();
 
-        //		$this->settingsTokens = $settingsTokens;
-        //		$this->allOrdersByStatus = $allOrdersByStatus;
-        //		$this->wbOrdersById = $wbOrdersById;
-        //		$this->wbOrdersAggregate = $wbOrdersAggregate;
-        //		$this->wildberriesAuthorization = $wildberriesAuthorization;
-        //		$this->logger = $logger;
-        $this->entityManager = $entityManager;
         $this->allProfileToken = $allProfileToken;
-        $this->WildberriesStatus = $WildberriesStatus;
-        $this->allOrdersByStatus = $allOrdersByStatus;
-        $this->wildberriesOrdersStatus = $wildberriesOrdersStatus;
-        $this->WildberriesOrderHandler = $WildberriesOrderHandler;
+        $this->messageDispatch = $messageDispatch;
+    }
+
+
+    protected function configure(): void
+    {
+        $this->addArgument('profile', InputArgument::OPTIONAL, 'Идентификатор профиля');
     }
 
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-
-        //return Command::SUCCESS;
-
         $io = new SymfonyStyle($input, $output);
 
-        foreach($this->allProfileToken->fetchAllWbTokenProfileAssociative() as $profile)
+        $profile = $input->getArgument('profile');
+
+        if($profile)
         {
-            ProgressBar::setFormatDefinition('custom', ' %current%/%max% -- %message%');
-            $progressBar = new ProgressBar($output);
-            $progressBar->setFormat('custom');
-            $progressBar->setMessage(sprintf('Token: %s', $profile));
-            $progressBar->start();
-
-            $this->wildberriesOrdersStatus->profile($profile);
-
-            foreach($this->WildberriesStatus as $wbStatus)
+            /** Если требуется выбрать профиль из списка */
+            if($profile === 'choice')
             {
-                /* Пропускаем заказы, которые уже завершились */
-                //                if(
-                //                    $wbStatus instanceof WildberriesStatusSold || // сборочное задание получено покупателем
-                //                    $wbStatus instanceof WildberriesStatusCanceled || // отмена сборочного задания
-                //                    $wbStatus instanceof WildberriesStatusCanceledClient || //  отмена сборочного задания покупателем
-                //                    $wbStatus instanceof WildberriesStatusDefect // отмена сборочного задания по причине брака
-                //                )
-                //                {
-                //                    continue;
-                //                }
+                $helper = $this->getHelper('question');
 
+                $profiles = $this->allProfileToken->fetchAllWbTokenProfileAssociative();
 
-                /* Получаем все заказы по статусу */
+                $questions = null;
 
-                $orders = $this->allOrdersByStatus
-                    ->fetchAllOrdersByWildberriesStatusAssociativeIndexed($profile, $wbStatus);
-
-                if(!$orders)
+                foreach($profiles as $quest)
                 {
-                    continue;
+                    $questions[] = $quest->getAttr();
                 }
 
-                /** Делим все заказы по 1000 items */
-                $chunkedOrders = array_chunk($orders, 1000);
+                $question = new Question('Профиль пользователя: ');
+                $question->setAutocompleterValues($questions);
 
-                foreach($chunkedOrders as $chunkedOrder)
+                $profileName = $helper->ask($input, $output, $question);
+
+                foreach($profiles as $profile)
                 {
-                    sleep(1); /* Делаем задержку между запросами */
-                    $wbOrdersAll = array_column($chunkedOrder, 'order_wb');
-
-                    /** Получаем все статусы Wildberries API */
-                    $this->wildberriesOrdersStatus->setOrders($wbOrdersAll)->request();
-                    $apiWbOrdersStatus = $this->wildberriesOrdersStatus->getContent();
-
-                    foreach($apiWbOrdersStatus as $apiStatus)
+                    if($profile->getAttr() === $profileName)
                     {
-                        /** Не обновляем заказы со статусом Новый */
-                        if($apiStatus['supplierStatus'] === 'new' && $apiStatus['wbStatus'] === 'waiting')
-                        {
-                            continue;
-                        }
-
-
-                        $progressBar->advance($apiStatus['id']);
-
-                        $currentOrder = $orders[$apiStatus['id']];
-
-                        /** Если статус был изменен - обновляем заказ Wildberries */
-                        if(
-                            $currentOrder['event_status'] !== $apiStatus['supplierStatus'] ||
-                            $currentOrder['event_wildberries'] !== $apiStatus['wbStatus']
-                        )
-                        {
-                            $WbOrdersEvent = $this->entityManager->getRepository(WbOrdersEvent::class)->find($currentOrder['order_event']);
-                            $WbOrderDTO = new WbOrderDTO($profile, $apiStatus['id']);
-                            $WbOrdersEvent->getDto($WbOrderDTO);
-
-                            $WbOrderDTO->setStatus(new WbOrderStatus($apiStatus['supplierStatus']));
-                            $WbOrderDTO->setWildberries(new WildberriesStatus($apiStatus['wbStatus']));
-
-                            $this->WildberriesOrderHandler->handle($WbOrderDTO);
-
-                            $io->warning(sprintf('Обновили заказ %s', $apiStatus['id']));
-
-                        }
+                        break;
                     }
                 }
             }
+
+            /* Присваиваем профиль пользователя */
+            $profile = new UserProfileUid($profile);
+
+            /* Отправляем сообщение в шину профиля */
+            $this->messageDispatch->dispatch(
+                message: new UpdateOrderStatusMessage($profile),
+                transport: (string) $profile,
+            );
+        }
+        else
+        {
+            foreach($this->allProfileToken->fetchAllWbTokenProfileAssociative() as $profile)
+            {
+                /* Отправляем сообщение в шину профиля */
+                $this->messageDispatch->dispatch(
+                    message: new UpdateOrderStatusMessage($profile),
+                    transport: (string) $profile,
+                );
+            }
         }
 
-        $io->success('Заказы успешно обновлены');
+        $io->success('Новые заказы успешно добавлены в очередь');
 
         return Command::SUCCESS;
 

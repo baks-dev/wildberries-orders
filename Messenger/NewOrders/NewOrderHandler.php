@@ -35,7 +35,6 @@ use BaksDev\Orders\Order\UseCase\Admin\Status\OrderStatusHandler;
 use BaksDev\Products\Product\Repository\ProductByVariation\ProductByVariationInterface;
 use BaksDev\Reference\Money\Type\Money;
 use BaksDev\Wildberries\Api\Token\Orders\WildberriesOrdersNew;
-use BaksDev\Wildberries\Orders\Entity\Event\WbOrdersEvent;
 use BaksDev\Wildberries\Orders\Entity\WbOrders;
 use BaksDev\Wildberries\Orders\Repository\WbOrdersById\WbOrdersByIdInterface;
 use BaksDev\Wildberries\Orders\Type\Email\ClientEmail;
@@ -74,7 +73,8 @@ final class NewOrderHandler
         WbOrderHandler $WildberriesOrderHandler,
         EntityManagerInterface $entityManager,
         LoggerInterface $messageDispatchLogger,
-    ) {
+    )
+    {
         $this->wildberriesOrdersNew = $wildberriesOrdersNew;
         $this->wbOrdersById = $wbOrdersById;
         $this->productByVariation = $productByVariation;
@@ -85,34 +85,35 @@ final class NewOrderHandler
         $this->messageDispatchLogger = $messageDispatchLogger;
     }
 
-    public function __invoke(NewOrdersMessage $message)
+    public function __invoke(NewOrdersMessage $message): void
     {
-
-//        ProgressBar::setFormatDefinition('custom', ' %current%/%max% -- %message%');
-//        $progressBar = new ProgressBar($output);
-//        $progressBar->setFormat('custom');
-//        $progressBar->setMessage(sprintf('Token: %s', $profileName));
-//        $progressBar->start();
-
 
         $profile = $message->getProfile();
 
-        $this->wildberriesOrdersNew->profile($profile)->request();
-        $orders = $this->wildberriesOrdersNew->request()->getContent();
+        $orders = $this->wildberriesOrdersNew
+            ->profile($profile)
+            ->request()
+            ->getContent()
+        ;
 
         if(empty($orders))
         {
             return;
         }
 
+        $this->messageDispatchLogger
+            ->info(
+                sprintf('%s: Добавляем новые заказы Wildberries', $profile),
+                [__LINE__ => __FILE__]
+            );
+
         foreach($orders as $order)
         {
             /* Проверяем, имеется ли в системе заказ WB с указанным идентификатором */
-            /** @var WbOrdersEvent $WbOrder */
-            $WbOrder = $this->wbOrdersById->getWbOrderOrNullResult($order['id']);
+            $WbOrder = $this->wbOrdersById->isExistWbOrder($order['id']);
 
             /* Если заказ существует - пропускам */
-            if($WbOrder !== null)
+            if($WbOrder)
             {
                 continue;
             }
@@ -139,9 +140,12 @@ final class NewOrderHandler
                     $this->entityManager->remove($WbProductCardRemove);
                 }
 
-                //$io->error(sprintf('Отсутствует карточка товара Wildberries barcode: %s', $barcode));
+                $this->messageDispatchLogger
+                    ->warning(
+                        sprintf('%s: Отсутствует карточка товара Wildberries (article: %s; barcode : %s) ', $profile, $order['article'], $barcode),
+                        [__LINE__ => __FILE__]
+                    );
 
-                $this->messageDispatchLogger->error(sprintf('Отсутствует карточка товара Wildberries barcode: %s', $barcode));
                 continue;
             }
 
@@ -158,7 +162,13 @@ final class NewOrderHandler
 
             if(!$Product)
             {
-                $this->messageDispatchLogger->error(sprintf('Отсутствует продукция barcode: %s', $barcode));
+
+                $this->messageDispatchLogger
+                    ->warning(
+                        sprintf('%s: Ошибка при добавлении заказа Wildberries ( ProductVariationConst : %s) ', $profile, $ProductVariationConst),
+                        [__LINE__ => __FILE__]
+                    );
+
                 continue;
             }
 
@@ -222,7 +232,11 @@ final class NewOrderHandler
             }
 
 
-            //$io->text(sprintf('Добавили новый заказ %s', $order['id']));
+            $this->messageDispatchLogger
+                ->info(
+                    sprintf('%s: Добавили новый заказ ( order : %s) ', $profile, $order['id']),
+                    [__LINE__ => __FILE__]
+                );
 
         }
     }

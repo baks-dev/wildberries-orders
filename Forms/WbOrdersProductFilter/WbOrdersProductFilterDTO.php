@@ -68,11 +68,16 @@ final class WbOrdersProductFilterDTO implements WbOrdersProductFilterInterface
     /**
      * Категория
      */
-    public function setCategory(?ProductCategoryUid $category): void
+    public function setCategory(ProductCategoryUid|string|null $category): void
     {
         if(empty($category))
         {
             $this->request->getSession()->remove(self::category);
+        }
+
+        if(is_string($category))
+        {
+            $category = new ProductCategoryUid($category);
         }
 
         $this->category = $category;

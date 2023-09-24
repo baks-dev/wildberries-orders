@@ -23,32 +23,42 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Wildberries\Orders\Messenger;
+namespace BaksDev\Wildberries\Orders\Schedule\UpdateOrdersStatus;
 
-use BaksDev\Core\Cache\AppCacheInterface;
-use Psr\Log\LoggerInterface;
+use BaksDev\Core\Messenger\MessageDispatchInterface;
+use BaksDev\Wildberries\Orders\Messenger\UpdateOrdersStatus\UpdateOrderStatusMessage;
+use BaksDev\Wildberries\Repository\AllProfileToken\AllProfileTokenInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsMessageHandler(fromTransport: 'sync')]
-final class WbOrderCacheClear
+#[AsMessageHandler]
+final class UpdateOrdersStatusScheduleHandler
 {
-    private AppCacheInterface $cache;
-    private LoggerInterface $messageDispatchLogger;
+    private AllProfileTokenInterface $allProfileToken;
+
+    private MessageDispatchInterface $messageDispatch;
 
     public function __construct(
-        AppCacheInterface $cache,
-        LoggerInterface $messageDispatchLogger,
-    ) {
-        $this->cache = $cache;
-        $this->messageDispatchLogger = $messageDispatchLogger;
-    }
-
-    public function __invoke(WbOrderMessage $message)
+        AllProfileTokenInterface $allProfileToken,
+        MessageDispatchInterface $messageDispatch,
+    )
     {
-        /* Чистим кеш модуля */
-        $cache = $this->cache->init('WildberriesOrders');
-        $cache->clear();
-
-        $this->messageDispatchLogger->info('Очистили кеш WildberriesOrders', [__LINE__ => __FILE__]);
+        $this->allProfileToken = $allProfileToken;
+        $this->messageDispatch = $messageDispatch;
     }
+
+    /**
+     * Обновляем статусы заказов которые изменились
+     */
+    public function __invoke(UpdateOrdersStatusScheduleMessage $message): void
+    {
+        foreach($this->allProfileToken->fetchAllWbTokenProfileAssociative() as $profile)
+        {
+            /* Отправляем сообщение в шину профиля */
+            $this->messageDispatch->dispatch(
+                message: new UpdateOrderStatusMessage($profile),
+                transport: (string) $profile,
+            );
+        }
+    }
+
 }

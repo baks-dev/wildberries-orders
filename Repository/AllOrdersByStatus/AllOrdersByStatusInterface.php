@@ -27,4 +27,10 @@ interface AllOrdersByStatusInterface
         WildberriesStatus|WildberriesStatusInterface $status
     ): ?array;
 
+
+
+    /**
+     * Метод возвращает всю продукцию в заказах профиля со статусом NEW для обновления статистики
+     */
+    public function allWildberriesNewOrderProducts(UserProfileUid $profile): ?array;
 }

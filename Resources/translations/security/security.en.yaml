@@ -5,12 +5,18 @@ ROLE_WB_ORDERS:
   desc: 'Wildberries orders'
 
 # Rules
+ROLE_WB_ORDERS_INDEX:
+  name: 'View'
+  desc: ''
 
 ROLE_WB_ORDERS_NEW:
   name: 'Add'
+  desc: ''
 
 ROLE_WB_ORDERS_EDIT:
   name: 'Edit'
+  desc: ''
 
 ROLE_WB_ORDERS_DELETE:
   name: 'Delete'
+  desc: ''

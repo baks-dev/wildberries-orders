@@ -8,10 +8,14 @@ namespace BaksDev\Wildberries\Orders\Repository\AllOrdersByStatus;
 //use App\Module\Wildberries\Orders\Order\Entity as EntityWbOrders;
 //use App\Module\Wildberries\Orders\Order\Type\Status\WbOrderStatus;
 //use App\Module\Wildberries\Orders\Order\Type\Status\WbOrderStatusEnum;
+use BaksDev\Orders\Order\Entity\Order;
+use BaksDev\Orders\Order\Entity\Products\OrderProduct;
+use BaksDev\Products\Product\Entity\Product;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Wildberries\Orders\Entity\Event\WbOrdersEvent;
 use BaksDev\Wildberries\Orders\Entity\WbOrders;
 use BaksDev\Wildberries\Orders\Type\OrderStatus\Status\Collection\WbOrderStatusInterface;
+use BaksDev\Wildberries\Orders\Type\OrderStatus\Status\WbOrderStatusNew;
 use BaksDev\Wildberries\Orders\Type\OrderStatus\WbOrderStatus;
 use BaksDev\Wildberries\Orders\Type\WildberriesStatus\Status\Collection\WildberriesStatusInterface;
 use BaksDev\Wildberries\Orders\Type\WildberriesStatus\WildberriesStatus;
@@ -102,5 +106,47 @@ final class AllOrdersByStatus implements AllOrdersByStatusInterface
         return $qb->fetchAllAssociativeIndexed();
     }
 
+
+    /**
+     * Метод возвращает всю продукцию в заказах профиля со статусом NEW для обновления статистики
+     */
+    public function allWildberriesNewOrderProducts(UserProfileUid $profile): ?array
+    {
+        $qb = $this->entityManager->getConnection()->createQueryBuilder();
+
+        $qb->from(WbOrders::TABLE, 'orders');
+
+        $qb->join('orders',
+            WbOrdersEvent::TABLE,
+            'event',
+            'event.id = orders.event AND event.status = :status AND event.profile = :profile'
+        );
+
+        $qb->join('orders',
+            Order::TABLE,
+            'ord',
+            'ord.id = event.ord'
+        );
+
+        $qb->leftJoin('orders',
+            OrderProduct::TABLE,
+            'ord_product',
+            'ord_product.event = ord.event'
+        );
+
+        $qb->addSelect('product.id');
+        $qb->addSelect('product.event');
+
+        $qb->join('ord_product',
+            Product::TABLE,
+            'product',
+            'product.event = ord_product.product'
+        );
+
+        $qb->setParameter('status', WbOrderStatusNew::STATUS, WbOrderStatus::TYPE);
+        $qb->setParameter('profile', $profile, UserProfileUid::TYPE);
+
+        return $qb->fetchAllAssociative();
+    }
 
 }

@@ -11,7 +11,7 @@
 
 namespace BaksDev\Wildberries\Orders\Command;
 
-use BaksDev\Core\Services\Messenger\MessageDispatchInterface;
+use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Wildberries\Orders\Messenger\NewOrders\NewOrdersMessage;
 use BaksDev\Wildberries\Repository\AllProfileToken\AllProfileTokenInterface;
@@ -23,8 +23,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+/**
+ * Получаем "НОВЫЕ" заказы
+ */
+
 #[AsCommand(
-    name: 'baks:wb:orders:new',
+    name: 'baks:wildberries-orders:new',
     description: 'Получаем "НОВЫЕ" заказы')
 ]
 class NewOrdersCommand extends Command

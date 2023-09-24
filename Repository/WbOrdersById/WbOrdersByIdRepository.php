@@ -19,6 +19,7 @@
 namespace BaksDev\Wildberries\Orders\Repository\WbOrdersById;
 
 
+use BaksDev\Core\Doctrine\DBALQueryBuilder;
 use BaksDev\Orders\Order\Type\Id\OrderUid;
 use BaksDev\Wildberries\Orders\Entity\Event\WbOrdersEvent;
 use BaksDev\Wildberries\Orders\Entity\WbOrders;
@@ -28,10 +29,15 @@ use Doctrine\ORM\EntityManagerInterface;
 final class WbOrdersByIdRepository implements WbOrdersByIdInterface
 {
     private EntityManagerInterface $entityManager;
+    private DBALQueryBuilder $DBALQueryBuilder;
 
-    public function __construct(EntityManagerInterface $entityManager)
+    public function __construct(
+        DBALQueryBuilder $DBALQueryBuilder,
+        EntityManagerInterface $entityManager
+    )
     {
         $this->entityManager = $entityManager;
+        $this->DBALQueryBuilder = $DBALQueryBuilder;
     }
 
     /**
@@ -48,6 +54,22 @@ final class WbOrdersByIdRepository implements WbOrdersByIdInterface
         $qb->setParameter('order', $order, ParameterType::INTEGER);
 
         return $qb->getQuery()->getOneOrNullResult();
+
+    }
+
+
+    /**
+     * Метод проверяет, имеется ли заказ по идентификатору заказа Wildberries
+     */
+    public function isExistWbOrder(int $order): bool
+    {
+        $qb = $this->DBALQueryBuilder->createQueryBuilder(self::class);
+
+        $qb->from(WbOrders::TABLE, 'wb_orders');
+        $qb->where('wb_orders.ord = :order');
+        $qb->setParameter('order', $order, ParameterType::INTEGER);
+
+        return $qb->fetchExist();
 
     }
 

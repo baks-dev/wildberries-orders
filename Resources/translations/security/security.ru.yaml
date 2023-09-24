@@ -5,14 +5,20 @@ ROLE_WB_ORDERS:
   desc: 'Заказы Wildberries'
 
 # Правила
+ROLE_WB_ORDERS_INDEX:
+  name: 'Просмотр'
+  desc: ''
 
 ROLE_WB_ORDERS_NEW:
   name: 'Добавить'
+  desc: ''
 
 ROLE_WB_ORDERS_EDIT:
   name: 'Редактировать'
+  desc: ''
 
 ROLE_WB_ORDERS_DELETE:
   name: 'Удалить'
+  desc: ''
 
 
