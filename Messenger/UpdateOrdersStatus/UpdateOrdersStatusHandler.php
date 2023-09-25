@@ -82,7 +82,6 @@ final class UpdateOrdersStatusHandler
 
         foreach($this->WildberriesStatus as $wbStatus)
         {
-
             /** Пропускаем заказы которые уже выполнены (со статусом Доставлен, Отменен, Дефект) */
             if(
                 $wbStatus instanceof WildberriesStatusSold ||

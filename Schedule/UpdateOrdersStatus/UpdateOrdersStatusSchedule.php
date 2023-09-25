@@ -25,21 +25,31 @@ declare(strict_types=1);
 
 namespace BaksDev\Wildberries\Orders\Schedule\UpdateOrdersStatus;
 
-use Symfony\Component\Scheduler\Attribute\AsSchedule;
-use Symfony\Component\Scheduler\RecurringMessage;
-use Symfony\Component\Scheduler\Schedule;
-use Symfony\Component\Scheduler\ScheduleProviderInterface;
+use BaksDev\Core\Schedule\ScheduleInterface;
+use DateInterval;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
-#[AsSchedule('default')]
-final class UpdateOrdersStatusSchedule implements ScheduleProviderInterface
+/**
+ * Обновляем статусы заказов каждые 5 минут
+ */
+
+#[AutoconfigureTag('baks.schedule')]
+final class UpdateOrdersStatusSchedule implements ScheduleInterface
 {
     /**
-     * Обновляем статусы заказов каждые 5 минут
+     * Возвращает объект сообщения
      */
-    public function getSchedule(): Schedule
+    public function getMessage(): object
     {
-        return (new Schedule())->add(
-            RecurringMessage::every('5 minutes', new UpdateOrdersStatusScheduleMessage())
-        );
+        return new UpdateOrdersStatusScheduleMessage();
+    }
+
+    /**
+     * Интервал повтора
+     * @see https://www.php.net/manual/en/dateinterval.createfromdatestring.php
+     */
+    public function getInterval(): DateInterval
+    {
+       return DateInterval::createFromDateString('6 minutes');
     }
 }
