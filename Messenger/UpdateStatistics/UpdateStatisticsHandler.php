@@ -25,18 +25,12 @@ declare(strict_types=1);
 
 namespace BaksDev\Wildberries\Orders\Messenger\UpdateStatistics;
 
+use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Orders\Order\Entity\Order;
 use BaksDev\Orders\Order\Entity\Products\OrderProduct;
 use BaksDev\Products\Product\Entity\Product;
-use BaksDev\Wildberries\Orders\Entity\WbOrdersStatistics;
 use BaksDev\Wildberries\Orders\Messenger\WbOrderMessage;
-use BaksDev\Wildberries\Orders\Repository\WbOrdersAlarm\WbOrdersAlarmInterface;
-use BaksDev\Wildberries\Orders\Repository\WbOrdersAnalog\WbOrdersAnalogInterface;
-use BaksDev\Wildberries\Orders\Repository\WbOrdersOld\WbOrdersOldInterface;
-use BaksDev\Wildberries\Orders\UseCase\Command\Statistic\WbOrdersStatisticsDTO;
-use BaksDev\Wildberries\Orders\UseCase\Command\Statistic\WbOrdersStatisticsHandler;
 use Doctrine\ORM\EntityManagerInterface;
-use DomainException;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -44,27 +38,18 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 final class UpdateStatisticsHandler
 {
     private EntityManagerInterface $entityManager;
-    private WbOrdersAlarmInterface $ordersAlarm;
-    private WbOrdersAnalogInterface $ordersAnalog;
-    private WbOrdersOldInterface $ordersOld;
-    private WbOrdersStatisticsHandler $ordersStatisticsHandler;
     private LoggerInterface $messageDispatchLogger;
+    private MessageDispatchInterface $messageDispatch;
 
     public function __construct(
+        MessageDispatchInterface $messageDispatch,
         EntityManagerInterface $entityManager,
-        WbOrdersAlarmInterface $ordersAlarm,
-        WbOrdersAnalogInterface $ordersAnalog,
-        WbOrdersOldInterface $ordersOld,
-        WbOrdersStatisticsHandler $ordersStatisticsHandler,
         LoggerInterface $messageDispatchLogger,
     )
     {
         $this->entityManager = $entityManager;
-        $this->ordersAlarm = $ordersAlarm;
-        $this->ordersAnalog = $ordersAnalog;
-        $this->ordersOld = $ordersOld;
-        $this->ordersStatisticsHandler = $ordersStatisticsHandler;
         $this->messageDispatchLogger = $messageDispatchLogger;
+        $this->messageDispatch = $messageDispatch;
     }
 
     /**
@@ -83,24 +68,27 @@ final class UpdateStatisticsHandler
         {
             $this->messageDispatchLogger->warning(
                 sprintf('Невозможно найти заказ ( %s id=\'%s\' )', Order::TABLE, $message->getId()),
-                [__LINE__ => __FILE__]);
+                [__FILE__.':'.__LINE__]);
             return;
         }
 
         /**
-         * Получаем продукцию в заказе
+         * Получаем всю продукцию в заказе
          */
 
         $products = $this->entityManager
             ->getRepository(OrderProduct::class)
             ->findBy(['event' => $Order->getEvent()]);
 
-
         if(!$products)
         {
             $this->messageDispatchLogger->warning(
-                sprintf('Невозможно найти продукцию ( %s event=\'%s\' )', OrderProduct::TABLE, $Order->getEvent()),
-                [__LINE__ => __FILE__]
+                'Невозможно найти продукцию',
+                [
+                    'table' => OrderProduct::TABLE,
+                    'event' => $Order->getEvent(),
+                    __FILE__.':'.__LINE__
+                ]
             );
             return;
         }
@@ -119,59 +107,11 @@ final class UpdateStatisticsHandler
                 continue;
             }
 
-            $this->messageDispatchLogger->info(
-                sprintf('Обновляем статистику Wildberries продукции ( ProductUid : %s )', $Product->getId()) ,
-                [__LINE__ => __FILE__]);
-
-            $productUid = $Product->getId();
-            $ProductEventUid = $Product->getEvent();
-
-            /**
-             * Получаем объект статистики, если не найден - создаем новый
-             */
-            $WbOrdersProductStats = $this->entityManager
-                ->getRepository(WbOrdersStatistics::class)
-                ->find($productUid);
-
-            $WbOrdersStatisticsDTO = new WbOrdersStatisticsDTO();
-            $WbOrdersStatisticsDTO->setProduct($productUid);
-            $WbOrdersProductStats ? $WbOrdersProductStats->getDto($WbOrdersStatisticsDTO) : false;
-
-            /**
-             * Получаем и обновляем срочные
-             */
-            $alarm = $this->ordersAlarm->countOrderAlarmByProduct($ProductEventUid);
-            $WbOrdersStatisticsDTO->setAlarm($alarm);
-
-
-            /**
-             * Получаем и обновляем аналоги
-             */
-            $analog = $this->ordersAnalog->countOrderAnalogByProduct($ProductEventUid);
-            $WbOrdersStatisticsDTO->setAnalog($analog);
-
-
-            /**
-             * Получаем и обновляем дату самого старого невыполненного заказа
-             */
-            $old = $this->ordersOld->getOldOrderDateByProduct($ProductEventUid);
-            $WbOrdersStatisticsDTO->setOld($old);
-
-            /**
-             * Обновляем статистику по продукции
-             */
-
-            $StatisticsHandler = $this->ordersStatisticsHandler->handle($WbOrdersStatisticsDTO);
-
-            if(!$StatisticsHandler instanceof WbOrdersStatistics)
-            {
-                throw new DomainException(sprintf(
-                    '%s: Ошибка при обновлении статистики продукта ( ProductUid : %s )',
-                    $StatisticsHandler,
-                    $productUid
-                ));
-            }
-
+            /* Отправляем сообщение в шину для обновления статистики */
+            $this->messageDispatch->dispatch(
+                message: new UpdateStatisticMessage($Product->getId(), $Product->getEvent()),
+                transport: 'async'
+            );
         }
     }
 }

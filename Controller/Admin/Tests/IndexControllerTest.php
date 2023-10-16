@@ -31,7 +31,7 @@ final class IndexControllerTest extends WebTestCase
     private const ROLE = 'ROLE_WB_ORDERS';
 
     /** Доступ по роли */
-    public function testRoleProductSuccessful(): void
+    public function testRoleSuccessful(): void
     {
         self::ensureKernelShutdown();
         $client = static::createClient();
@@ -45,7 +45,6 @@ final class IndexControllerTest extends WebTestCase
             $client->loginUser($usr, 'user');
             $client->request('GET', self::URL);
 
-    
             self::assertResponseIsSuccessful();
         }
     }

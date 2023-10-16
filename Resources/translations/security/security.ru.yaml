@@ -21,4 +21,9 @@ ROLE_WB_ORDERS_DELETE:
   name: 'Удалить'
   desc: ''
 
+ROLE_WB_ORDERS_GET:
+  name: 'Получить новые'
+  desc: ''
+
+
 

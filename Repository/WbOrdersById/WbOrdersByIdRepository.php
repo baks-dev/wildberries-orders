@@ -20,6 +20,7 @@ namespace BaksDev\Wildberries\Orders\Repository\WbOrdersById;
 
 
 use BaksDev\Core\Doctrine\DBALQueryBuilder;
+use BaksDev\Core\Doctrine\ORMQueryBuilder;
 use BaksDev\Orders\Order\Type\Id\OrderUid;
 use BaksDev\Wildberries\Orders\Entity\Event\WbOrdersEvent;
 use BaksDev\Wildberries\Orders\Entity\WbOrders;
@@ -28,16 +29,18 @@ use Doctrine\ORM\EntityManagerInterface;
 
 final class WbOrdersByIdRepository implements WbOrdersByIdInterface
 {
-    private EntityManagerInterface $entityManager;
+
     private DBALQueryBuilder $DBALQueryBuilder;
+    private ORMQueryBuilder $ORMQueryBuilder;
 
     public function __construct(
         DBALQueryBuilder $DBALQueryBuilder,
-        EntityManagerInterface $entityManager
+        ORMQueryBuilder $ORMQueryBuilder,
+
     )
     {
-        $this->entityManager = $entityManager;
         $this->DBALQueryBuilder = $DBALQueryBuilder;
+        $this->ORMQueryBuilder = $ORMQueryBuilder;
     }
 
     /**
@@ -45,7 +48,7 @@ final class WbOrdersByIdRepository implements WbOrdersByIdInterface
      */
     public function getWbOrderOrNullResult(int $order): ?WbOrdersEvent
     {
-        $qb = $this->entityManager->createQueryBuilder();
+        $qb = $this->ORMQueryBuilder->createQueryBuilder(self::class);
 
         $qb->select('event');
         $qb->from(WbOrders::class, 'wb_orders');
@@ -53,7 +56,7 @@ final class WbOrdersByIdRepository implements WbOrdersByIdInterface
         $qb->where('wb_orders.ord = :order');
         $qb->setParameter('order', $order, ParameterType::INTEGER);
 
-        return $qb->getQuery()->getOneOrNullResult();
+        return $qb->getOneOrNullResult();
 
     }
 
@@ -76,17 +79,17 @@ final class WbOrdersByIdRepository implements WbOrdersByIdInterface
     /**
      * Метод возвращает активное событие заказа по идентификатору системного заказа
      */
-    public function getWbOrderByOrderUidOrNullResult(OrderUid $order): WbOrdersEvent
+    public function getWbOrderByOrderUidOrNullResult(OrderUid $order): ?WbOrdersEvent
     {
-        $qb = $this->entityManager->createQueryBuilder();
+        $qb = $this->ORMQueryBuilder->createQueryBuilder(self::class);
 
         $qb->select('event');
         $qb->from(WbOrders::class, 'ord');
         $qb->join(WbOrdersEvent::class, 'event', 'WITH', 'event.id = ord.event');
-        $qb->where('ord.id = :ord');
-        $qb->setParameter('ord', $order, OrderUid::TYPE);
+        $qb->where('ord.id = :order');
+        $qb->setParameter('order', $order, OrderUid::TYPE);
 
-        return $qb->getQuery()->getOneOrNullResult();
+        return $qb->getOneOrNullResult();
 
     }
 }

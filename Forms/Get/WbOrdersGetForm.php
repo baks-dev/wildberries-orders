@@ -23,30 +23,31 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Wildberries\Orders\Messenger\UpdateOrdersStatus;
-
-use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
+namespace BaksDev\Wildberries\Orders\Forms\Get;
 
 
-final class UpdateOrderStatusMessage
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
+final class WbOrdersGetForm extends AbstractType
 {
-    /**
-     * Идентификатор профиля
-     */
-    private UserProfileUid $profile;
-
-
-    public function __construct(UserProfileUid $profile)
+    public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        $this->profile = $profile;
+        /* Сохранить ******************************************************/
+        $builder->add(
+            'wb_orders_get',
+            SubmitType::class,
+            ['label' => 'Save', 'label_html' => true, 'attr' => ['class' => 'btn-primary']]
+        );
     }
 
-    /**
-     * Profile
-     */
-    public function getProfile(): UserProfileUid
+    public function configureOptions(OptionsResolver $resolver): void
     {
-        return $this->profile;
+        $resolver->setDefaults([
+            'method' => 'POST',
+            'attr' => ['class' => 'w-100'],
+        ]);
     }
-
 }

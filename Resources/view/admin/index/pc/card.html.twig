@@ -71,14 +71,19 @@
                 </div>
             </div>
 
-            {# Превью  #}
+            {# Обложка #}
+            {% set image_path = '/assets/img/blank.svg' %}
 
-            {% set img_path = item.product_image_cdn == true ? CDN_HOST : '' %}
-            {% set product_image_ext = item.product_image_cdn == true ? 'small.'~item.product_image_ext : item.product_image_ext %}
+            {% if item.product_image_ext is defined and item.product_image_ext is not null %}
+                {% set img_host =  item.product_image_cdn == true  ? CDN_HOST : '' %}
+                {% set img_dir = item.product_image %}
+                {% set img_file = (img_host is empty ? '/image.' : '/small.') ~ item.product_image_ext %}
+                {% set image_path = img_host ~ img_dir ~ img_file %}
+            {% endif %}
 
             <div class="d-flex flex-column small gap-1 p-2 bg-cover lazy col-2 w-100 position-relative"
                  style=" height: 280px;"
-                 data-bg="{{ item.product_image ? img_path ~ item.product_image ~ product_image_ext : '/assets/img/blank.svg' }}"
+                 data-bg="{{ image_path }}"
             >
                 <div
                         class="icon rounded-circle bg-contain p-1 mb-2 shadow position-absolute"
@@ -139,8 +144,6 @@
                         </div>
                     </form>
                 {% endif %}
-
-                222
             </div>
 
 
@@ -148,8 +151,12 @@
 
             <div class="card-body d-flex flex-column p-2">
 
-
-                <div>
+                <div class="text-truncate"
+                     data-bs-toggle="tooltip"
+                     data-bs-placement="top"
+                     data-bs-delay='{"show":600,"hide":100}'
+                     title="{{ item.product_name }}"
+                >
                     <a href="#"
                        class="fw-bolder mb-1 text-dark text-decoration-none">
                         {{ item.product_name }}

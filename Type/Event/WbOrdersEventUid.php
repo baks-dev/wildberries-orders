@@ -18,10 +18,14 @@
 
 namespace BaksDev\Wildberries\Orders\Type\Event;
 
+use App\Kernel;
 use BaksDev\Core\Type\UidType\Uid;
+use Symfony\Component\Uid\AbstractUid;
 
 final class WbOrdersEventUid extends Uid
 {
+    public const TEST = '018ad882-3cbf-72fb-81a9-86893c583fe6';
+
     public const TYPE = 'wb_order_event';
 
 }

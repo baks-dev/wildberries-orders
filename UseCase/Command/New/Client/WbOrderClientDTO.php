@@ -16,12 +16,9 @@
  *
  */
 
-namespace BaksDev\Wildberries\Orders\UseCase\Command\NewEdit\Client;
+namespace BaksDev\Wildberries\Orders\UseCase\Command\New\Client;
 
-//use App\Module\Wildberries\Orders\Order\Entity\Client\WbOrderClientInterface;
-//use App\Module\Wildberries\Orders\Order\Type\Email\ClientEmail;
-//use App\Module\Wildberries\Orders\Order\Type\StatusClient\WbClientStatus;
-//use App\Module\Wildberries\Orders\Order\Type\StatusClient\WbClientStatusEnum;
+
 use BaksDev\Wildberries\Orders\Entity\Client\WbOrderClientInterface;
 use BaksDev\Wildberries\Orders\Type\Email\ClientEmail;
 

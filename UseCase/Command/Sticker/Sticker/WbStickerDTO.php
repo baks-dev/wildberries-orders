@@ -16,9 +16,10 @@
  *
  */
 
-namespace BaksDev\Wildberries\Orders\UseCase\Command\NewEdit\Sticker;
+namespace BaksDev\Wildberries\Orders\UseCase\Command\Sticker\Sticker;
 
 use BaksDev\Wildberries\Orders\Entity\Sticker\WbOrdersStickerInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /** @see WbOrdersSticker */
 final class WbStickerDTO implements WbOrdersStickerInterface
@@ -27,16 +28,18 @@ final class WbStickerDTO implements WbOrdersStickerInterface
 	/**
      * Стикер
      */
-	private ?string $sticker = null;
+    #[Assert\NotBlank]
+	private string $sticker;
 	
 	/**
      * Номер штрихкод заказа
      */
-	private ?string $part = null;
+    #[Assert\NotBlank]
+	private string $part;
 	
 	
 	/** Стикер */
-	public function getSticker() : ?string
+	public function getSticker() : string
 	{
 		return $this->sticker;
 	}
@@ -50,13 +53,13 @@ final class WbStickerDTO implements WbOrdersStickerInterface
 	
 	/** Номер штрихкод заказа */
 	
-	public function getPart() : ?string
+	public function getPart() : string
 	{
 		return $this->part;
 	}
 	
 	
-	public function setPart(?string $part) : void
+	public function setPart(string $part) : void
 	{
 		$this->part = $part;
 	}

@@ -70,8 +70,15 @@ class WbOrdersStatistics extends EntityEvent
     private ?DateTimeImmutable $old = null;
 
 
+    public function __toString(): string
+    {
+        return (string) $this->product;
+    }
+
     public function getDto($dto): mixed
     {
+        $dto = is_string($dto) && class_exists($dto) ? new $dto() : $dto;
+
         if($dto instanceof WbOrdersStatisticsInterface)
         {
             return parent::getDto($dto);
@@ -82,7 +89,7 @@ class WbOrdersStatistics extends EntityEvent
 
     public function setEntity($dto): mixed
     {
-        if($dto instanceof WbOrdersStatisticsInterface)
+        if($dto instanceof WbOrdersStatisticsInterface || $dto instanceof self)
         {
             return parent::setEntity($dto);
         }

@@ -64,31 +64,6 @@ final class IndexController extends AbstractController
 
 
         /**
-         * Фильтр профиля пользователя
-         */
-
-//        $profile = new ProfileFilterDTO($request, $this->getProfileUid());
-//        $ROLE_ADMIN = $this->isGranted('ROLE_ADMIN');
-//
-//        if($ROLE_ADMIN)
-//        {
-//            $profileForm = $this->createForm(ProfileFilterFormAdmin::class, $profile, [
-//                'action' => $this->generateUrl('WildberriesOrders:admin.index'),
-//            ]);
-//        }
-//        else
-//        {
-//            $profileForm = $this->createForm(ProfileFilterForm::class, $profile, [
-//                'action' => $this->generateUrl('WildberriesOrders:admin.index'),
-//            ]);
-//        }
-
-//        $profileForm->handleRequest($request);
-//        !$profileForm->isSubmitted()?:$this->redirectToReferer();
-
-
-
-        /**
          * Фильтр товаров
          */
 
@@ -102,7 +77,7 @@ final class IndexController extends AbstractController
 
 
         /**
-         * Фильтр товаров
+         * Фильтр статусов
          */
 
         $status = new WbOrdersStatusFilterDTO($request);
@@ -112,8 +87,6 @@ final class IndexController extends AbstractController
         $statusForm->handleRequest($request);
         !$statusForm->isSubmitted()?:$this->redirectToReferer();
 
-
-        
 
         /**
          * Получаем список

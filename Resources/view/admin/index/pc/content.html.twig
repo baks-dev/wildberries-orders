@@ -1,4 +1,4 @@
-{% trans_default_domain('admin.wildberries.orders') %}
+{% trans_default_domain('admin.wb.orders') %}
 
 
 <main class="main d-print-none ">
@@ -19,6 +19,18 @@
                 {{ include(_self|replace({ "content.html.twig": "_counter.html.twig" })) }}
 
             </div>
+
+
+            {% if is_granted('ROLE_WB_ORDERS_GET') or true %}
+
+                <a href="{{ path('WildberriesOrders:admin.get') }}"
+                   class="btn btn-primary text-nowrap modal-link"
+                   data-bs-toggle="modal"
+                   data-bs-target="#modal"
+                >
+                    {{ 'Получить новые'|trans({}, 'core.btn') }}
+                </a>
+            {% endif %}
 
             {#<div class="w-100 d-flex align-items-center gap-3 justify-content-end">
                 {{ form_start(profile) }}

@@ -23,32 +23,30 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Wildberries\Orders\Type\ManufacturePartComplete;
+namespace BaksDev\Wildberries\Orders\Messenger\UpdateOrderSticker;
 
-use BaksDev\Manufacture\Part\Type\Complete\Collection\ManufacturePartCompleteInterface;
-use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
+use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 
-#[AutoconfigureTag('baks.part.complete')]
-final class ManufacturePartCompleteWildberriesFbs implements ManufacturePartCompleteInterface
+
+final class UpdateOrderStickerMessage
 {
     /**
-     * Ничего не делать
+     * Идентификатор профиля
      */
-    public const ACTION = 'wb_fbs';
+    private UserProfileUid $profile;
 
-    /**
-     * Возвращает значение (value)
-     */
-    public function getValue(): string
+
+    public function __construct(UserProfileUid $profile)
     {
-        return self::ACTION;
+        $this->profile = $profile;
     }
 
     /**
-     * Проверяет, относится ли строка цвета к данному объекту
+     * Profile
      */
-    public static function equals(string $action): bool
+    public function getProfile(): UserProfileUid
     {
-        return mb_strtolower($action) === self::ACTION;
+        return $this->profile;
     }
+
 }

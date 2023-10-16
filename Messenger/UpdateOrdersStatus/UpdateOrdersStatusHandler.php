@@ -27,6 +27,7 @@ namespace BaksDev\Wildberries\Orders\Messenger\UpdateOrdersStatus;
 
 use BaksDev\Wildberries\Api\Token\Orders\WildberriesOrdersStatus;
 use BaksDev\Wildberries\Orders\Entity\Event\WbOrdersEvent;
+use BaksDev\Wildberries\Orders\Entity\WbOrders;
 use BaksDev\Wildberries\Orders\Repository\AllOrdersByStatus\AllOrdersByStatusInterface;
 use BaksDev\Wildberries\Orders\Type\OrderStatus\WbOrderStatus;
 use BaksDev\Wildberries\Orders\Type\WildberriesStatus\Status\WildberriesStatusCanceled;
@@ -34,8 +35,10 @@ use BaksDev\Wildberries\Orders\Type\WildberriesStatus\Status\WildberriesStatusCa
 use BaksDev\Wildberries\Orders\Type\WildberriesStatus\Status\WildberriesStatusDefect;
 use BaksDev\Wildberries\Orders\Type\WildberriesStatus\Status\WildberriesStatusSold;
 use BaksDev\Wildberries\Orders\Type\WildberriesStatus\WildberriesStatus;
-use BaksDev\Wildberries\Orders\UseCase\Command\NewEdit\WbOrderDTO;
-use BaksDev\Wildberries\Orders\UseCase\Command\NewEdit\WbOrderHandler;
+use BaksDev\Wildberries\Orders\UseCase\Command\New\CreateWbOrderDTO;
+use BaksDev\Wildberries\Orders\UseCase\Command\New\CreateWbOrderHandler;
+use BaksDev\Wildberries\Orders\UseCase\Command\Status\StatusWbOrderDTO;
+use BaksDev\Wildberries\Orders\UseCase\Command\Status\StatusWbOrderHandler;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
@@ -48,8 +51,8 @@ final class UpdateOrdersStatusHandler
     private iterable $WildberriesStatus;
     private AllOrdersByStatusInterface $allOrdersByStatus;
     private WildberriesOrdersStatus $wildberriesOrdersStatus;
-    private WbOrderHandler $WildberriesOrderHandler;
     private LoggerInterface $messageDispatchLogger;
+    private StatusWbOrderHandler $statusWbOrderHandler;
 
 
     public function __construct(
@@ -57,8 +60,8 @@ final class UpdateOrdersStatusHandler
         EntityManagerInterface $entityManager,
         AllOrdersByStatusInterface $allOrdersByStatus,
         WildberriesOrdersStatus $wildberriesOrdersStatus,
-        WbOrderHandler $WildberriesOrderHandler,
         LoggerInterface $messageDispatchLogger,
+        StatusWbOrderHandler $statusWbOrderHandler
 
     )
     {
@@ -66,19 +69,14 @@ final class UpdateOrdersStatusHandler
         $this->WildberriesStatus = $WildberriesStatus;
         $this->allOrdersByStatus = $allOrdersByStatus;
         $this->wildberriesOrdersStatus = $wildberriesOrdersStatus;
-        $this->WildberriesOrderHandler = $WildberriesOrderHandler;
         $this->messageDispatchLogger = $messageDispatchLogger;
+
+        $this->statusWbOrderHandler = $statusWbOrderHandler;
     }
 
-    public function __invoke(UpdateOrderStatusMessage $message): void
+    public function __invoke(UpdateOrdersStatusMessage $message): void
     {
         $profile = $message->getProfile();
-
-        $this->messageDispatchLogger
-            ->info(
-                sprintf('%s: Обновляем статусы заказов Wildberries', $profile),
-                [__LINE__ => __FILE__]
-            );
 
         foreach($this->WildberriesStatus as $wbStatus)
         {
@@ -132,20 +130,35 @@ final class UpdateOrdersStatusHandler
                         $currentOrder['event_wildberries'] !== $apiStatus['wbStatus']
                     )
                     {
-                        $WbOrdersEvent = $this->entityManager->getRepository(WbOrdersEvent::class)->find($currentOrder['order_event']);
-                        $WbOrderDTO = new WbOrderDTO($profile, $apiStatus['id']);
-                        $WbOrdersEvent->getDto($WbOrderDTO);
+                        $WbOrdersEvent = $this->entityManager
+                            ->getRepository(WbOrdersEvent::class)
+                            ->find($currentOrder['order_event']);
+
+                        /** @var StatusWbOrderDTO $WbOrderDTO */
+                        $WbOrderDTO = $WbOrdersEvent->getDto(StatusWbOrderDTO::class);
 
                         $WbOrderDTO->setStatus(new WbOrderStatus($apiStatus['supplierStatus']));
                         $WbOrderDTO->setWildberries(new WildberriesStatus($apiStatus['wbStatus']));
 
-                        $this->WildberriesOrderHandler->handle($WbOrderDTO);
+                        $handle = $this->statusWbOrderHandler->handle($WbOrderDTO);
+
+                        if($handle instanceof WbOrders)
+                        {
+                            $this->messageDispatchLogger
+                                ->info(
+                                    sprintf('%s: Обновили статус заказа Wildberries ( order : %s ) ', $profile, $apiStatus['id']),
+                                    [__FILE__.':'.__LINE__]
+                                );
+
+                            continue;
+                        }
 
                         $this->messageDispatchLogger
-                            ->info(
-                                sprintf('%s: Обновили статус заказа Wildberries ( order : %s ) ', $profile, $apiStatus['id']),
-                                [__LINE__ => __FILE__]
+                            ->critical(
+                                sprintf('%s: Ошибка при обновлении статуса заказа Wildberries ', $handle),
+                                [__FILE__.':'.__LINE__]
                             );
+
                     }
                 }
             }

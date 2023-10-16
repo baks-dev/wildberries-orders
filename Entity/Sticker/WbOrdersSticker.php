@@ -24,43 +24,73 @@
 namespace BaksDev\Wildberries\Orders\Entity\Sticker;
 
 use BaksDev\Core\Entity\EntityEvent;
+use BaksDev\Core\Entity\EntityReadonly;
+use BaksDev\Orders\Order\Type\Id\OrderUid;
 use BaksDev\Wildberries\Orders\Entity\Event\WbOrdersEvent;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use InvalidArgumentException;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /* Barcode */
 
 #[ORM\Entity]
 #[ORM\Table(name: 'wb_orders_sticker')]
 #[ORM\Index(columns: ['part'])]
-class WbOrdersSticker extends EntityEvent
+class WbOrdersSticker extends EntityReadonly
 {
     public const TABLE = 'wb_orders_sticker';
 
-    /** ID события */
+    /**
+     * Идентификатор WbSupply
+     */
+    #[Assert\NotBlank]
+    #[Assert\Uuid]
     #[ORM\Id]
+    #[ORM\Column(type: OrderUid::TYPE)]
+    private OrderUid $main;
+
+    /** ID события */
+    #[Assert\NotBlank]
+    #[Assert\Uuid]
     #[ORM\OneToOne(inversedBy: 'sticker', targetEntity: WbOrdersEvent::class)]
     #[ORM\JoinColumn(name: 'event', referencedColumnName: 'id')]
     private WbOrdersEvent $event;
 
     /** Стикер */
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $sticker = null;
+    #[Assert\NotBlank]
+    #[ORM\Column(type: Types::TEXT)]
+    private string $sticker;
 
 
     /** Номер штрихкод заказа */
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    private ?string $part = null;
+    #[Assert\NotBlank]
+    #[ORM\Column(type: Types::TEXT)]
+    private string $part;
 
 
     public function __construct(WbOrdersEvent $event)
     {
         $this->event = $event;
+        $this->main = $event->getMain();
+
     }
+
+    public function __toString(): string
+    {
+        return (string) $this->main;
+    }
+
+    public function getOrder(): OrderUid
+    {
+        return $this->main;
+    }
+
 
     public function getDto($dto): mixed
     {
+        $dto = is_string($dto) && class_exists($dto) ? new $dto() : $dto;
+
         if($dto instanceof WbOrdersStickerInterface)
         {
             return parent::getDto($dto);
@@ -71,10 +101,10 @@ class WbOrdersSticker extends EntityEvent
 
     public function setEntity($dto): mixed
     {
-        if($dto instanceof WbOrdersStickerInterface)
+        if($dto instanceof WbOrdersStickerInterface || $dto instanceof self)
         {
 
-            if(empty($dto->getSticker()) && empty($dto->getPart()))
+            if($dto instanceof WbOrdersStickerInterface && empty($dto->getSticker()) && empty($dto->getPart()))
             {
                 return false;
             }
@@ -85,5 +115,12 @@ class WbOrdersSticker extends EntityEvent
         throw new InvalidArgumentException(sprintf('Class %s interface error', $dto::class));
     }
 
+    /**
+     * Sticker
+     */
+    public function getSticker(): string
+    {
+        return $this->sticker;
+    }
 
 }

@@ -19,6 +19,8 @@
 namespace BaksDev\Wildberries\Orders\Entity\Client;
 
 use BaksDev\Core\Entity\EntityEvent;
+use BaksDev\Core\Entity\EntityReadonly;
+use BaksDev\Orders\Order\Type\Id\OrderUid;
 use BaksDev\Wildberries\Orders\Entity\Event\WbOrdersEvent;
 use BaksDev\Wildberries\Orders\Type\Email\ClientEmail;
 use Doctrine\DBAL\Types\Types;
@@ -30,15 +32,24 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'wb_orders_client')]
-class WbOrderClient extends EntityEvent
+class WbOrderClient extends EntityReadonly
 {
     public const TABLE = 'wb_orders_client';
+
+    /**
+     * Идентификатор WbSupply
+     */
+    #[Assert\NotBlank]
+    #[Assert\Uuid]
+    #[ORM\Id]
+    #[ORM\Column(type: OrderUid::TYPE)]
+    private OrderUid $main;
 
     /**
      * Идентификатор события
      */
     #[Assert\NotBlank]
-    #[ORM\Id]
+    #[Assert\Uuid]
     #[ORM\OneToOne(inversedBy: 'client', targetEntity: WbOrdersEvent::class)]
     #[ORM\JoinColumn(name: 'event', referencedColumnName: 'id')]
     private WbOrdersEvent $event;
@@ -71,11 +82,20 @@ class WbOrderClient extends EntityEvent
     public function __construct(WbOrdersEvent $event)
     {
         $this->event = $event;
+        $this->main = $event->getMain();
+
+    }
+
+    public function __toString(): string
+    {
+        return (string) $this->main;
     }
 
 
     public function getDto($dto): mixed
     {
+        $dto = is_string($dto) && class_exists($dto) ? new $dto() : $dto;
+
         if($dto instanceof WbOrderClientInterface)
         {
             return parent::getDto($dto);
@@ -88,22 +108,27 @@ class WbOrderClient extends EntityEvent
     public function setEntity($dto): mixed
     {
 
-        if($dto instanceof WbOrderClientInterface)
+        if($dto instanceof WbOrderClientInterface || $dto instanceof self)
         {
-            if(
-                empty($dto->getUsername()) &&
-                empty($dto->getPhone()) &&
-                empty($dto->getEmail()) &&
-                empty($dto->getAddress())
-            )
+            if($dto instanceof WbOrderClientInterface)
             {
-                return false;
+                if(
+                    empty($dto->getUsername()) &&
+                    empty($dto->getPhone()) &&
+                    empty($dto->getEmail()?->getValue()) &&
+                    empty($dto->getAddress())
+                )
+                {
+                    return false;
+                }
             }
-
 
             return parent::setEntity($dto);
         }
 
         throw new InvalidArgumentException(sprintf('Class %s interface error', $dto::class));
     }
+
+
+
 }

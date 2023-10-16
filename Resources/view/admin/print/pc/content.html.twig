@@ -1,0 +1,84 @@
+{# ПЕЧАТЬ #}
+
+<div class="d-none d-print-block" >
+    {% for order in item %}
+
+        <div style="width: 5cm; margin-left: 0.7cm;">
+            <div class="text-center w-100">
+                <img src="data:image/svg+xml;base64,{{ sticker }}"
+                     style="height: 3cm; padding-top: 0;"
+                     alt="sticker" />
+            </div>
+        </div>
+
+        <div style="page-break-after: always !important;"></div>
+
+        {% for i in 1..counter %}
+
+            <div style="width: 5cm; margin-left: 0.7cm; margin-top: 0.3cm;">
+
+                <div class="text-center w-100">
+                    <img src='data:image/svg+xml;base64,{{ barcode }}' alt='Штрихкод {{ barcode }}' style="height: 1.2cm;"/>
+                    <h6 class="w-100 lh-normal">{{ order.barcode }}</h6>
+                </div>
+                <div class="d-flex justify-content-between align-items-end w-100"
+                     style="margin-top: -10px; font-size: 8px;">
+                    {{ include(_self|replace({ "content.html.twig" : "sticker.html.twig" })) }}
+                </div>
+            </div>
+
+            {% if not loop.last %}
+                <div style="page-break-after: always !important;"></div>
+            {% endif %}
+
+        {% endfor %}
+
+
+        {% if not loop.last %}
+            <div style="page-break-after: always !important;"></div>
+        {% endif %}
+
+    {% endfor %}
+</div>
+
+
+<div class="modal-dialog modal-dialog-centered" style="max-width: 400px;">
+
+    <div class="modal-content p-3 border-bottom border-5 border-primary d-print-none">
+
+        <div class="modal-header">
+            <h5 class="modal-title">
+                {{ 'Стикеры заказа'|trans }}
+            </h5>
+        </div>
+
+        <div class="modal-body">
+            {{ include(_self|replace({ "content.html.twig" : "card.html.twig" })) }}
+        </div>
+
+        <div class="modal-footer">
+
+            <div class="mt-3 gap-3 d-flex">
+                {# Отмена #}
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">
+                    {{ 'btn.cancel'|trans({}, 'core.btn') }}
+                </button>
+                {# Печать #}
+                <button id="print_all" type="button" class="btn btn-primary">
+
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                         class="bi bi-printer-fill"
+                         viewBox="0 0 16 16">
+                        <path d="M5 1a2 2 0 0 0-2 2v1h10V3a2 2 0 0 0-2-2H5zm6 8H5a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1z"/>
+                        <path d="M0 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2h-1v-2a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v2H2a2 2 0 0 1-2-2V7zm2.5 1a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+                    </svg>
+
+                    Печать {{ item|length }} шт.
+                </button>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+

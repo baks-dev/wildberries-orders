@@ -72,7 +72,7 @@ final class WbOrdersStatusFilterForm extends AbstractType
             },
             'label' => false,
             'required' => false,
-            'translation_domain' => 'admin.wildberries.orders'
+            'translation_domain' => 'admin.wb.orders'
         ]);
 
 
@@ -89,7 +89,7 @@ final class WbOrdersStatusFilterForm extends AbstractType
             },
             'label' => false,
             'required' => false,
-            'translation_domain' => 'admin.wildberries.orders'
+            'translation_domain' => 'admin.wb.orders'
         ]);
 
 

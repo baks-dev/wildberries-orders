@@ -24,12 +24,12 @@ use BaksDev\Core\Type\UidType\UidType;
 final class WbOrdersEventUidType extends UidType
 {
     
-    public function getClassType() : string
+    public function getClassType(): string
     {
         return WbOrdersEventUid::class;
     }
     
-    public function getName() : string
+    public function getName(): string
     {
         return WbOrdersEventUid::TYPE;
     }

@@ -13,7 +13,7 @@ namespace BaksDev\Wildberries\Orders\Command;
 
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
-use BaksDev\Wildberries\Orders\Messenger\UpdateOrdersStatus\UpdateOrderStatusMessage;
+use BaksDev\Wildberries\Orders\Messenger\UpdateOrdersStatus\UpdateOrdersStatusMessage;
 use BaksDev\Wildberries\Repository\AllProfileToken\AllProfileTokenInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -97,7 +97,7 @@ class UpdateOrdersStatusCommand extends Command
 
             /* Отправляем сообщение в шину профиля */
             $this->messageDispatch->dispatch(
-                message: new UpdateOrderStatusMessage($profile),
+                message: new UpdateOrdersStatusMessage($profile),
                 transport: (string) $profile,
             );
         }
@@ -107,7 +107,7 @@ class UpdateOrdersStatusCommand extends Command
             {
                 /* Отправляем сообщение в шину профиля */
                 $this->messageDispatch->dispatch(
-                    message: new UpdateOrderStatusMessage($profile),
+                    message: new UpdateOrdersStatusMessage($profile),
                     transport: (string) $profile,
                 );
             }

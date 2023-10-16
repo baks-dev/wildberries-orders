@@ -25,6 +25,7 @@ use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Wildberries\Orders\Entity\Client\WbOrderClient;
 use BaksDev\Wildberries\Orders\Entity\Modify\WbOrdersModify;
 use BaksDev\Wildberries\Orders\Entity\Sticker\WbOrdersSticker;
+use BaksDev\Wildberries\Orders\Entity\WbOrders;
 use BaksDev\Wildberries\Orders\Type\Event\WbOrdersEventUid;
 use BaksDev\Wildberries\Orders\Type\OrderStatus\Status\WbOrderStatusNew;
 use BaksDev\Wildberries\Orders\Type\OrderStatus\WbOrderStatus;
@@ -40,7 +41,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'wb_orders_event')]
-#[ORM\Index(columns: ['ord'])]
+#[ORM\Index(columns: ['main'])]
 #[ORM\Index(columns: ['barcode'])]
 #[ORM\Index(columns: ['profile'])]
 #[ORM\Index(columns: ['status'])]
@@ -68,8 +69,9 @@ class WbOrdersEvent extends EntityEvent
      * Идентификатор системного заказа
      */
     #[Assert\NotBlank]
+    #[Assert\Uuid]
     #[ORM\Column(type: OrderUid::TYPE)]
-    private ?OrderUid $ord = null;
+    private ?OrderUid $main = null;
 
     /**
      * Штрихкод
@@ -110,13 +112,13 @@ class WbOrdersEvent extends EntityEvent
      * Стикер заказа
      */
     #[ORM\OneToOne(mappedBy: 'event', targetEntity: WbOrdersSticker::class, cascade: ['all'])]
-    private WbOrdersSticker $sticker;
+    private ?WbOrdersSticker $sticker = null;
 
     /**
      * Клиент
      */
     #[ORM\OneToOne(mappedBy: 'event', targetEntity: WbOrderClient::class, cascade: ['all'])]
-    private WbOrderClient $client;
+    private ?WbOrderClient $client = null;
 
 
     public function __construct()
@@ -130,28 +132,18 @@ class WbOrdersEvent extends EntityEvent
 
     public function __clone()
     {
-        $this->id = new WbOrdersEventUid();
+        $this->id = clone $this->id;
     }
 
-
-    public function getId(): WbOrdersEventUid
+    public function __toString(): string
     {
-        return $this->id;
-    }
-
-
-    public function getOrd(): ?OrderUid
-    {
-        return $this->ord;
-    }
-
-    public function setOrd(OrderUid|Order $ord): void
-    {
-        $this->ord = $ord instanceof Order ? $ord->getId() : $ord;
+        return (string) $this->id;
     }
 
     public function getDto($dto): mixed
     {
+        $dto = is_string($dto) && class_exists($dto) ? new $dto() : $dto;
+
         if($dto instanceof WbOrdersEventInterface)
         {
             return parent::getDto($dto);
@@ -163,7 +155,7 @@ class WbOrdersEvent extends EntityEvent
 
     public function setEntity($dto): mixed
     {
-        if($dto instanceof WbOrdersEventInterface)
+        if($dto instanceof WbOrdersEventInterface || $dto instanceof self)
         {
             return parent::setEntity($dto);
         }
@@ -171,15 +163,28 @@ class WbOrdersEvent extends EntityEvent
         throw new InvalidArgumentException(sprintf('Class %s interface error', $dto::class));
     }
 
-    //    public function isStatusOrderEquals(WbOrderStatusEnum $status) : bool
-    //    {
-    //
-    //        return $this->status->equals($status);
-    //    }
-    //
-    //    public function isStatusClientEquals(WbClientStatusEnum $status) : bool
-    //    {
-    //        return $this->client->statusEquals($status);
-    //    }
+    /**
+     * Id
+     */
+    public function getId(): WbOrdersEventUid
+    {
+        return $this->id;
+    }
 
+
+    public function getMain(): ?OrderUid
+    {
+        return $this->main;
+    }
+
+    public function setMain(OrderUid|WbOrders $ord): void
+    {
+        $this->main = $ord instanceof WbOrders ? $ord->getId() : $ord;
+    }
+
+
+    public function statusEquals(mixed $status): bool
+    {
+        return $this->status->equals($status);
+    }
 }

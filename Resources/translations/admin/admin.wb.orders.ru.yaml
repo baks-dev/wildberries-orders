@@ -1,10 +1,16 @@
 admin:
   page:
     index: 'Заказы Wildberries'
+    get: 'Получить новые заказы Wildberries'
 
   breadcrumb:
     index: 'Заказы Wildberries'
 
+  success:
+    get: 'Обновление заказов Wildberries добавлено в очередь'
+
+  danger:
+    get: 'Уже было обновление! Повторите попытку через 5 минут!'
 
 unknown:  'Неизвестный'
 

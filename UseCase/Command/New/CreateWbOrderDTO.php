@@ -16,16 +16,8 @@
  *
  */
 
-namespace BaksDev\Wildberries\Orders\UseCase\Command\NewEdit;
+namespace BaksDev\Wildberries\Orders\UseCase\Command\New;
 
-//use App\Module\Orders\Order\Entity\Order;
-//use App\Module\Orders\Order\Type\Id\OrderUid;
-//use App\Module\User\Profile\UserProfile\Type\Id\UserProfileUid;
-//use App\Module\Wildberries\Orders\Order\Entity\Client\WbOrderClient;
-//use App\Module\Wildberries\Orders\Order\Entity\Event\WbOrdersEventInterface;
-//use App\Module\Wildberries\Orders\Order\Type\Event\WbOrdersEventUid;
-//use App\Module\Wildberries\Orders\Order\Type\Status\WbOrderStatus;
-//use App\Module\Wildberries\Orders\Order\Type\Status\WbOrderStatusEnum;
 use BaksDev\Orders\Order\Entity\Order;
 use BaksDev\Orders\Order\Type\Id\OrderUid;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
@@ -39,21 +31,17 @@ use DateTimeImmutable;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /** @see WbOrdersEvent */
-final class WbOrderDTO implements WbOrdersEventInterface
+final class CreateWbOrderDTO implements WbOrdersEventInterface
 {
-    private bool $update = false;
-
     /**
      * Идентификатор события
      */
     #[Assert\Uuid]
+    #[Assert\isNull]
     private ?WbOrdersEventUid $id = null;
 
     /**
      * Профиль пользователя
-     */
-    /**
-     * Идентификатор события
      */
     #[Assert\NotBlank]
     #[Assert\Uuid]
@@ -64,7 +52,7 @@ final class WbOrderDTO implements WbOrdersEventInterface
      */
     #[Assert\NotBlank]
     #[Assert\Uuid]
-    private readonly OrderUid $ord;
+    private readonly OrderUid $main;
 
     /**
      * Идентификатор заказа Wildberries
@@ -102,17 +90,10 @@ final class WbOrderDTO implements WbOrdersEventInterface
     #[Assert\Valid]
     private Client\WbOrderClientDTO $client;
 
-    /**
-     * Стикер заказа
-     */
-    #[Assert\Valid]
-    private Sticker\WbStickerDTO $sticker;
-
 
     public function __construct(UserProfileUid $profile, int $wbOrder)
     {
         $this->client = new Client\WbOrderClientDTO();
-        $this->sticker = new Sticker\WbStickerDTO();
         $this->wbOrder = $wbOrder;
         $this->profile = $profile;
     }
@@ -219,15 +200,15 @@ final class WbOrderDTO implements WbOrdersEventInterface
      * Идентификатор системного заказа
      */
 
-    public function getOrd(): ?OrderUid
+    public function getMain(): ?OrderUid
     {
-        return $this->ord;
+        return $this->main;
     }
 
 
-    public function setOrd(OrderUid|Order $order): void
+    public function setMain(OrderUid|Order $order): void
     {
-        $this->ord = $order instanceof Order ? $order->getId() : $order;
+        $this->main = $order instanceof Order ? $order->getId() : $order;
     }
 
 
@@ -239,38 +220,5 @@ final class WbOrderDTO implements WbOrdersEventInterface
     {
         return $this->profile;
     }
-
-
-    /**
-     * Стикер заказа
-     */
-
-    public function getSticker(): Sticker\WbStickerDTO
-    {
-        return $this->sticker;
-    }
-
-    public function setSticker(Sticker\WbStickerDTO $sticker): void
-    {
-        $this->sticker = $sticker;
-    }
-
-
-
-
-
-
-
-
-//    public function update(): void
-//    {
-//        $this->update = true;
-//    }
-//
-//    public function isUpdate(): bool
-//    {
-//        return $this->update;
-//    }
-
 
 }

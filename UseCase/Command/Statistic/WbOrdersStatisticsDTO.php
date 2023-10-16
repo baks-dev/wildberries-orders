@@ -28,6 +28,7 @@ namespace BaksDev\Wildberries\Orders\UseCase\Command\Statistic;
 use BaksDev\Products\Product\Type\Id\ProductUid;
 use BaksDev\Wildberries\Orders\Entity\WbOrdersStatisticsInterface;
 use DateTimeImmutable;
+use ReflectionProperty;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /** @see WbOrdersStatistics */
@@ -68,7 +69,10 @@ final class WbOrdersStatisticsDTO implements WbOrdersStatisticsInterface
 
     public function setProduct(ProductUid $product): void
     {
-        $this->product = $product;
+        if(!(new ReflectionProperty(self::class, 'product'))->isInitialized($this))
+        {
+            $this->product = $product;
+        }
     }
 
 

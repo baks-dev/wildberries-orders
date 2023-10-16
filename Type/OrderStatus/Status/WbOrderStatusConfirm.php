@@ -33,7 +33,7 @@ final class WbOrderStatusConfirm implements WbOrderStatusInterface
 {
 
     /**
-     * На сборке
+     * Добавлен к поставке, на сборке
      */
 
     public const STATUS = 'confirm';

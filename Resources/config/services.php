@@ -40,6 +40,5 @@ return static function(ContainerConfigurator $configurator) {
 
     $services->load($NAMESPACE.'Type\OrderStatus\Status\\', $MODULE.'Type/OrderStatus/Status');
     $services->load($NAMESPACE.'Type\WildberriesStatus\Status\\', $MODULE.'Type/WildberriesStatus/Status');
-    $services->load($NAMESPACE.'Type\ManufacturePartComplete\\', $MODULE.'Type/ManufacturePartComplete');
 
 };

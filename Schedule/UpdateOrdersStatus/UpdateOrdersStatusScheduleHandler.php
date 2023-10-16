@@ -26,7 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Wildberries\Orders\Schedule\UpdateOrdersStatus;
 
 use BaksDev\Core\Messenger\MessageDispatchInterface;
-use BaksDev\Wildberries\Orders\Messenger\UpdateOrdersStatus\UpdateOrderStatusMessage;
+use BaksDev\Wildberries\Orders\Messenger\UpdateOrdersStatus\UpdateOrdersStatusMessage;
 use BaksDev\Wildberries\Repository\AllProfileToken\AllProfileTokenInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -55,7 +55,7 @@ final class UpdateOrdersStatusScheduleHandler
         {
             /* Отправляем сообщение в шину профиля */
             $this->messageDispatch->dispatch(
-                message: new UpdateOrderStatusMessage($profile),
+                message: new UpdateOrdersStatusMessage($profile),
                 transport: (string) $profile,
             );
         }

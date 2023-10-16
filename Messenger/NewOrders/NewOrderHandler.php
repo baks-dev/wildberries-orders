@@ -25,6 +25,7 @@ declare(strict_types=1);
 
 namespace BaksDev\Wildberries\Orders\Messenger\NewOrders;
 
+use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Orders\Order\Type\Status\OrderStatus\OrderStatusCanceled;
 use BaksDev\Orders\Order\UseCase\Admin\NewEdit\OrderDTO;
 use BaksDev\Orders\Order\UseCase\Admin\NewEdit\OrderHandler;
@@ -34,17 +35,19 @@ use BaksDev\Orders\Order\UseCase\Admin\Status\OrderStatusDTO;
 use BaksDev\Orders\Order\UseCase\Admin\Status\OrderStatusHandler;
 use BaksDev\Products\Product\Repository\ProductByVariation\ProductByVariationInterface;
 use BaksDev\Reference\Money\Type\Money;
+use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Wildberries\Api\Token\Orders\WildberriesOrdersNew;
 use BaksDev\Wildberries\Orders\Entity\WbOrders;
 use BaksDev\Wildberries\Orders\Repository\WbOrdersById\WbOrdersByIdInterface;
 use BaksDev\Wildberries\Orders\Type\Email\ClientEmail;
 use BaksDev\Wildberries\Orders\Type\OrderStatus\Status\WbOrderStatusNew;
 use BaksDev\Wildberries\Orders\Type\WildberriesStatus\Status\WildberriesStatusWaiting;
-use BaksDev\Wildberries\Orders\UseCase\Command\NewEdit\WbOrderDTO;
-use BaksDev\Wildberries\Orders\UseCase\Command\NewEdit\WbOrderHandler;
+use BaksDev\Wildberries\Orders\UseCase\Command\New\CreateWbOrderDTO;
+use BaksDev\Wildberries\Orders\UseCase\Command\New\CreateWbOrderHandler;
 use BaksDev\Wildberries\Products\Entity\Cards\WbProductCard;
 use BaksDev\Wildberries\Products\Entity\Cards\WbProductCardOffer;
 use BaksDev\Wildberries\Products\Entity\Cards\WbProductCardVariation;
+use BaksDev\Wildberries\Products\Messenger\WbCardNew\WbCardNewMessage;
 use BaksDev\Wildberries\Products\UseCase\Cards\NewEdit\Variation\WbProductCardVariationDTO;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
@@ -60,9 +63,15 @@ final class NewOrderHandler
     private ProductByVariationInterface $productByVariation;
     private OrderHandler $orderHandler;
     private OrderStatusHandler $orderStatusHandler;
-    private WbOrderHandler $WildberriesOrderHandler;
+    private CreateWbOrderHandler $WildberriesOrderHandler;
     private EntityManagerInterface $entityManager;
     private LoggerInterface $messageDispatchLogger;
+    private MessageDispatchInterface $messageDispatch;
+
+    private UserProfileUid $profile;
+    private bool $WbCardUpdate = false;
+
+    private string $barcode;
 
     public function __construct(
         WildberriesOrdersNew $wildberriesOrdersNew,
@@ -70,9 +79,10 @@ final class NewOrderHandler
         ProductByVariationInterface $productByVariation,
         OrderHandler $orderHandler,
         OrderStatusHandler $orderStatusHandler,
-        WbOrderHandler $WildberriesOrderHandler,
+        CreateWbOrderHandler $WildberriesOrderHandler,
         EntityManagerInterface $entityManager,
         LoggerInterface $messageDispatchLogger,
+        MessageDispatchInterface $messageDispatch
     )
     {
         $this->wildberriesOrdersNew = $wildberriesOrdersNew;
@@ -83,18 +93,18 @@ final class NewOrderHandler
         $this->WildberriesOrderHandler = $WildberriesOrderHandler;
         $this->entityManager = $entityManager;
         $this->messageDispatchLogger = $messageDispatchLogger;
+        $this->messageDispatch = $messageDispatch;
     }
 
     public function __invoke(NewOrdersMessage $message): void
     {
+        $this->profile = $message->getProfile();
 
-        $profile = $message->getProfile();
-
+        /* Получить список новых сборочных заданий */
         $orders = $this->wildberriesOrdersNew
-            ->profile($profile)
+            ->profile($this->profile)
             ->request()
-            ->getContent()
-        ;
+            ->getContent();
 
         if(empty($orders))
         {
@@ -103,77 +113,51 @@ final class NewOrderHandler
 
         $this->messageDispatchLogger
             ->info(
-                sprintf('%s: Добавляем новые заказы Wildberries', $profile),
-                [__LINE__ => __FILE__]
+                sprintf('%s: Добавляем новые заказы Wildberries', $this->profile),
+                [__FILE__.':'.__LINE__]
             );
 
         foreach($orders as $order)
         {
-            /* Проверяем, имеется ли в системе заказ WB с указанным идентификатором */
-            $WbOrder = $this->wbOrdersById->isExistWbOrder($order['id']);
-
-            /* Если заказ существует - пропускам */
-            if($WbOrder)
+            if($this->wbOrdersById->isExistWbOrder($order['id']))
             {
-                continue;
+                continue; /* Переходим к следующему заказу */
             }
 
-            /* Получаем карточку по штрихкод */
-            $barcode = current($order['skus']);
+            $this->barcode = (string) current($order['skus']);
 
             $WbProductCardVariation = $this->entityManager
-                ->getRepository(WbProductCardVariation::class)->find($barcode);
+                ->getRepository(WbProductCardVariation::class)
+                ->find($this->barcode);
 
-
-            /* Если множественный вариант Wildberries не найден - смотрим, нет ли торгового предложения с данной номенклатурой */
-            if(empty($WbProductCardVariation))
+            if(!$WbProductCardVariation)
             {
-                $WbProductCardOfferRemove = $this->entityManager
-                    ->getRepository(WbProductCardOffer::class)->find($order['nmId']);
-
-                /* Если найдена номенклатура - следовательно карточка изменилась (восстановлена с другом штрихкодом)*/
-                if($WbProductCardOfferRemove)
-                {
-                    $WbProductCardRemove = $this->entityManager->getRepository(WbProductCard::class)
-                        ->find($WbProductCardOfferRemove->getCard());
-
-                    $this->entityManager->remove($WbProductCardRemove);
-                }
-
-                $this->messageDispatchLogger
-                    ->warning(
-                        sprintf('%s: Отсутствует карточка товара Wildberries (article: %s; barcode : %s) ', $profile, $order['article'], $barcode),
-                        [__LINE__ => __FILE__]
-                    );
+                $this->removeWbCardWhereExistNomenclature($order['nmId']);
+                $this->WbCardUpdate = true;
 
                 continue;
             }
-
 
             /* Применяем множественный вариант Wildberries */
             $WbProductCardVariationDTO = new WbProductCardVariationDTO();
             $WbProductCardVariation->getDto($WbProductCardVariationDTO);
 
-
             /* Получаем продукт */
             $ProductVariationConst = $WbProductCardVariationDTO->getVariation();
             $Product = $this->productByVariation->getProductByVariationConstOrNull($ProductVariationConst);
 
-
             if(!$Product)
             {
-
-                $this->messageDispatchLogger
-                    ->warning(
-                        sprintf('%s: Ошибка при добавлении заказа Wildberries ( ProductVariationConst : %s) ', $profile, $ProductVariationConst),
-                        [__LINE__ => __FILE__]
-                    );
+                $this->removeWbCardWhereExistNomenclature($order['nmId']);
+                $this->WbCardUpdate = true;
 
                 continue;
             }
 
 
-            /* Создаем системный заказ */
+            /**
+             * Создаем системный заказ
+             */
 
             $OrderDTO = new OrderDTO();
             $OrderDTO->setUsers(null);
@@ -190,14 +174,17 @@ final class NewOrderHandler
             $OrderProductDTO->setPrice($OrderPriceDTO);
             $OrderDTO->addProduct($OrderProductDTO);
 
-            $Order = $this->orderHandler->handle($OrderDTO);
+
+            $Order = $this->orderHandler->handle($OrderDTO); /* Сохраняем системный заказ */
 
 
-            /* Создаем Wildberries заказ */
+            /**
+             * Создаем Wildberries заказ
+             */
 
-            $WbOrderDTO = new WbOrderDTO($profile, $order['id']);
-            $WbOrderDTO->setOrd($Order->getId());
-            $WbOrderDTO->setBarcode((string) $barcode);
+            $WbOrderDTO = new CreateWbOrderDTO($this->profile, $order['id']);
+            $WbOrderDTO->setMain($Order->getId());
+            $WbOrderDTO->setBarcode($this->barcode);
             $dateCreated = new DateTimeImmutable($order['createdAt']);
             $WbOrderDTO->setCreated($dateCreated);
             $WbOrderDTO->setStatus(new WbOrderStatusNew());
@@ -217,15 +204,14 @@ final class NewOrderHandler
                 }
             }
 
-            /* Сохраняем */
-            $WildberriesOrderResult = $this->WildberriesOrderHandler->handle($WbOrderDTO);
+            $WildberriesOrderHandle = $this->WildberriesOrderHandler->handle($WbOrderDTO);
 
-            if(!$WildberriesOrderResult instanceof WbOrders)
+            if(!$WildberriesOrderHandle instanceof WbOrders)
             {
                 $OrderStatusDTO = new OrderStatusDTO(
                     new OrderStatusCanceled(),
                     $Order->getEvent(),
-                    $profile
+                    $this->profile
                 );
 
                 $this->orderStatusHandler->handle($OrderStatusDTO);
@@ -234,10 +220,49 @@ final class NewOrderHandler
 
             $this->messageDispatchLogger
                 ->info(
-                    sprintf('%s: Добавили новый заказ ( order : %s) ', $profile, $order['id']),
-                    [__LINE__ => __FILE__]
+                    sprintf('%s: Добавили новый заказ ( order : %s )',
+                        $this->profile, $order['id']),
+                    [__FILE__.':'.__LINE__]
                 );
 
+        }
+
+        $this->WbCardUpdate();
+    }
+
+
+    /**
+     * Добавляет комманду для обновления новыми карточками
+     */
+    public function WbCardUpdate(): void
+    {
+        if($this->WbCardUpdate)
+        {
+            $this->messageDispatch->dispatch(
+                message: new WbCardNewMessage($this->profile),
+                transport: (string) $this->profile,
+            );
+        }
+    }
+
+    /**
+     * Если множественный вариант Wildberries не найден - смотрим, нет ли торгового предложения с данной номенклатурой
+     * Если найдено торговое предложение с номенклатурой - следовательно карточка изменилась
+     * (могла быть восстановлена из корзины с другом штрихкодом)
+     */
+    public function removeWbCardWhereExistNomenclature(int $nomenclature): void
+    {
+        $WbProductCardOfferRemove = $this->entityManager
+            ->getRepository(WbProductCardOffer::class)
+            ->find($nomenclature);
+
+        if($WbProductCardOfferRemove)
+        {
+            $WbProductCardRemove = $this->entityManager
+                ->getRepository(WbProductCard::class)
+                ->find($WbProductCardOfferRemove->getCard());
+
+            $this->entityManager->remove($WbProductCardRemove);
         }
     }
 }

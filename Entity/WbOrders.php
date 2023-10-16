@@ -58,16 +58,34 @@ class WbOrders
     private WbOrdersEventUid $event;
 
 
-    public function __construct(OrderUid|Order $order, int $wbOrder)
+//    public function __construct(OrderUid|Order $order, int $wbOrder)
+//    {
+//        $this->id = $order instanceof Order ? $order->getId() : $order;
+//        $this->ord = $wbOrder;
+//    }
+
+    public function __toString(): string
     {
-        $this->id = $order instanceof Order ? $order->getId() : $order;
-        $this->ord = $wbOrder;
+        return (string) $this->id;
     }
 
     public function getId(): OrderUid
     {
         return $this->id;
     }
+
+    public function setId(OrderUid $id): self
+    {
+        $this->id = $id;
+        return $this;
+    }
+
+    public function setOrd(int $ord): self
+    {
+        $this->ord = $ord;
+        return $this;
+    }
+
 
     public function getEvent(): WbOrdersEventUid
     {
@@ -78,5 +96,11 @@ class WbOrders
     {
         $this->event = $event instanceof WbOrdersEvent ? $event->getId() : $event;
     }
+
+
+
+
+
+
 
 }

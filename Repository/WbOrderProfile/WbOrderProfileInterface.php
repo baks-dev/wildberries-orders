@@ -21,12 +21,15 @@
  *  THE SOFTWARE.
  */
 
-namespace BaksDev\Wildberries\Orders\Forms\WbFilterProfile;
+namespace BaksDev\Wildberries\Orders\Repository\WbOrderProfile;
 
+use BaksDev\Orders\Order\Type\Id\OrderUid;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 
-interface ProfileFilterInterface
+interface WbOrderProfileInterface
 {
-
-    public function getProfile(): ?UserProfileUid;
+    /**
+     * Метод возвращает идентификатор профиля заказа и номер заказа Wildberries в качестве атрибута
+     */
+    public function findWbOrderProfile(OrderUid $order): ?UserProfileUid;
 }

@@ -22,9 +22,9 @@ use BaksDev\Wildberries\Orders\Type\Event\WbOrdersEventUid;
 
 interface WbOrdersEventInterface
 {
-    public function getWbOrder() : int;
+    //public function getWbOrder() : int;
     
     public function getEvent() : ?WbOrdersEventUid;
     
-    public function setId(WbOrdersEventUid $id) : void;
+    //public function setId(WbOrdersEventUid $id) : void;
 }

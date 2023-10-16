@@ -20,3 +20,7 @@ ROLE_WB_ORDERS_EDIT:
 ROLE_WB_ORDERS_DELETE:
   name: 'Delete'
   desc: ''
+
+ROLE_WB_ORDERS_GET:
+  name: 'Get new'
+  desc: ''

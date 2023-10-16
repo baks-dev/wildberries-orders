@@ -34,6 +34,12 @@ final class WildberriesStatus
 
         if(is_string($status))
         {
+            if(class_exists($status))
+            {
+                $this->status = new $status();
+                return;
+            }
+
             /** @var WildberriesStatusInterface $class */
             foreach(self::getDeclaredWildberriesStatus() as $class)
             {

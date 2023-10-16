@@ -1,0 +1,40 @@
+{% if card %}
+    <div class="lh-normal w-100">
+
+        <div class="fw-bolder">{{ card.product_name }}</div>
+
+        <div>
+            {% if settings.offer %}
+                {# Значение торгового предложения #}
+                {{ card.product_offer_name }}: {{ card.product_offer_value|call_twig_func(card.product_offer_reference) }} &nbsp;
+            {% endif %}
+
+            {% if settings.variation %}
+                {# Значение множественного варианта ТП #}
+                {{ card.product_variation_name }}: {{ card.product_variation_value|call_twig_func(card.product_variation_reference) }}
+            {% endif %}
+        </div>
+
+        <div>Арт: {{ card.product_article }}</div>
+
+        {% for props in property %}
+            {% if props.value %}
+                <div>{{ props.name }}: {{ props.value }}</div>
+            {% endif %}
+        {% endfor %}
+
+        <div>Дата производства: {{ "now"|date("d.m.Y") }}</div>
+    </div>
+
+    <div class="text-end" style="float: right;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 200 200">
+            <path fill="#fff" d="M-1.179-.59h201.084v186.145H-1.179z"/>
+            <path d="M50 13H10v155h40v-20H30V98h20V83H30V33h20z"/>
+            <path d="M90 98v70H70V13h60v155h-20V98z" stroke="#000"/>
+            <path d="M90 83h20V28H90z" fill="#fff" stroke="#000"/>
+            <path d="M190 13h-40v155h40v-20h-20V33h20z" stroke="#000"/>
+        </svg>
+    </div>
+
+{% endif %}
+

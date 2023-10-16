@@ -33,12 +33,18 @@ final class WbOrderStatus
 
         if(is_string($status))
         {
+            if(class_exists($status))
+            {
+                $this->status = new $status();
+                return;
+            }
+
             /** @var WbOrderStatusInterface $class */
             foreach(self::getDeclaredWbOrderStatus() as $class)
             {
                 if($class::equals($status))
                 {
-                    $this->status = new $class;
+                    $this->status = new $class();
                     return;
                 }
             }
@@ -83,7 +89,6 @@ final class WbOrderStatus
         return $case;
     }
 
-
     public static function getDeclaredWbOrderStatus(): array
     {
         return array_filter(
@@ -93,5 +98,25 @@ final class WbOrderStatus
                     return in_array(WbOrderStatusInterface::class, class_implements($className), true);
                 },
         );
+    }
+
+    public function equals(mixed $status): bool
+    {
+        if(is_string($status) && class_exists($status))
+        {
+            $status = new $status();
+        }
+
+        if($status instanceof WbOrderStatusInterface)
+        {
+            return $this->status->equals($status->getValue());
+        }
+
+        if($status instanceof self)
+        {
+            return $this->status->equals((string) $status);
+        }
+
+        return false;
     }
 }

@@ -163,7 +163,7 @@ final class AllWbOrdersGroup implements AllWbOrdersGroupInterface
         $qb->leftJoin('order_product',
             ProductInfo::TABLE,
             'product_info',
-            'product_info.product = product_event.product'
+            'product_info.product = product_event.main'
         );
 
         if($filter->getCategory())
@@ -289,11 +289,11 @@ final class AllWbOrdersGroup implements AllWbOrdersGroupInterface
         $qb->addSelect("
 			CASE
 			   WHEN product_variation_image.name IS NOT NULL THEN
-					CONCAT ( '/upload/".ProductVariationImage::TABLE."' , '/', product_variation_image.dir, '/', product_variation_image.name, '.')
+					CONCAT ( '/upload/".ProductVariationImage::TABLE."' , '/', product_variation_image.name)
 			   WHEN product_offer_images.name IS NOT NULL THEN
-					CONCAT ( '/upload/".ProductOfferImage::TABLE."' , '/', product_offer_images.dir, '/', product_offer_images.name, '.')
+					CONCAT ( '/upload/".ProductOfferImage::TABLE."' , '/', product_offer_images.name)
 			   WHEN product_photo.name IS NOT NULL THEN
-					CONCAT ( '/upload/".ProductPhoto::TABLE."' , '/', product_photo.dir, '/', product_photo.name, '.')
+					CONCAT ( '/upload/".ProductPhoto::TABLE."' , '/', product_photo.name)
 			   ELSE NULL
 			END AS product_image
 		"
@@ -351,7 +351,7 @@ final class AllWbOrdersGroup implements AllWbOrdersGroupInterface
         $qb->leftJoin('product_event',
             WbOrdersStatistics::TABLE,
             'wb_order_stats',
-            'wb_order_stats.product = product_event.product'
+            'wb_order_stats.product = product_event.main'
         );
 
 
