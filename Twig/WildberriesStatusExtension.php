@@ -50,7 +50,7 @@ final class WildberriesStatusExtension extends AbstractExtension
         }
         catch(LoaderError $loaderError)
         {
-            return $twig->render('@WildberriesOrders/twig/wildberries_status/content.html.twig', ['value' => $value]);
+            return $twig->render('@wildberries-orders/twig/wildberries_status/content.html.twig', ['value' => $value]);
         }
     }
 
@@ -64,7 +64,7 @@ final class WildberriesStatusExtension extends AbstractExtension
         }
         catch(LoaderError $loaderError)
         {
-            return $twig->render('@WildberriesOrders/twig/wildberries_status/template.html.twig', ['value' => $value]);
+            return $twig->render('@wildberries-orders/twig/wildberries_status/template.html.twig', ['value' => $value]);
         }
     }
 }

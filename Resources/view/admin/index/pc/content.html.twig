@@ -23,7 +23,7 @@
 
             {% if is_granted('ROLE_WB_ORDERS_GET') or true %}
 
-                <a href="{{ path('WildberriesOrders:admin.get') }}"
+                <a href="{{ path('wildberries-orders:admin.get') }}"
                    class="btn btn-primary text-nowrap modal-link"
                    data-bs-toggle="modal"
                    data-bs-target="#modal"
@@ -46,7 +46,7 @@
 
             {# Добавить #}
             {# {% if is_granted(ROLE~'_NEW') or is_granted('ROLE_ADMIN') %}
-				<a href="{{ path('ProfileType:admin.newedit.new') }}" class="btn btn-danger fw-bolder">
+				<a href="{{ path('users-profile-type:admin.newedit.new') }}" class="btn btn-danger fw-bolder">
 					{{ 'btn.new'|trans({}, 'core.btn') }}
 				</a>
 			{% endif %} #}

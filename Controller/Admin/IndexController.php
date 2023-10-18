@@ -57,7 +57,7 @@ final class IndexController extends AbstractController
         $search = new SearchDTO($request);
         $searchForm = $this->createForm(
             SearchForm::class, $search, [
-                'action' => $this->generateUrl('WildberriesOrders:admin.index'),
+                'action' => $this->generateUrl('wildberries-orders:admin.index'),
             ]
         );
         $searchForm->handleRequest($request);
@@ -69,7 +69,7 @@ final class IndexController extends AbstractController
 
         $filter = new WbOrdersProductFilterDTO($request);
         $filterForm = $this->createForm(WbOrdersProductFilterForm::class, $filter, [
-            'action' => $this->generateUrl('WildberriesOrders:admin.index'),
+            'action' => $this->generateUrl('wildberries-orders:admin.index'),
         ]);
         $filterForm->handleRequest($request);
         !$filterForm->isSubmitted()?:$this->redirectToReferer();
@@ -82,7 +82,7 @@ final class IndexController extends AbstractController
 
         $status = new WbOrdersStatusFilterDTO($request);
         $statusForm = $this->createForm(WbOrdersStatusFilterForm::class, $status, [
-            'action' => $this->generateUrl('WildberriesOrders:admin.index'),
+            'action' => $this->generateUrl('wildberries-orders:admin.index'),
         ]);
         $statusForm->handleRequest($request);
         !$statusForm->isSubmitted()?:$this->redirectToReferer();

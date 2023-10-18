@@ -181,7 +181,7 @@
                             <span>Арт:&nbsp;</span>
                             {% if item.wb_order_analog > 1 %}
 
-                                <form method="post" action='{{ path('WildberriesOrders:admin.index') }}' class="p-0">
+                                <form method="post" action='{{ path('wildberries-orders:admin.index') }}' class="p-0">
                                     <input type="hidden" name="search_form[query]" value="{{ item.product_article }}">
                                     <button type="submit" class="btn btn-link text-decoration-none btn-sm p-0 border-0">
                                         <span class="small">{{ item.product_article }}</span>
@@ -203,7 +203,7 @@
                             title='QR продукции'
                     >
 
-                    <a href="{{ path('Product:admin.qrcode', {
+                    <a href="{{ path('products-product:admin.qrcode', {
                         product: item.wb_product_event,
                         offer: item.wb_product_offer,
                         variation: item.wb_product_variation,

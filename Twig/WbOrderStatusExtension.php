@@ -50,7 +50,7 @@ final class WbOrderStatusExtension extends AbstractExtension
         }
         catch(LoaderError $loaderError)
         {
-            return $twig->render('@WildberriesOrders/twig/wb_order_status/content.html.twig', ['value' => $value]);
+            return $twig->render('@wildberries-orders/twig/wb_order_status/content.html.twig', ['value' => $value]);
         }
     }
 
@@ -64,7 +64,7 @@ final class WbOrderStatusExtension extends AbstractExtension
         }
         catch(LoaderError $loaderError)
         {
-            return $twig->render('@WildberriesOrders/twig/wb_order_status/template.html.twig', ['value' => $value]);
+            return $twig->render('@wildberries-orders/twig/wb_order_status/template.html.twig', ['value' => $value]);
         }
     }
 }

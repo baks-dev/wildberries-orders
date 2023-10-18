@@ -52,7 +52,7 @@ final class GetController extends AbstractController
     ): Response
     {
         $form = $this->createForm(WbOrdersGetForm::class, null, [
-            'action' => $this->generateUrl('WildberriesOrders:admin.get'),
+            'action' => $this->generateUrl('wildberries-orders:admin.get'),
         ]);
         $form->handleRequest($request);
 
@@ -97,7 +97,7 @@ final class GetController extends AbstractController
             }
 
 
-            return $this->redirectToRoute('WildberriesOrders:admin.index');
+            return $this->redirectToRoute('wildberries-orders:admin.index');
         }
 
         return $this->render(['form' => $form->createView()]);

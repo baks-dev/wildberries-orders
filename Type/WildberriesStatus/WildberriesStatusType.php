@@ -11,25 +11,12 @@ final class WildberriesStatusType extends StringType
 
     public function convertToDatabaseValue($value, AbstractPlatform $platform): mixed
     {
-
-        return $value instanceof WildberriesStatus ? $value->getStatusValue() : (new WildberriesStatus($value))->getStatusValue();
-
+        return (string) $value;
     }
 
     public function convertToPHPValue($value, AbstractPlatform $platform): mixed
     {
-
-        /** @var WildberriesStatus $status */
-        foreach(WildberriesStatus::cases() as $status)
-        {
-            if($status->getStatus()::equals($value))
-            {
-                return $status;
-            }
-        }
-
-        throw new InvalidArgumentException(sprintf('Not found Wildberries Status %s', $value));
-
+        return new WildberriesStatus($value);
     }
 
     public function getName(): string

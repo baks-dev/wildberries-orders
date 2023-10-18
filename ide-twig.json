@@ -1,7 +1,7 @@
 {
   "namespaces": [
     {
-      "namespace": "WildberriesOrders",
+      "namespace": "wildberries-orders",
       "path": "Resources/view"
     }
   ]

@@ -13,11 +13,22 @@ final class WbOrderStatus
 
     public const TYPE = 'wb_order_status';
 
-    private ?WbOrderStatusInterface $status = null;
+    private WbOrderStatusInterface $status;
 
 
-    public function __construct(self|string|WbOrderStatusInterface $status)
+    public function __construct(WbOrderStatusInterface|self|string $status)
     {
+
+        if(is_string($status) && class_exists($status))
+        {
+            $instance = new $status();
+
+            if($instance instanceof WbOrderStatusInterface)
+            {
+                $this->status = $instance;
+                return;
+            }
+        }
 
         if($status instanceof WbOrderStatusInterface)
         {
@@ -25,51 +36,38 @@ final class WbOrderStatus
             return;
         }
 
-        if($status instanceof $this)
+        if($status instanceof self)
         {
-            $this->status = $status->getStatus();
+            $this->status = $status->getWbOrderStatus();
             return;
         }
 
-        if(is_string($status))
+        /** @var WbOrderStatusInterface $declare */
+        foreach(self::getDeclared() as $declare)
         {
-            if(class_exists($status))
+            if($declare::equals($status))
             {
-                $this->status = new $status();
+                $this->status = new $declare;
                 return;
-            }
-
-            /** @var WbOrderStatusInterface $class */
-            foreach(self::getDeclaredWbOrderStatus() as $class)
-            {
-                if($class::equals($status))
-                {
-                    $this->status = new $class();
-                    return;
-                }
             }
         }
 
-        throw new InvalidArgumentException(sprintf('Not found Wildberries Order Status %s', $status));
+        throw new InvalidArgumentException(sprintf('Not found WbOrderStatus %s', $status));
 
     }
 
 
     public function __toString(): string
     {
-        return $this->status ? $this->status->getvalue() : '';
+        return $this->status->getvalue();
     }
 
-
-    /** Возвращает значение ColorsInterface */
-    public function getStatus(): WbOrderStatusInterface
+    public function getWbOrderStatus(): WbOrderStatusInterface
     {
         return $this->status;
     }
 
-
-    /** Возвращает значение ColorsInterface */
-    public function getStatusValue(): string
+    public function getWbOrderStatusValue(): string
     {
         return $this->status->getValue();
     }
@@ -79,7 +77,7 @@ final class WbOrderStatus
     {
         $case = [];
 
-        foreach(self::getDeclaredWbOrderStatus() as $status)
+        foreach(self::getDeclared() as $status)
         {
             /** @var WbOrderStatusInterface $status */
             $class = new $status;
@@ -89,34 +87,22 @@ final class WbOrderStatus
         return $case;
     }
 
-    public static function getDeclaredWbOrderStatus(): array
+    public static function getDeclared(): array
     {
         return array_filter(
             get_declared_classes(),
-            static function($className)
-                {
-                    return in_array(WbOrderStatusInterface::class, class_implements($className), true);
-                },
+            static function($className) {
+                return in_array(WbOrderStatusInterface::class, class_implements($className), true);
+            }
         );
     }
 
     public function equals(mixed $status): bool
     {
-        if(is_string($status) && class_exists($status))
-        {
-            $status = new $status();
-        }
+        $status = new self($status);
 
-        if($status instanceof WbOrderStatusInterface)
-        {
-            return $this->status->equals($status->getValue());
-        }
-
-        if($status instanceof self)
-        {
-            return $this->status->equals((string) $status);
-        }
-
-        return false;
+        return $this->getWbOrderStatusValue() === $status->getWbOrderStatusValue();
     }
+
+
 }

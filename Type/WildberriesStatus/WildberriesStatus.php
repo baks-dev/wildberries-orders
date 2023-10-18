@@ -13,12 +13,20 @@ final class WildberriesStatus
 {
     public const TYPE = 'wb_status';
 
+    private WildberriesStatusInterface $status;
 
-    private ?WildberriesStatusInterface $status = null;
-
-
-    public function __construct(self|string|WildberriesStatusInterface $status)
+    public function __construct(WildberriesStatusInterface|self|string $status)
     {
+        if(is_string($status) && class_exists($status))
+        {
+            $instance = new $status();
+
+            if($instance instanceof WildberriesStatusInterface)
+            {
+                $this->status = $instance;
+                return;
+            }
+        }
 
         if($status instanceof WildberriesStatusInterface)
         {
@@ -26,51 +34,39 @@ final class WildberriesStatus
             return;
         }
 
-        if($status instanceof $this)
+        if($status instanceof self)
         {
-            $this->status = $status->getStatus();
+            $this->status = $status->getWildberriesStatus();
             return;
         }
 
-        if(is_string($status))
+        /** @var WildberriesStatusInterface $declare */
+        foreach(self::getDeclared() as $declare)
         {
-            if(class_exists($status))
+            if($declare::equals($status))
             {
-                $this->status = new $status();
+                $this->status = new $declare;
                 return;
-            }
-
-            /** @var WildberriesStatusInterface $class */
-            foreach(self::getDeclaredWildberriesStatus() as $class)
-            {
-                if($class::equals($status))
-                {
-                    $this->status = new $class;
-                    return;
-                }
             }
         }
 
-        throw new InvalidArgumentException(sprintf('Not found Wildberries Order Status %s', $status));
+        throw new InvalidArgumentException(sprintf('Not found WildberriesStatus %s', $status));
 
     }
 
 
     public function __toString(): string
     {
-        return $this->status ? $this->status->getvalue() : '';
+        return $this->status->getvalue();
     }
 
 
-    /** Возвращает значение ColorsInterface */
-    public function getStatus(): WildberriesStatusInterface
+    public function getWildberriesStatus(): WildberriesStatusInterface
     {
         return $this->status;
     }
 
-
-    /** Возвращает значение ColorsInterface */
-    public function getStatusValue(): string
+    public function getWildberriesStatusValue(): string
     {
         return $this->status->getValue();
     }
@@ -80,7 +76,7 @@ final class WildberriesStatus
     {
         $case = [];
 
-        foreach(self::getDeclaredWildberriesStatus() as $status)
+        foreach(self::getDeclared() as $status)
         {
             /** @var WildberriesStatusInterface $class */
             $class = new $status;
@@ -90,12 +86,23 @@ final class WildberriesStatus
         return $case;
     }
 
-
-    public static function getDeclaredWildberriesStatus(): array
+    public static function getDeclared(): array
     {
-        return array_filter(get_declared_classes(), static function($className) {
-            return in_array(WildberriesStatusInterface::class, class_implements($className), true);
-        });
+        return array_filter(
+            get_declared_classes(),
+            static function($className) {
+                return in_array(WildberriesStatusInterface::class, class_implements($className), true);
+            }
+        );
     }
+
+    public function equals(mixed $status): bool
+    {
+        $status = new self($status);
+
+        return $this->getWildberriesStatusValue() === $status->getWildberriesStatusValue();
+    }
+
+
 
 }
