@@ -23,8 +23,11 @@ use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Wildberries\Orders\Entity\Event\WbOrdersEventInterface;
 use BaksDev\Wildberries\Orders\Type\Event\WbOrdersEventUid;
 use BaksDev\Wildberries\Orders\Type\OrderStatus\Status\Collection\WbOrderStatusInterface;
+use BaksDev\Wildberries\Orders\Type\OrderStatus\Status\WbOrderStatusCancel;
 use BaksDev\Wildberries\Orders\Type\OrderStatus\WbOrderStatus;
 use BaksDev\Wildberries\Orders\Type\WildberriesStatus\Status\Collection\WildberriesStatusInterface;
+use BaksDev\Wildberries\Orders\Type\WildberriesStatus\Status\WildberriesStatusCanceled;
+use BaksDev\Wildberries\Orders\Type\WildberriesStatus\Status\WildberriesStatusCanceledClient;
 use BaksDev\Wildberries\Orders\Type\WildberriesStatus\WildberriesStatus;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -87,14 +90,9 @@ final class StatusWbOrderDTO implements WbOrdersEventInterface
         return $this->status;
     }
 
-    public function setStatus(WbOrderStatus|WbOrderStatusInterface|string $status): void
+    public function setStatus(mixed $status): void
     {
-        if(is_string($status) && class_exists($status))
-        {
-            $status = new $status();
-        }
-
-        $this->status = $status instanceof WbOrderStatusInterface ? new WbOrderStatus($status) : $status;
+        $this->status = new WbOrderStatus($status);
     }
 
     /**
@@ -105,9 +103,20 @@ final class StatusWbOrderDTO implements WbOrdersEventInterface
         return $this->wildberries;
     }
 
-    public function setWildberries(WildberriesStatus|WildberriesStatusInterface $wildberries): void
+    public function setWildberries(mixed $wildberries): void
     {
-        $this->wildberries = $wildberries instanceof WildberriesStatusInterface ? new WildberriesStatus($wildberries) : $wildberries;
+        $status = new WildberriesStatus($wildberries);
+
+        $this->wildberries = $status;
+
+        /** Делаем отмену заказа, если отмена клиентом или отмена сборочного задания */
+        if(
+            $status->getWildberriesStatus() instanceof WildberriesStatusCanceledClient ||
+            $status->getWildberriesStatus() instanceof WildberriesStatusCanceled
+        )
+        {
+            $this->setStatus(WbOrderStatusCancel::class);
+        }
     }
 
 }

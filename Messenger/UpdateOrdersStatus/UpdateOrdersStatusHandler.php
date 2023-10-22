@@ -146,8 +146,11 @@ final class UpdateOrdersStatusHandler
                         {
                             $this->messageDispatchLogger
                                 ->info(
-                                    sprintf('%s: Обновили статус заказа Wildberries ( order : %s ) ', $profile, $apiStatus['id']),
-                                    [__FILE__.':'.__LINE__]
+                                    'Обновили статус заказа Wildberries',
+                                    [
+                                        'profile' => $profile,
+                                        'order' => $apiStatus['id']
+                                    ]
                                 );
 
                             continue;
@@ -156,7 +159,11 @@ final class UpdateOrdersStatusHandler
                         $this->messageDispatchLogger
                             ->critical(
                                 sprintf('%s: Ошибка при обновлении статуса заказа Wildberries ', $handle),
-                                [__FILE__.':'.__LINE__]
+                                [
+                                    'profile' => $profile,
+                                    'order' => $apiStatus['id'],
+                                    __FILE__.':'.__LINE__
+                                ]
                             );
 
                     }
