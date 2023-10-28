@@ -29,7 +29,7 @@ final class WbStickerDTO implements WbOrdersStickerInterface
      * Стикер
      */
     #[Assert\NotBlank]
-	private string $sticker;
+	private ?string $sticker = null;
 	
 	/**
      * Номер штрихкод заказа
@@ -39,7 +39,7 @@ final class WbStickerDTO implements WbOrdersStickerInterface
 	
 	
 	/** Стикер */
-	public function getSticker() : string
+	public function getSticker() : ?string
 	{
 		return $this->sticker;
 	}

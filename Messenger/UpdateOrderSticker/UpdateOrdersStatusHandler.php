@@ -51,7 +51,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsMessageHandler]
+#[AsMessageHandler(fromTransport: 'sync')]
 final class UpdateOrdersStatusHandler
 {
 
@@ -97,17 +97,19 @@ final class UpdateOrdersStatusHandler
             return;
         }
 
+        /** @var StickerWbOrderDTO $StickerWbOrderDTO */
+        $StickerWbOrderDTO = $WbOrdersEvent->getDto(StickerWbOrderDTO::class);
+        $WbStickerDTO = $StickerWbOrderDTO->getSticker();
+
+
         $WildberriesOrdersSticker = $this->wildberriesOrdersSticker
             ->profile($UserProfileUid)
             ->addOrder($UserProfileUid->getAttr())
             ->getOrderSticker();
 
-        /** @var StickerWbOrderDTO $StickerWbOrderDTO */
-        $StickerWbOrderDTO = $WbOrdersEvent->getDto(StickerWbOrderDTO::class);
-
-        $WbStickerDTO = $StickerWbOrderDTO->getSticker();
         $WbStickerDTO->setSticker($WildberriesOrdersSticker->getSticker());
         $WbStickerDTO->setPart($WildberriesOrdersSticker->getPart());
+
 
         $this->messageDispatchLogger->info(
             'Обновляем стикер заказа Wildberries',
