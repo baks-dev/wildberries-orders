@@ -16,7 +16,7 @@ final class WildberriesStatusType extends StringType
 
     public function convertToPHPValue($value, AbstractPlatform $platform): mixed
     {
-        return new WildberriesStatus($value);
+        return !empty($value) ? new WildberriesStatus($value) : null;
     }
 
     public function getName(): string

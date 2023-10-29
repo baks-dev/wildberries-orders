@@ -1,6 +1,6 @@
 # BaksDev Wildberries Orders
 
-![Version](https://img.shields.io/badge/version-6.3.13-blue) ![php 8.1+](https://img.shields.io/badge/php-min%208.1-red.svg)
+![Version](https://img.shields.io/badge/version-6.3.14-blue) ![php 8.1+](https://img.shields.io/badge/php-min%208.1-red.svg)
 
 Модуль заказов Wildberries
 

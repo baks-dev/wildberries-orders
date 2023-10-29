@@ -10,7 +10,7 @@ final class ClientEmailType extends StringType
 
     public function convertToDatabaseValue($value, AbstractPlatform $platform): mixed
     {
-        return $value instanceof ClientEmail ? $value->getValue() : $value;
+        return (string) $value;
     }
     
     public function convertToPHPValue($value, AbstractPlatform $platform): mixed

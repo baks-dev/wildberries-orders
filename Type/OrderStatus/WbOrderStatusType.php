@@ -14,12 +14,10 @@ final class WbOrderStatusType extends StringType
         return (string) $value;
     }
 
-
     public function convertToPHPValue($value, AbstractPlatform $platform): mixed
     {
-        return new WbOrderStatus($value);
+        return !empty($value) ? new WbOrderStatus($value) : null;
     }
-
 
     public function getName(): string
     {
