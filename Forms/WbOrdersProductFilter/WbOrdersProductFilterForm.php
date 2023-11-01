@@ -98,7 +98,6 @@ final class WbOrdersProductFilterForm extends AbstractType
                     },
                     'label' => false,
                     'required' => false,
-                    /*'attr' => ['onchange' => 'this.form.submit()'],*/
                 ]);
 
             }
