@@ -50,7 +50,7 @@ final class StickerWbOrderHandler extends AbstractHandler
 
         try
         {
-            $command->getEvent() ? $this->preUpdate($command) : $this->prePersist($command);
+            $command->getEvent() ? $this->preUpdate($command, true) : $this->prePersist($command);
         }
         catch(DomainException $errorUniqid)
         {
