@@ -160,7 +160,7 @@ final class NewOrderHandler
              */
 
             $OrderDTO = new OrderDTO();
-            $OrderDTO->setUsers(null);
+            $OrderDTO->setUsr(null);
 
             $OrderProductDTO = new OrderProductDTO();
             $OrderProductDTO->setProduct($Product['event_id']);
