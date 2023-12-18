@@ -27,10 +27,10 @@ namespace BaksDev\Wildberries\Orders\Messenger\NewOrders;
 
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Orders\Order\Type\Status\OrderStatus\OrderStatusCanceled;
-use BaksDev\Orders\Order\UseCase\Admin\NewEdit\OrderDTO;
-use BaksDev\Orders\Order\UseCase\Admin\NewEdit\OrderHandler;
-use BaksDev\Orders\Order\UseCase\Admin\NewEdit\Products\OrderProductDTO;
-use BaksDev\Orders\Order\UseCase\Admin\NewEdit\Products\Price\OrderPriceDTO;
+use BaksDev\Orders\Order\UseCase\Admin\Edit\EditOrderDTO;
+use BaksDev\Orders\Order\UseCase\Admin\Edit\EditOrderHandler;
+use BaksDev\Orders\Order\UseCase\Admin\Edit\Products\OrderProductDTO;
+use BaksDev\Orders\Order\UseCase\Admin\Edit\Products\Price\OrderPriceDTO;
 use BaksDev\Orders\Order\UseCase\Admin\Status\OrderStatusDTO;
 use BaksDev\Orders\Order\UseCase\Admin\Status\OrderStatusHandler;
 use BaksDev\Products\Product\Repository\ProductByVariation\ProductByVariationInterface;
@@ -61,7 +61,7 @@ final class NewOrderHandler
     private WildberriesOrdersNew $wildberriesOrdersNew;
     private WbOrdersByIdInterface $wbOrdersById;
     private ProductByVariationInterface $productByVariation;
-    private OrderHandler $orderHandler;
+    private EditOrderHandler $orderHandler;
     private OrderStatusHandler $orderStatusHandler;
     private CreateWbOrderHandler $WildberriesOrderHandler;
     private EntityManagerInterface $entityManager;
@@ -77,7 +77,7 @@ final class NewOrderHandler
         WildberriesOrdersNew $wildberriesOrdersNew,
         WbOrdersByIdInterface $wbOrdersById,
         ProductByVariationInterface $productByVariation,
-        OrderHandler $orderHandler,
+        EditOrderHandler $orderHandler,
         OrderStatusHandler $orderStatusHandler,
         CreateWbOrderHandler $WildberriesOrderHandler,
         EntityManagerInterface $entityManager,
@@ -159,7 +159,7 @@ final class NewOrderHandler
              * Создаем системный заказ
              */
 
-            $OrderDTO = new OrderDTO();
+            $OrderDTO = new EditOrderDTO();
             $OrderDTO->setUsr(null);
 
             $OrderProductDTO = new OrderProductDTO();
