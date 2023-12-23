@@ -375,6 +375,7 @@ final class AllWbOrders implements AllWbOrdersInterface
                 ->addSearchEqualUid('order_product.product')
                 ->addSearchEqualUid('order_product.offer')
                 ->addSearchEqualUid('order_product.variation')
+                ->addSearchEqual('wb_order.ord')
                 ->addSearchLike('product_trans.name')
                 ->addSearchLike('wb_order_event.barcode')
                 ->addSearchLike('product_variation.article')
