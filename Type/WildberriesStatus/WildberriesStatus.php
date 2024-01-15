@@ -76,11 +76,11 @@ final class WildberriesStatus
     {
         $case = [];
 
-        foreach(self::getDeclared() as $status)
+        foreach(self::getDeclared() as $key => $status)
         {
             /** @var WildberriesStatusInterface $class */
             $class = new $status;
-            $case[$class::sort()] = new self($class);
+            $case[$class::sort().$key] = new self($class);
         }
 
         return $case;

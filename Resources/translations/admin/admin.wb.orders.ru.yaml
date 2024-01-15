@@ -26,5 +26,6 @@ ready_for_pickup: 'ПВЗ'
 sold: 'Доставлен'
 canceled: 'Отмена'
 canceled_by_client: 'Отмена покупателем'
+declined_by_client: 'Отмена покупателем (час)'
 defect: 'Брак'
 

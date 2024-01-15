@@ -29,12 +29,12 @@
                 </span>
 
             <div class="text-muted fw-bolder">
-                {{ card.product_offer_value|call_twig_func(card.product_offer_reference) }}
-                {{ card.product_offer_postfix }}
 
-                {{ card.product_variation_value|call_twig_func(card.product_variation_reference) }}
+                {{ card.product_variation_value|call_twig_func(card.product_variation_reference~'_render') }}
                 {{ card.product_variation_postfix }}
 
+                {{ card.product_offer_value|call_twig_func(card.product_offer_reference~'_render') }}
+                {{ card.product_offer_postfix }}
             </div>
         </div>
 
