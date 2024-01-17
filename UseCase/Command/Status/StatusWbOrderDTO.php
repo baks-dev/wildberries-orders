@@ -28,6 +28,7 @@ use BaksDev\Wildberries\Orders\Type\OrderStatus\WbOrderStatus;
 use BaksDev\Wildberries\Orders\Type\WildberriesStatus\Status\Collection\WildberriesStatusInterface;
 use BaksDev\Wildberries\Orders\Type\WildberriesStatus\Status\WildberriesStatusCanceled;
 use BaksDev\Wildberries\Orders\Type\WildberriesStatus\Status\WildberriesStatusCanceledClient;
+use BaksDev\Wildberries\Orders\Type\WildberriesStatus\Status\WildberriesStatusDeclinedClient;
 use BaksDev\Wildberries\Orders\Type\WildberriesStatus\WildberriesStatus;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -112,7 +113,8 @@ final class StatusWbOrderDTO implements WbOrdersEventInterface
         /** Делаем отмену заказа, если отмена клиентом или отмена сборочного задания */
         if(
             $status->getWildberriesStatus() instanceof WildberriesStatusCanceledClient ||
-            $status->getWildberriesStatus() instanceof WildberriesStatusCanceled
+            $status->getWildberriesStatus() instanceof WildberriesStatusCanceled ||
+            $status->getWildberriesStatus() instanceof WildberriesStatusDeclinedClient
         )
         {
             $this->setStatus(WbOrderStatusCancel::class);
