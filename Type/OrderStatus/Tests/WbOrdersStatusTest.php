@@ -93,5 +93,7 @@ final class WbOrdersStatusTest extends KernelTestCase
 
         }
 
+        self::assertTrue(true);
+
     }
 }

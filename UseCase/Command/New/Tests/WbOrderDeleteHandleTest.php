@@ -54,13 +54,6 @@ use BaksDev\Wildberries\Orders\UseCase\Command\Sticker\Tests\StickerWbOrderHandl
 final class WbOrderDeleteHandleTest extends KernelTestCase
 {
 
-    public function testUseCase(): void
-    {
-        self::assertTrue(true);
-
-
-    }
-
 
     public static function tearDownAfterClass(): void
     {

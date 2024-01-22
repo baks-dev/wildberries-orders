@@ -90,5 +90,7 @@ final class WildberriesStatusTest extends KernelTestCase
 
         }
 
+        self::assertTrue(true);
+
     }
 }
