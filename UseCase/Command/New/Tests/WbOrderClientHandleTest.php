@@ -85,6 +85,7 @@ final class WbOrderClientHandleTest extends KernelTestCase
         }
 
         $em->flush();
+        $em->clear();
     }
 
 
@@ -151,6 +152,9 @@ final class WbOrderClientHandleTest extends KernelTestCase
         $WbOrderClient = $em->getRepository(WbOrderClient::class)
             ->find(OrderUid::TEST);
         self::assertNotNull($WbOrderClient);
+
+        $em->clear();
+        //$em->close();
 
     }
 }

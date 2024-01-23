@@ -26,22 +26,12 @@ declare(strict_types=1);
 namespace BaksDev\Wildberries\Orders\UseCase\Command\New\Tests;
 
 use BaksDev\Orders\Order\Type\Id\OrderUid;
-use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Wildberries\Orders\Entity\Event\WbOrdersEvent;
 use BaksDev\Wildberries\Orders\Entity\WbOrders;
-use BaksDev\Wildberries\Package\Entity\Supply\Event\WbSupplyEvent;
-use BaksDev\Wildberries\Package\Entity\Supply\WbSupply;
-use BaksDev\Wildberries\Package\Type\Supply\Id\WbSupplyUid;
-use BaksDev\Wildberries\Package\Type\Supply\Status\WbSupplyStatus\Collection\WbSupplyStatusCollection;
-use BaksDev\Wildberries\Package\Type\Supply\Status\WbSupplyStatus\WbSupplyStatusNew;
-use BaksDev\Wildberries\Package\UseCase\Supply\New\Const\WbSupplyConstDTO;
-use BaksDev\Wildberries\Package\UseCase\Supply\New\WbSupplyNewDTO;
-use BaksDev\Wildberries\Package\UseCase\Supply\New\WbSupplyNewHandler;
+use BaksDev\Wildberries\Orders\UseCase\Command\Sticker\Tests\StickerWbOrderHandleTest;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
-use BaksDev\Wildberries\Orders\UseCase\Command\New\Tests\WbOrderClientHandleTest;
-use BaksDev\Wildberries\Orders\UseCase\Command\Sticker\Tests\StickerWbOrderHandleTest;
 
 /**
  * @group wildberries-orders
@@ -54,10 +44,8 @@ use BaksDev\Wildberries\Orders\UseCase\Command\Sticker\Tests\StickerWbOrderHandl
 final class WbOrderDeleteHandleTest extends KernelTestCase
 {
 
-
     public static function tearDownAfterClass(): void
     {
-
         /** @var EntityManagerInterface $em */
         $em = self::getContainer()->get(EntityManagerInterface::class);
 
@@ -69,7 +57,6 @@ final class WbOrderDeleteHandleTest extends KernelTestCase
             $em->remove($WbOrders);
         }
 
-
         $WbSupplyEventCollection = $em->getRepository(WbOrdersEvent::class)
             ->findBy(['main' => OrderUid::TEST]);
 
@@ -79,5 +66,13 @@ final class WbOrderDeleteHandleTest extends KernelTestCase
         }
 
         $em->flush();
+        $em->clear();
+        //$em->close();
+    }
+
+
+    public function testComplete(): void
+    {
+        self::assertTrue(true);
     }
 }
