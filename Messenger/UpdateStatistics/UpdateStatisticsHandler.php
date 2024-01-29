@@ -38,17 +38,17 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 final class UpdateStatisticsHandler
 {
     private EntityManagerInterface $entityManager;
-    private LoggerInterface $messageDispatchLogger;
+    private LoggerInterface $logger;
     private MessageDispatchInterface $messageDispatch;
 
     public function __construct(
         MessageDispatchInterface $messageDispatch,
         EntityManagerInterface $entityManager,
-        LoggerInterface $messageDispatchLogger,
+        LoggerInterface $wildberriesOrdersLogger,
     )
     {
         $this->entityManager = $entityManager;
-        $this->messageDispatchLogger = $messageDispatchLogger;
+        $this->logger = $wildberriesOrdersLogger;
         $this->messageDispatch = $messageDispatch;
     }
 
@@ -66,7 +66,7 @@ final class UpdateStatisticsHandler
 
         if(!$Order)
         {
-            $this->messageDispatchLogger->warning(
+            $this->logger->warning(
                 sprintf('Невозможно найти заказ ( %s id=\'%s\' )', Order::TABLE, $message->getId()),
                 [__FILE__.':'.__LINE__]);
             return;
@@ -82,7 +82,7 @@ final class UpdateStatisticsHandler
 
         if(!$products)
         {
-            $this->messageDispatchLogger->warning(
+            $this->logger->warning(
                 'Невозможно найти продукцию',
                 [
                     'table' => OrderProduct::TABLE,

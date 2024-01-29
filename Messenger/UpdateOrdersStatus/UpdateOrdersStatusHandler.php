@@ -51,7 +51,7 @@ final class UpdateOrdersStatusHandler
     private iterable $WildberriesStatus;
     private AllOrdersByStatusInterface $allOrdersByStatus;
     private WildberriesOrdersStatus $wildberriesOrdersStatus;
-    private LoggerInterface $messageDispatchLogger;
+    private LoggerInterface $logger;
     private StatusWbOrderHandler $statusWbOrderHandler;
 
 
@@ -60,7 +60,7 @@ final class UpdateOrdersStatusHandler
         EntityManagerInterface $entityManager,
         AllOrdersByStatusInterface $allOrdersByStatus,
         WildberriesOrdersStatus $wildberriesOrdersStatus,
-        LoggerInterface $messageDispatchLogger,
+        LoggerInterface $wildberriesOrdersLogger,
         StatusWbOrderHandler $statusWbOrderHandler
 
     )
@@ -69,7 +69,7 @@ final class UpdateOrdersStatusHandler
         $this->WildberriesStatus = $WildberriesStatus;
         $this->allOrdersByStatus = $allOrdersByStatus;
         $this->wildberriesOrdersStatus = $wildberriesOrdersStatus;
-        $this->messageDispatchLogger = $messageDispatchLogger;
+        $this->logger = $wildberriesOrdersLogger;
 
         $this->statusWbOrderHandler = $statusWbOrderHandler;
     }
@@ -144,7 +144,7 @@ final class UpdateOrdersStatusHandler
 
                         if($handle instanceof WbOrders)
                         {
-                            $this->messageDispatchLogger
+                            $this->logger
                                 ->info(
                                     'Обновили статус заказа Wildberries',
                                     [
@@ -156,7 +156,7 @@ final class UpdateOrdersStatusHandler
                             continue;
                         }
 
-                        $this->messageDispatchLogger
+                        $this->logger
                             ->critical(
                                 sprintf('%s: Ошибка при обновлении статуса заказа Wildberries ', $handle),
                                 [

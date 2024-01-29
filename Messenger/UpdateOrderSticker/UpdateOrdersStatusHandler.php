@@ -59,21 +59,21 @@ final class UpdateOrdersStatusHandler
     private WbOrdersByIdInterface $wbOrdersById;
     private WildberriesOrdersSticker $wildberriesOrdersSticker;
     private WbOrderProfileInterface $wbOrderProfile;
-    private LoggerInterface $messageDispatchLogger;
+    private LoggerInterface $logger;
 
     public function __construct(
         WbOrdersByIdInterface $wbOrdersById,
         WbOrderProfileInterface $wbOrderProfile,
         WildberriesOrdersSticker $wildberriesOrdersSticker,
         StickerWbOrderHandler $stickerWbOrderHandler,
-        LoggerInterface $messageDispatchLogger
+        LoggerInterface $wildberriesOrdersLogger
     )
     {
         $this->stickerWbOrderHandler = $stickerWbOrderHandler;
         $this->wbOrdersById = $wbOrdersById;
         $this->wildberriesOrdersSticker = $wildberriesOrdersSticker;
         $this->wbOrderProfile = $wbOrderProfile;
-        $this->messageDispatchLogger = $messageDispatchLogger;
+        $this->logger = $wildberriesOrdersLogger;
     }
 
     /**
@@ -111,7 +111,7 @@ final class UpdateOrdersStatusHandler
         $WbStickerDTO->setPart($WildberriesOrdersSticker->getPart());
 
 
-        $this->messageDispatchLogger->info(
+        $this->logger->info(
             'Обновляем стикер заказа Wildberries',
             [
                 'order' => $UserProfileUid->getAttr(),
@@ -122,7 +122,7 @@ final class UpdateOrdersStatusHandler
 
         if(!$handle instanceof WbOrders)
         {
-            $this->messageDispatchLogger->critical(
+            $this->logger->critical(
                 'Ошибка при обновлении стикера заказа Wildberries',
                 [
                     'code' => $handle,

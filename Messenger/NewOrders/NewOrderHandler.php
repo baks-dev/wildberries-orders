@@ -65,7 +65,7 @@ final class NewOrderHandler
     private OrderStatusHandler $orderStatusHandler;
     private CreateWbOrderHandler $WildberriesOrderHandler;
     private EntityManagerInterface $entityManager;
-    private LoggerInterface $messageDispatchLogger;
+    private LoggerInterface $logger;
     private MessageDispatchInterface $messageDispatch;
 
     private UserProfileUid $profile;
@@ -81,7 +81,7 @@ final class NewOrderHandler
         OrderStatusHandler $orderStatusHandler,
         CreateWbOrderHandler $WildberriesOrderHandler,
         EntityManagerInterface $entityManager,
-        LoggerInterface $messageDispatchLogger,
+        LoggerInterface $wildberriesOrdersLogger,
         MessageDispatchInterface $messageDispatch
     )
     {
@@ -92,7 +92,7 @@ final class NewOrderHandler
         $this->orderStatusHandler = $orderStatusHandler;
         $this->WildberriesOrderHandler = $WildberriesOrderHandler;
         $this->entityManager = $entityManager;
-        $this->messageDispatchLogger = $messageDispatchLogger;
+        $this->logger = $wildberriesOrdersLogger;
         $this->messageDispatch = $messageDispatch;
     }
 
@@ -111,7 +111,7 @@ final class NewOrderHandler
             return;
         }
 
-        $this->messageDispatchLogger
+        $this->logger
             ->info(
                 sprintf('%s: Добавляем новые заказы Wildberries', $this->profile),
                 [__FILE__.':'.__LINE__]
@@ -218,7 +218,7 @@ final class NewOrderHandler
             }
 
 
-            $this->messageDispatchLogger
+            $this->logger
                 ->info(
                     sprintf('%s: Добавили новый заказ ( order : %s )',
                         $this->profile, $order['id']),

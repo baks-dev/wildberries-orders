@@ -46,19 +46,19 @@ final class UpdateStatisticsOldHandler
     private EntityManagerInterface $entityManager;
     private WbOrdersOldInterface $ordersOld;
     private WbOrdersStatisticsHandler $ordersStatisticsHandler;
-    private LoggerInterface $messageDispatchLogger;
+    private LoggerInterface $logger;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         WbOrdersOldInterface $ordersOld,
         WbOrdersStatisticsHandler $ordersStatisticsHandler,
-        LoggerInterface $messageDispatchLogger,
+        LoggerInterface $wildberriesOrdersLogger,
     )
     {
         $this->entityManager = $entityManager;
         $this->ordersOld = $ordersOld;
         $this->ordersStatisticsHandler = $ordersStatisticsHandler;
-        $this->messageDispatchLogger = $messageDispatchLogger;
+        $this->logger = $wildberriesOrdersLogger;
     }
 
     /**
@@ -68,7 +68,7 @@ final class UpdateStatisticsOldHandler
     {
         $this->entityManager->clear();
 
-        $this->messageDispatchLogger->info(
+        $this->logger->info(
             'Обновляем дату самого старого невыполненного заказа Wildberries продукции',
             [
                 'ProductUid' => $message->getProduct(),
@@ -100,7 +100,7 @@ final class UpdateStatisticsOldHandler
 
         if(!$StatisticsHandler instanceof WbOrdersStatistics)
         {
-            $this->messageDispatchLogger->warning(
+            $this->logger->warning(
                 'Ошибка при обновлении даты самого старого невыполненного заказа Wildberries продукции',
                 [
                     'code' => $StatisticsHandler,

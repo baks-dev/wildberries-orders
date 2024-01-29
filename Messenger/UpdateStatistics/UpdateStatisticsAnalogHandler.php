@@ -46,19 +46,19 @@ final class UpdateStatisticsAnalogHandler
     private EntityManagerInterface $entityManager;
     private WbOrdersAnalogInterface $ordersAnalog;
     private WbOrdersStatisticsHandler $ordersStatisticsHandler;
-    private LoggerInterface $messageDispatchLogger;
+    private LoggerInterface $logger;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         WbOrdersAnalogInterface $ordersAnalog,
         WbOrdersStatisticsHandler $ordersStatisticsHandler,
-        LoggerInterface $messageDispatchLogger,
+        LoggerInterface $wildberriesOrdersLogger,
     )
     {
         $this->entityManager = $entityManager;
         $this->ordersAnalog = $ordersAnalog;
         $this->ordersStatisticsHandler = $ordersStatisticsHandler;
-        $this->messageDispatchLogger = $messageDispatchLogger;
+        $this->logger = $wildberriesOrdersLogger;
     }
 
     /**
@@ -66,7 +66,7 @@ final class UpdateStatisticsAnalogHandler
      */
     public function __invoke(UpdateStatisticMessage $message): void
     {
-        $this->messageDispatchLogger->info(
+        $this->logger->info(
             'Обновляем статистику аналогов продукции заказов Wildberries',
             [
                 'ProductUid' => $message->getProduct(),
@@ -93,7 +93,7 @@ final class UpdateStatisticsAnalogHandler
 
         if(!$StatisticsHandler instanceof WbOrdersStatistics)
         {
-            $this->messageDispatchLogger->warning(
+            $this->logger->warning(
                 'Ошибка при обновлении статистики аналогов продукции заказов Wildberries',
                 [
                     'code' => $StatisticsHandler,
