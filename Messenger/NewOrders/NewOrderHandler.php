@@ -144,7 +144,7 @@ final class NewOrderHandler
 
             /* Получаем продукт */
             $ProductVariationConst = $WbProductCardVariationDTO->getVariation();
-            $Product = $this->productByVariation->getProductByVariationConstOrNull($ProductVariationConst);
+            $Product = $this->productByVariation->getProductByVariationOrNull($ProductVariationConst);
 
             if(!$Product)
             {
