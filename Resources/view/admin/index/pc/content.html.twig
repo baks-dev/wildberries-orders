@@ -24,7 +24,7 @@
             {% if is_granted('ROLE_WB_ORDERS_GET') or true %}
 
                 <a href="{{ path('wildberries-orders:admin.get') }}"
-                   class="btn btn-primary text-nowrap modal-link"
+                   class="btn btn-primary text-nowrap modal-link disabled"
                    data-bs-toggle="modal"
                    data-bs-target="#modal"
                 >
