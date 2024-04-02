@@ -105,19 +105,19 @@ class WbOrdersEvent extends EntityEvent
     /**
      * Модификатор
      */
-    #[ORM\OneToOne(mappedBy: 'event', targetEntity: WbOrdersModify::class, cascade: ['all'])]
+    #[ORM\OneToOne(targetEntity: WbOrdersModify::class, mappedBy: 'event', cascade: ['all'])]
     private WbOrdersModify $modify;
 
     /**
      * Стикер заказа
      */
-    #[ORM\OneToOne(mappedBy: 'event', targetEntity: WbOrdersSticker::class, cascade: ['all'])]
+    #[ORM\OneToOne(targetEntity: WbOrdersSticker::class, mappedBy: 'event', cascade: ['all'])]
     private ?WbOrdersSticker $sticker = null;
 
     /**
      * Клиент
      */
-    #[ORM\OneToOne(mappedBy: 'event', targetEntity: WbOrderClient::class, cascade: ['all'])]
+    #[ORM\OneToOne(targetEntity: WbOrderClient::class, mappedBy: 'event', cascade: ['all'])]
     private ?WbOrderClient $client = null;
 
 

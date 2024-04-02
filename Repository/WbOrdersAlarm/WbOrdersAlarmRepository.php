@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Wildberries\Orders\Repository\WbOrdersAnalog;
+namespace BaksDev\Wildberries\Orders\Repository\WbOrdersAlarm;
 
 use BaksDev\Orders\Order\Entity\Order;
 use BaksDev\Orders\Order\Entity\Products\OrderProduct;
@@ -13,8 +13,9 @@ use BaksDev\Wildberries\Orders\Type\OrderStatus\Status\WbOrderStatusNew;
 use BaksDev\Wildberries\Orders\Type\OrderStatus\WbOrderStatus;
 use Doctrine\DBAL\Connection;
 
-final class WbOrdersAnalog implements WbOrdersAnalogInterface
+final class WbOrdersAlarmRepository implements WbOrdersAlarmInterface
 {
+
     private Connection $connection;
 
     public function __construct(
@@ -25,9 +26,10 @@ final class WbOrdersAnalog implements WbOrdersAnalogInterface
     }
 
     /**
-     * Метод возвращает количество аналогичных НОВЫХ заказов продукта (все ТП и множественные варианты)
+     * Метод возвращает количеств срочных заказов продукта, требующих особое внимание
+     * Заказы с интервалом 36 часов
      */
-    public function countOrderAnalogByProduct(ProductEventUid $product): int
+    public function countOrderAlarmByProduct(ProductEventUid $product): int
     {
         $qb = $this->connection->createQueryBuilder();
 
@@ -45,21 +47,23 @@ final class WbOrdersAnalog implements WbOrdersAnalogInterface
         $qb->setParameter('product', $product, ProductEventUid::TYPE);
 
 
-        $qb->join(
-            'orders',
+        $qb->join('orders',
             WbOrders::TABLE,
-            'count_wb_orders',
-            'count_wb_orders.id = orders.id'
+            'alarm_wb_orders',
+            'alarm_wb_orders.id = orders.id'
         );
 
-        $qb->join(
-            'count_wb_orders',
+        $qb->join('alarm_wb_orders',
             WbOrdersEvent::TABLE,
-            'count_wb_orders_event',
-            'count_wb_orders_event.id = count_wb_orders.event AND count_wb_orders_event.status = :wb_orders_status'
-        );
+            'alarm_wb_orders_event',
+            'alarm_wb_orders_event.id = alarm_wb_orders.event AND
+				alarm_wb_orders_event.status = :wb_orders_status AND
+				alarm_wb_orders_event.created < ( NOW() - interval \'36 HOUR\')
+ 			');
 
-        //$status = new WbOrderStatus(WbOrderStatusEnum::NEW);
+
+
+        //$status = new WbOrderStatus(new WbOrderStatusNew::STATUS);
         $qb->setParameter('wb_orders_status', WbOrderStatusNew::STATUS, WbOrderStatus::TYPE);
 
         return $qb->fetchOne();

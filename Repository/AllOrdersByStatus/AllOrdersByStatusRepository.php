@@ -21,7 +21,7 @@ use BaksDev\Wildberries\Orders\Type\WildberriesStatus\Status\Collection\Wildberr
 use BaksDev\Wildberries\Orders\Type\WildberriesStatus\WildberriesStatus;
 use Doctrine\ORM\EntityManagerInterface;
 
-final class AllOrdersByStatus implements AllOrdersByStatusInterface
+final class AllOrdersByStatusRepository implements AllOrdersByStatusInterface
 {
     private EntityManagerInterface $entityManager;
 

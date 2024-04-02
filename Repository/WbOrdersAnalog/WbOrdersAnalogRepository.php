@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Wildberries\Orders\Repository\WbOrdersOld;
+namespace BaksDev\Wildberries\Orders\Repository\WbOrdersAnalog;
 
 use BaksDev\Orders\Order\Entity\Order;
 use BaksDev\Orders\Order\Entity\Products\OrderProduct;
@@ -11,10 +11,9 @@ use BaksDev\Wildberries\Orders\Entity\Event\WbOrdersEvent;
 use BaksDev\Wildberries\Orders\Entity\WbOrders;
 use BaksDev\Wildberries\Orders\Type\OrderStatus\Status\WbOrderStatusNew;
 use BaksDev\Wildberries\Orders\Type\OrderStatus\WbOrderStatus;
-use DateTimeImmutable;
 use Doctrine\DBAL\Connection;
 
-final class WbOrdersOld implements WbOrdersOldInterface
+final class WbOrdersAnalogRepository implements WbOrdersAnalogInterface
 {
     private Connection $connection;
 
@@ -26,13 +25,13 @@ final class WbOrdersOld implements WbOrdersOldInterface
     }
 
     /**
-     * Метод возвращает дату самого старого невыполненного заказа данного продукта (со статусом NEW)
+     * Метод возвращает количество аналогичных НОВЫХ заказов продукта (все ТП и множественные варианты)
      */
-    public function getOldOrderDateByProduct(ProductEventUid $product): ?DateTimeImmutable
+    public function countOrderAnalogByProduct(ProductEventUid $product): int
     {
         $qb = $this->connection->createQueryBuilder();
 
-        $qb->select('MIN(wb_orders_event.created)');
+        $qb->select('COUNT(*)');
         $qb->from(OrderProduct::TABLE, 'orders_product');
 
         $qb->join('orders_product',
@@ -46,22 +45,23 @@ final class WbOrdersOld implements WbOrdersOldInterface
         $qb->setParameter('product', $product, ProductEventUid::TYPE);
 
 
-        $qb->join('orders',
+        $qb->join(
+            'orders',
             WbOrders::TABLE,
-            'wb_orders',
-            'wb_orders.id = orders.id'
+            'count_wb_orders',
+            'count_wb_orders.id = orders.id'
         );
 
-        $qb->join('wb_orders',
+        $qb->join(
+            'count_wb_orders',
             WbOrdersEvent::TABLE,
-            'wb_orders_event',
-            'wb_orders_event.id = wb_orders.event AND wb_orders_event.status = :wb_orders_status'
+            'count_wb_orders_event',
+            'count_wb_orders_event.id = count_wb_orders.event AND count_wb_orders_event.status = :wb_orders_status'
         );
 
+        //$status = new WbOrderStatus(WbOrderStatusEnum::NEW);
         $qb->setParameter('wb_orders_status', WbOrderStatusNew::STATUS, WbOrderStatus::TYPE);
 
-        $oldDate = $qb->fetchOne();
-
-        return !empty($oldDate) ? new DateTimeImmutable($oldDate) : null;
+        return $qb->fetchOne();
     }
 }

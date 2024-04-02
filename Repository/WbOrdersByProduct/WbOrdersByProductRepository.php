@@ -36,7 +36,7 @@ use BaksDev\Wildberries\Orders\Entity\Event\WbOrdersEvent;
 use BaksDev\Wildberries\Orders\Entity\WbOrders;
 use BaksDev\Wildberries\Orders\Type\OrderStatus\Status\WbOrderStatusNew;
 
-final class WbOrdersByProduct implements WbOrdersByProductInterface
+final class WbOrdersByProductRepository implements WbOrdersByProductInterface
 {
     private ORMQueryBuilder $ORMQueryBuilder;
 

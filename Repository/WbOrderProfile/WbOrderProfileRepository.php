@@ -31,7 +31,7 @@ use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Wildberries\Orders\Entity\Event\WbOrdersEvent;
 use BaksDev\Wildberries\Orders\Entity\WbOrders;
 
-final class WbOrderProfile implements WbOrderProfileInterface
+final class WbOrderProfileRepository implements WbOrderProfileInterface
 {
     private DBALQueryBuilder $DBALQueryBuilder;
 
