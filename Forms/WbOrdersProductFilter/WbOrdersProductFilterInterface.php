@@ -23,9 +23,9 @@
 
 namespace BaksDev\Wildberries\Orders\Forms\WbOrdersProductFilter;
 
-use BaksDev\Products\Category\Type\Id\ProductCategoryUid;
+use BaksDev\Products\Category\Type\Id\CategoryProductUid;
 
 interface WbOrdersProductFilterInterface
 {
-    public function getCategory(): ?ProductCategoryUid;
+    public function getCategory(): ?CategoryProductUid;
 }
