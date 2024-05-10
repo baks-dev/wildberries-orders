@@ -87,9 +87,8 @@ final class WbOrdersProductFilterForm extends AbstractType
             {
                 $builder = $event->getForm();
 
-
                 $builder->add('category', ChoiceType::class, [
-                    'choices' => $this->categoryChoice->getCategoryCollection(),
+                    'choices' => $this->categoryChoice->findAll(),
                     'choice_value' => function(?CategoryProductUid $category) {
                         return $category?->getValue();
                     },
