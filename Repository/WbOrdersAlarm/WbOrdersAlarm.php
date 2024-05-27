@@ -13,7 +13,7 @@ use BaksDev\Wildberries\Orders\Type\OrderStatus\Status\WbOrderStatusNew;
 use BaksDev\Wildberries\Orders\Type\OrderStatus\WbOrderStatus;
 use Doctrine\DBAL\Connection;
 
-final class WbOrdersAlarmRepository implements WbOrdersAlarmInterface
+final class WbOrdersAlarm implements WbOrdersAlarmInterface
 {
 
     private Connection $connection;
