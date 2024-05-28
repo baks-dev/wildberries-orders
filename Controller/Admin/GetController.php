@@ -58,6 +58,8 @@ final class GetController extends AbstractController
 
         if($form->isSubmitted() && $form->has('wb_orders_get'))
         {
+            $this->refreshTokenForm($form);
+
             /**
              * Предотвращаем обновление чаще раз в 5 минут
              * @var CacheInterface $AppCache
