@@ -23,6 +23,7 @@
 
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
+use BaksDev\Wildberries\Orders\BaksDevWildberriesOrdersBundle;
 use BaksDev\Wildberries\Orders\Type\Email\ClientEmail;
 use BaksDev\Wildberries\Orders\Type\Email\ClientEmailType;
 use BaksDev\Wildberries\Orders\Type\Event\WbOrdersEventUid;
@@ -44,11 +45,10 @@ return static function(ContainerConfigurator $container, DoctrineConfig $doctrin
 
     $emDefault = $doctrine->orm()->entityManager('default')->autoMapping(true);
 
-    $MODULE = substr(__DIR__, 0, strpos(__DIR__, "Resources"));
 
     $emDefault->mapping('wildberries-orders')
         ->type('attribute')
-        ->dir($MODULE.'Entity')
+        ->dir(BaksDevWildberriesOrdersBundle::PATH.'Entity')
         ->isBundle(false)
         ->prefix('BaksDev\Wildberries\Orders')
         ->alias('wildberries-orders');
