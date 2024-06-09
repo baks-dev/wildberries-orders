@@ -19,18 +19,18 @@
 		<li class="breadcrumb-item">
 			<a href="{{ path('core:user.homepage') }}"
 					class="text-decoration-none"
-					aria-label="{{ 'breadcrumb.homepage.user'|trans }}"
-					title="{{ 'breadcrumb.homepage.user'|trans }}">
-				{{ 'breadcrumb.homepage.user'|trans }}
+					aria-label="{{ 'breadcrumb.homepage.user'|trans({}, 'core') }}"
+					title="{{ 'breadcrumb.homepage.user'|trans({}, 'core') }}">
+				{{ 'breadcrumb.homepage.user'|trans({}, 'core') }}
 			</a>
 		</li>
 		
 		<li class="breadcrumb-item">
 			<a href="{{ path('core:admin.homepage') }}"
 					class="text-decoration-none"
-					aria-label="{{ 'breadcrumb.homepage.admin'|trans({}, 'core') }}"
-					title="{{ 'breadcrumb.homepage.admin'|trans({}, 'core') }}">
-				{{ 'breadcrumb.homepage.admin'|trans({}, 'core') }}
+					aria-label="{{ 'breadcrumb.homepage.index'|trans({}, 'core') }}"
+					title="{{ 'breadcrumb.homepage.index'|trans({}, 'core') }}">
+				{{ 'breadcrumb.homepage.index'|trans({}, 'core') }}
 			</a>
 		</li>
 		
