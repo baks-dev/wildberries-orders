@@ -122,7 +122,9 @@
                                     ><small>{{ item.product_article }}</small> #}
 
                         <div class="btn-group p-0" role="group">
-                            <button type="submit" class="btn btn-primary btn-sm py-0"
+                            <button type="submit"
+                                    class="btn btn-primary btn-sm py-0"
+                                    role="tooltip"
                                     data-bs-toggle="tooltip"
                                     data-bs-placement="bottom"
                                     title='Общее количество аналогичных заказов'
@@ -131,7 +133,9 @@
                             </button>
 
                             {% if item.wb_order_alarm %}
-                                <button type="submit" class="btn btn-danger btn-sm py-0"
+                                <button type="submit"
+                                        class="btn btn-danger btn-sm py-0"
+                                        role="tooltip"
                                         data-bs-toggle="tooltip"
                                         data-bs-placement="bottom"
                                         title='Количество срочных заказов'
@@ -152,6 +156,7 @@
             <div class="card-body d-flex flex-column p-2">
 
                 <div class="text-truncate"
+                     role="tooltip"
                      data-bs-toggle="tooltip"
                      data-bs-placement="top"
                      data-bs-delay='{"show":600,"hide":100}'
@@ -202,6 +207,8 @@
 
                     {# QR продукции #}
                     {#<span
+
+              role="tooltip"
                             data-bs-toggle="tooltip"
                             data-bs-placement="bottom"
                             title='QR продукции'
