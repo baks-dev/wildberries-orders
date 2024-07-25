@@ -42,7 +42,6 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 final class WbOrdersProductFilterForm extends AbstractType
 {
-
     private RequestStack $request;
 
     private CategoryChoiceInterface $categoryChoice;
@@ -53,15 +52,12 @@ final class WbOrdersProductFilterForm extends AbstractType
 
     public function __construct(
         RequestStack $request,
-
         CategoryChoiceInterface $categoryChoice,
         OfferFieldsCategoryChoiceInterface $offerChoice,
         VariationFieldsCategoryChoiceInterface $variationChoice,
         ModificationFieldsCategoryChoiceInterface $modificationChoice,
         FieldsChoice $choice,
-
-    )
-    {
+    ) {
         $this->request = $request;
         $this->categoryChoice = $categoryChoice;
         $this->offerChoice = $offerChoice;
@@ -89,10 +85,10 @@ final class WbOrdersProductFilterForm extends AbstractType
 
                 $builder->add('category', ChoiceType::class, [
                     'choices' => $this->categoryChoice->findAll(),
-                    'choice_value' => function(?CategoryProductUid $category) {
+                    'choice_value' => function (?CategoryProductUid $category) {
                         return $category?->getValue();
                     },
-                    'choice_label' => function(CategoryProductUid $category) {
+                    'choice_label' => function (CategoryProductUid $category) {
                         return $category->getOptions();
                     },
                     'label' => false,
@@ -104,12 +100,9 @@ final class WbOrdersProductFilterForm extends AbstractType
         });
 
 
-
-
-
         $builder->addEventListener(
             FormEvents::POST_SUBMIT,
-            function(FormEvent $event): void {
+            function (FormEvent $event): void {
                 /** @var WbOrdersProductFilterDTO $data */
                 $data = $event->getData();
 
@@ -125,7 +118,7 @@ final class WbOrdersProductFilterForm extends AbstractType
 
         $builder->addEventListener(
             FormEvents::PRE_SET_DATA,
-            function(FormEvent $event): void {
+            function (FormEvent $event): void {
                 // this would be your entity, i.e. SportMeetup
 
                 /** @var WbOrdersProductFilterDTO $data */
@@ -146,7 +139,9 @@ final class WbOrdersProductFilterForm extends AbstractType
                 {
                     /** Торговое предложение раздела */
 
-                    $offerField = $this->offerChoice->findByCategory($Category);
+                    $offerField = $this->offerChoice
+                        ->category($Category)
+                        ->findAllCategoryProductOffers();
 
                     if($offerField)
                     {
@@ -154,8 +149,8 @@ final class WbOrdersProductFilterForm extends AbstractType
 
                         if($inputOffer)
                         {
-                            $builder->add('offer',
-
+                            $builder->add(
+                                'offer',
                                 $inputOffer->form(),
                                 [
                                     'label' => $offerField->getOption(),
@@ -171,7 +166,9 @@ final class WbOrdersProductFilterForm extends AbstractType
 
                             /** Множественные варианты торгового предложения */
 
-                            $variationField = $this->variationChoice->getVariationFieldType($offerField);
+                            $variationField = $this->variationChoice
+                                ->offer($offerField)
+                                ->findCategoryProductVariation();
 
                             if($variationField)
                             {
@@ -180,7 +177,8 @@ final class WbOrdersProductFilterForm extends AbstractType
 
                                 if($inputVariation)
                                 {
-                                    $builder->add('variation',
+                                    $builder->add(
+                                        'variation',
                                         $inputVariation->form(),
                                         [
                                             'label' => $variationField->getOption(),
@@ -195,7 +193,9 @@ final class WbOrdersProductFilterForm extends AbstractType
 
                                     /** Модификации множественных вариантов торгового предложения */
 
-                                    $modificationField = $this->modificationChoice->findByVariation($variationField);
+                                    $modificationField = $this->modificationChoice
+                                        ->variation($variationField)
+                                        ->findAllModification();
 
 
                                     if($modificationField)
@@ -204,7 +204,8 @@ final class WbOrdersProductFilterForm extends AbstractType
 
                                         if($inputModification)
                                         {
-                                            $builder->add('modification',
+                                            $builder->add(
+                                                'modification',
                                                 $inputModification->form(),
                                                 [
                                                     'label' => $modificationField->getOption(),

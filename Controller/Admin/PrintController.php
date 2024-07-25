@@ -25,30 +25,15 @@ declare(strict_types=1);
 
 namespace BaksDev\Wildberries\Orders\Controller\Admin;
 
-
-use BaksDev\Centrifugo\Server\Publish\CentrifugoPublishInterface;
 use BaksDev\Core\Controller\AbstractController;
 use BaksDev\Core\Listeners\Event\Security\RoleSecurity;
-use BaksDev\Core\Messenger\MessageDispatchInterface;
-use BaksDev\Orders\Order\Repository\OrderDetail\OrderDetailInterface;
 use BaksDev\Orders\Order\Repository\OrderProducts\OrderProductsInterface;
 use BaksDev\Products\Product\Repository\ProductDetail\ProductDetailByUidInterface;
-use BaksDev\Products\Product\Type\Event\ProductEventUid;
-use BaksDev\Products\Product\Type\Id\ProductUid;
-use BaksDev\Products\Product\Type\Offers\Id\ProductOfferUid;
-use BaksDev\Products\Product\Type\Offers\Variation\Id\ProductVariationUid;
 use BaksDev\Wildberries\Orders\Entity\Sticker\WbOrdersSticker;
-use BaksDev\Wildberries\Package\Entity\Package\WbPackage;
-use BaksDev\Wildberries\Package\Entity\Supply\Wildberries\WbSupplyWildberries;
-use BaksDev\Wildberries\Package\Repository\Package\OrderByPackage\OrderByPackageInterface;
-use BaksDev\Wildberries\Package\Type\Package\Event\WbPackageEventUid;
-use BaksDev\Wildberries\Package\UseCase\Package\Print\PrintWbPackageDTO;
 use BaksDev\Wildberries\Products\Repository\Barcode\WbBarcodeProperty\WbBarcodePropertyByProductEventInterface;
 use BaksDev\Wildberries\Products\Repository\Barcode\WbBarcodeSettings\WbBarcodeSettingsInterface;
-use chillerlan\QRCode\QRCode;
 use Picqer\Barcode\BarcodeGeneratorSVG;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Annotation\Route;
@@ -65,16 +50,15 @@ final class PrintController extends AbstractController
     public function printer(
         #[MapEntity] WbOrdersSticker $WbOrdersSticker,
         OrderProductsInterface $orderProducts,
-//        CentrifugoPublishInterface $CentrifugoPublish,
-//        OrderByPackageInterface $orderByPackage,
         WbBarcodeSettingsInterface $barcodeSettings,
         WbBarcodePropertyByProductEventInterface $wbBarcodeProperty,
         ProductDetailByUidInterface $productDetail,
-//        MessageDispatchInterface $messageDispatch,
-    ): Response
-    {
+    ): Response {
+
         /** Получаем продукцию заказа */
-        $products = $orderProducts->fetchAllOrderProducts($WbOrdersSticker->getOrder());
+        $products = $orderProducts
+            ->order($WbOrdersSticker->getOrder())
+            ->findAllProducts();
 
         /* Получаем продукцию для иллюстрации */
         $current = current($products);
