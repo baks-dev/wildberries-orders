@@ -68,7 +68,7 @@ final class UpdateStatisticsHandler
         {
             $this->logger->warning(
                 sprintf('Невозможно найти заказ ( %s id=\'%s\' )', Order::TABLE, $message->getId()),
-                [__FILE__.':'.__LINE__]);
+                [self::class.':'.__LINE__]);
             return;
         }
 
@@ -87,7 +87,7 @@ final class UpdateStatisticsHandler
                 [
                     'table' => OrderProduct::TABLE,
                     'event' => $Order->getEvent(),
-                    __FILE__.':'.__LINE__
+                    self::class.':'.__LINE__
                 ]
             );
             return;

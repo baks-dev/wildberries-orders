@@ -70,7 +70,7 @@ final class UpdateStatisticsAnalogHandler
             'Обновляем статистику аналогов продукции заказов Wildberries',
             [
                 'ProductUid' => $message->getProduct(),
-                __FILE__.':'.__LINE__
+                self::class.':'.__LINE__
             ]);
 
         /**
@@ -98,7 +98,7 @@ final class UpdateStatisticsAnalogHandler
                 [
                     'code' => $StatisticsHandler,
                     'ProductUid' => $message->getProduct(),
-                    __FILE__.':'.__LINE__
+                    self::class.':'.__LINE__
                 ]);
         }
     }

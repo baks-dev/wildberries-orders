@@ -71,7 +71,7 @@ final class UpdateStatisticsAlarmHandler
             'Обновляем статистику срочных заказов Wildberries',
             [
                 'ProductUid' => $message->getProduct(),
-                __FILE__.':'.__LINE__
+                self::class.':'.__LINE__
             ]);
 
         /**
@@ -99,7 +99,7 @@ final class UpdateStatisticsAlarmHandler
                 [
                     'code' => $StatisticsHandler,
                     'ProductUid' => $message->getProduct(),
-                    __FILE__.':'.__LINE__
+                    self::class.':'.__LINE__
                 ]);
         }
     }

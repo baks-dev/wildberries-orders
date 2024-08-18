@@ -114,7 +114,7 @@ final class NewOrderHandler
         $this->logger
             ->info(
                 sprintf('%s: Добавляем новые заказы Wildberries', $this->profile),
-                [__FILE__.':'.__LINE__]
+                [self::class.':'.__LINE__]
             );
 
         foreach($orders as $order)
@@ -168,7 +168,7 @@ final class NewOrderHandler
             $OrderProductDTO->setVariation($Product['variation_id']);
 
             $OrderPriceDTO = new OrderPriceDTO();
-            $price = new Money(($order['convertedPrice'] / 100));
+            $price = new Money($order['convertedPrice'], true);
             $OrderPriceDTO->setPrice($price);
             $OrderPriceDTO->setTotal(1);
             $OrderProductDTO->setPrice($OrderPriceDTO);
@@ -222,7 +222,7 @@ final class NewOrderHandler
                 ->info(
                     sprintf('%s: Добавили новый заказ ( order : %s )',
                         $this->profile, $order['id']),
-                    [__FILE__.':'.__LINE__]
+                    [self::class.':'.__LINE__]
                 );
 
         }

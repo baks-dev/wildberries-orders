@@ -72,7 +72,7 @@ final class UpdateStatisticsOldHandler
             'Обновляем дату самого старого невыполненного заказа Wildberries продукции',
             [
                 'ProductUid' => $message->getProduct(),
-                __FILE__.':'.__LINE__
+                self::class.':'.__LINE__
             ]);
 
         /**
@@ -105,7 +105,7 @@ final class UpdateStatisticsOldHandler
                 [
                     'code' => $StatisticsHandler,
                     'ProductUid' => $message->getProduct(),
-                    __FILE__.':'.__LINE__
+                    self::class.':'.__LINE__
                 ]);
 
         }

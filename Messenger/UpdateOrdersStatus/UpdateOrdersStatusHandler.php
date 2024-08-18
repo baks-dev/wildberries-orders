@@ -41,7 +41,7 @@ use BaksDev\Wildberries\Orders\UseCase\Command\Status\StatusWbOrderDTO;
 use BaksDev\Wildberries\Orders\UseCase\Command\Status\StatusWbOrderHandler;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
@@ -56,7 +56,7 @@ final class UpdateOrdersStatusHandler
 
 
     public function __construct(
-        #[TaggedIterator('baks.wb.status')] iterable $WildberriesStatus,
+        #[AutowireIterator('baks.wb.status')] iterable $WildberriesStatus,
         EntityManagerInterface $entityManager,
         AllOrdersByStatusInterface $allOrdersByStatus,
         WildberriesOrdersStatus $wildberriesOrdersStatus,
@@ -162,7 +162,7 @@ final class UpdateOrdersStatusHandler
                                 [
                                     'profile' => $profile,
                                     'order' => $apiStatus['id'],
-                                    __FILE__.':'.__LINE__
+                                    self::class.':'.__LINE__
                                 ]
                             );
 

@@ -48,7 +48,7 @@ use BaksDev\Wildberries\Orders\UseCase\Command\Sticker\StickerWbOrderHandler;
 use Doctrine\ORM\EntityManagerInterface;
 use DomainException;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler(fromTransport: 'sync')]
@@ -115,7 +115,7 @@ final class UpdateOrdersStatusHandler
             'Обновляем стикер заказа Wildberries',
             [
                 'order' => $UserProfileUid->getAttr(),
-                __FILE__.':'.__LINE__
+                self::class.':'.__LINE__
             ]);
 
         $handle = $this->stickerWbOrderHandler->handle($StickerWbOrderDTO);
@@ -127,7 +127,7 @@ final class UpdateOrdersStatusHandler
                 [
                     'code' => $handle,
                     'order' => $UserProfileUid->getAttr(),
-                    __FILE__.':'.__LINE__
+                    self::class.':'.__LINE__
                 ]);
 
             throw new DomainException();

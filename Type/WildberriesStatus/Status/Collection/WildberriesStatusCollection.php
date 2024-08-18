@@ -25,7 +25,7 @@ declare(strict_types=1);
 
 namespace BaksDev\Wildberries\Orders\Type\WildberriesStatus\Status\Collection;
 
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 final class WildberriesStatusCollection
 {
@@ -34,7 +34,7 @@ final class WildberriesStatusCollection
 
 
     public function __construct(
-        #[TaggedIterator('baks.wb.status', defaultPriorityMethod: 'sort')] iterable $status,
+        #[AutowireIterator('baks.wb.status', defaultPriorityMethod: 'sort')] iterable $status,
     )
     {
         $this->status = $status;
