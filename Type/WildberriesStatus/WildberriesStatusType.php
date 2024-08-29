@@ -9,10 +9,9 @@ use InvalidArgumentException;
 
 final class WildberriesStatusType extends Type
 {
-
     public function convertToDatabaseValue($value, AbstractPlatform $platform): string
     {
-        return (string) $value;
+        return (string) new WildberriesStatus($value);
     }
 
     public function convertToPHPValue($value, AbstractPlatform $platform): ?WildberriesStatus

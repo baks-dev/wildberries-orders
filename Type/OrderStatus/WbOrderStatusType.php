@@ -9,10 +9,9 @@ use InvalidArgumentException;
 
 final class WbOrderStatusType extends Type
 {
-
     public function convertToDatabaseValue($value, AbstractPlatform $platform): string
     {
-        return (string) $value;
+        return (string) new WbOrderStatus($value);
     }
 
     public function convertToPHPValue($value, AbstractPlatform $platform): ?WbOrderStatus
