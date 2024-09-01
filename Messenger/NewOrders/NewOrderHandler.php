@@ -35,6 +35,7 @@ use BaksDev\Orders\Order\UseCase\Admin\Status\OrderStatusDTO;
 use BaksDev\Orders\Order\UseCase\Admin\Status\OrderStatusHandler;
 use BaksDev\Products\Product\Repository\ProductByVariation\ProductByVariationInterface;
 use BaksDev\Reference\Money\Type\Money;
+use BaksDev\Users\Profile\UserProfile\Repository\UserByUserProfile\UserByUserProfileInterface;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Wildberries\Api\Token\Orders\WildberriesOrdersNew;
 use BaksDev\Wildberries\Orders\Entity\WbOrders;
@@ -57,7 +58,6 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 #[AsMessageHandler]
 final class NewOrderHandler
 {
-
     private WildberriesOrdersNew $wildberriesOrdersNew;
     private WbOrdersByIdInterface $wbOrdersById;
     private ProductByVariationInterface $productByVariation;
@@ -72,6 +72,7 @@ final class NewOrderHandler
     private bool $WbCardUpdate = false;
 
     private string $barcode;
+    private UserByUserProfileInterface $userByUserProfile;
 
     public function __construct(
         WildberriesOrdersNew $wildberriesOrdersNew,
@@ -82,9 +83,9 @@ final class NewOrderHandler
         CreateWbOrderHandler $WildberriesOrderHandler,
         EntityManagerInterface $entityManager,
         LoggerInterface $wildberriesOrdersLogger,
+        UserByUserProfileInterface $userByUserProfile,
         MessageDispatchInterface $messageDispatch
-    )
-    {
+    ) {
         $this->wildberriesOrdersNew = $wildberriesOrdersNew;
         $this->wbOrdersById = $wbOrdersById;
         $this->productByVariation = $productByVariation;
@@ -94,6 +95,7 @@ final class NewOrderHandler
         $this->entityManager = $entityManager;
         $this->logger = $wildberriesOrdersLogger;
         $this->messageDispatch = $messageDispatch;
+        $this->userByUserProfile = $userByUserProfile;
     }
 
     public function __invoke(NewOrdersMessage $message): void
@@ -208,9 +210,14 @@ final class NewOrderHandler
 
             if(!$WildberriesOrderHandle instanceof WbOrders)
             {
+                $User = $this->userByUserProfile
+                    ->forProfile($this->profile)
+                    ->findUser();
+
                 $OrderStatusDTO = new OrderStatusDTO(
-                    new OrderStatusCanceled(),
+                    OrderStatusCanceled::class,
                     $Order->getEvent(),
+                    $User,
                     $this->profile
                 );
 
@@ -220,8 +227,11 @@ final class NewOrderHandler
 
             $this->logger
                 ->info(
-                    sprintf('%s: Добавили новый заказ ( order : %s )',
-                        $this->profile, $order['id']),
+                    sprintf(
+                        '%s: Добавили новый заказ ( order : %s )',
+                        $this->profile,
+                        $order['id']
+                    ),
                     [self::class.':'.__LINE__]
                 );
 
