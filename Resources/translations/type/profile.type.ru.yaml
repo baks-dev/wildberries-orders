@@ -1,0 +1,42 @@
+wildberries:
+
+  fbs:
+
+    name: 'Wildberries'
+    desc: 'Пользователь Wildberries'
+
+    section:
+      contact:
+        name: 'Контактные данные'
+        desc: 'Данные для связи менеджерами магазина с покупателем.'
+
+        field:
+
+          name:
+            name: 'Контактное лицо'
+            desc: 'ФИО пользователя'
+
+
+  dbs:
+
+    name: 'DBS Wildberries'
+    desc: 'Пользователь DBS Wildberries'
+
+    section:
+      contact:
+        name: 'Контактные данные'
+        desc: 'Данные для связи менеджерами магазина с покупателем.'
+
+        field:
+
+          name:
+            name: 'Получатель'
+            desc: 'ФИО пользователя'
+
+          email:
+            name: 'Контактный E-mail'
+            desc: 'Укажите для отправки уведомлений'
+
+          phone:
+            name: 'Контактный телефон'
+            desc: 'Контактный телефон для связи'

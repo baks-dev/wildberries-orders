@@ -1,0 +1,17 @@
+wildberries:
+  fbs:
+    name: 'Склад Wildberries'
+    desc: 'Курьерская доставка Wildberries'
+
+    address:
+      name: 'Адрес ПВЗ Wildberries'
+      desc: 'Адрес пункта выдачи заказов Wildberries выбранный клиентом'
+
+
+  dbs:
+    name: 'Доставка клиенту Wildberries'
+    desc: 'Доставка клиенту Wildberries'
+
+    address:
+      name: 'Адрес клиента'
+      desc: 'Адрес доставки заказа клиенту Wildberries'

@@ -1,0 +1,9 @@
+wildberries:
+  fbs:
+    name: 'Wildberries'
+    desc: 'Оплата FBS Wildberries'
+
+  dbs:
+    name: 'DBS Wildberries'
+    desc: 'Оплата DBS Wildberries'
+

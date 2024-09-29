@@ -1,0 +1,17 @@
+wildberries:
+  fbs:
+    name: 'Wildberries warehouse'
+    desc: 'Wildberries courier delivery'
+
+    address:
+      name: 'Wildberries pick-up point address'
+      desc: 'Address of the Wildberries order pick-up point selected by the client'
+
+
+  dbs:
+    name: 'Delivery to Wildberries client'
+    desc: 'Delivery to Wildberries client'
+
+    address:
+      name: 'Client address'
+      desc: 'Delivery address of the order to the Wildberries client'
