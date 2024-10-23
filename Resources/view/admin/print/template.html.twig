@@ -1,4 +1,3 @@
-
 {# ---- ШАБЛОН ------------------------------------------------------------ #}
 {% extends Template('/admin/base.html.twig') %}
 
@@ -14,5 +13,5 @@
 
 
 {% block javascript %}
-<script nonce='{{ csp_nonce() }}' async  data-src="/assets/ls/print.min.js?v={{ version }}" class="lazy"></script>
+    <script nonce='{{ csp_nonce() }}' async data-src="/assets/ls/print.min.js?v={{ version }}" class="lazy"></script>
 {% endblock %}

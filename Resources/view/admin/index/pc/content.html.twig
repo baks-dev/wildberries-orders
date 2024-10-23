@@ -32,7 +32,7 @@
                 </a>
             {% endif %}
 
-            {#<div class="w-100 d-flex align-items-center gap-3 justify-content-end">
+            {# <div class="w-100 d-flex align-items-center gap-3 justify-content-end">
                 {{ form_start(profile) }}
                 <div class="d-flex justify-content-end position-relative my-1 gap-3">
 
@@ -42,7 +42,7 @@
                     </div>
                 </div>
                 {{ form_end(profile) }}
-            </div>#}
+            </div> #}
 
             {# Добавить #}
             {# {% if is_granted(ROLE~'_NEW') or is_granted('ROLE_ADMIN') %}
@@ -94,8 +94,6 @@
                         {% endif %}
 
 
-
-
                         <button class="btn btn-primary"
                                 type="button"
                                 data-bs-toggle="collapse"
@@ -113,27 +111,27 @@
                     {{ form_end(filter) }}
 
                     {{ form_start(status) }}
-                        <div class="collapse multi-collapse" id="multiCollapseExample2" style="max-height: 50px;">
-                            <div class="d-flex justify-content-end align-items-center my-1 gap-3 mt-3">
+                    <div class="collapse multi-collapse" id="multiCollapseExample2" style="max-height: 50px;">
+                        <div class="d-flex justify-content-end align-items-center my-1 gap-3 mt-3">
 
-                                <div class="w-50">{{ form_widget(status.status, { placeholder: 'Любой статус заказа', attr: { 'data-select' : 'select2', class: 'mb-0' } }) }}</div>
+                            <div class="w-50">{{ form_widget(status.status, { placeholder: 'Любой статус заказа', attr: { 'data-select' : 'select2', class: 'mb-0' } }) }}</div>
 
-                                <div class="w-50">{{ form_widget(status.wildberries, { placeholder: 'Любой статус Wildberries', attr: { 'data-select' : 'select2', class: 'mb-0' } }) }}</div>
+                            <div class="w-50">{{ form_widget(status.wildberries, { placeholder: 'Любой статус Wildberries', attr: { 'data-select' : 'select2', class: 'mb-0' } }) }}</div>
 
-                                <button class="btn btn-primary invisible"
-                                        type="button"
-                                        data-bs-toggle="collapse"
-                                        data-bs-target="#multiCollapseExample2"
-                                        aria-expanded="false"
-                                        aria-controls="multiCollapseExample2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
-                                         class="bi bi-filter" viewBox="0 0 16 16">
-                                        <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>
-                                    </svg>
+                            <button class="btn btn-primary invisible"
+                                    type="button"
+                                    data-bs-toggle="collapse"
+                                    data-bs-target="#multiCollapseExample2"
+                                    aria-expanded="false"
+                                    aria-controls="multiCollapseExample2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-filter" viewBox="0 0 16 16">
+                                    <path d="M6 10.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm-2-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>
+                                </svg>
 
-                                </button>
-                            </div>
+                            </button>
                         </div>
+                    </div>
                     {{ form_end(status) }}
 
 

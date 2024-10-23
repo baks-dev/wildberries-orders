@@ -1,17 +1,17 @@
 <?php
 /*
  *  Copyright 2024.  Baks.dev <admin@baks.dev>
- *
+ *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
  *  in the Software without restriction, including without limitation the rights
  *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *  copies of the Software, and to permit persons to whom the Software is furnished
  *  to do so, subject to the following conditions:
- *
+ *  
  *  The above copyright notice and this permission notice shall be included in all
  *  copies or substantial portions of the Software.
- *
+ *  
  *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *  FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
@@ -23,7 +23,7 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Wildberries\Orders\Commands\Upgrade\FBS;
+namespace BaksDev\Wildberries\Orders\Commands\Upgrade\DBS;
 
 use BaksDev\Core\Type\Field\InputField;
 use BaksDev\Delivery\Entity\Delivery;
@@ -37,8 +37,8 @@ use BaksDev\Delivery\UseCase\Admin\NewEdit\Trans\DeliveryTransDTO;
 use BaksDev\Reference\Currency\Type\Currency;
 use BaksDev\Reference\Money\Type\Money;
 use BaksDev\Users\Profile\TypeProfile\Type\Id\TypeProfileUid;
-use BaksDev\Wildberries\Orders\Type\DeliveryType\TypeDeliveryFbsWildberries;
-use BaksDev\Wildberries\Orders\Type\ProfileType\TypeProfileFbsWildberries;
+use BaksDev\Wildberries\Orders\Type\DeliveryType\TypeDeliveryDbsWildberries;
+use BaksDev\Wildberries\Orders\Type\ProfileType\TypeProfileDbsWildberries;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -47,23 +47,24 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AsCommand(
-    name: 'baks:delivery:wildberries-fbs',
-    description: 'Добавляет курьерскую доставку FBS Wildberries'
+    name: 'baks:delivery:wildberries-dbs',
+    description: 'Добавляет собственную доставку клиенту Wildberries'
 )]
-class UpgradeDeliveryTypeFbsWildberriesCommand extends Command
+class UpgradeDeliveryTypeDbsWildberriesCommand extends Command
 {
     public function __construct(
         private readonly ExistTypeDeliveryInterface $existTypeDelivery,
         private readonly TranslatorInterface $translator,
         private readonly DeliveryHandler $deliveryHandler
-    ) {
+    )
+    {
         parent::__construct();
     }
 
-    /** Добавляет доставку Wildberries  */
+    /** Добавляет доставку Wildberries */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $DeliveryUid = new DeliveryUid(TypeDeliveryFbsWildberries::class);
+        $DeliveryUid = new DeliveryUid(TypeDeliveryDbsWildberries::class);
 
         /** Проверяем наличие доставки Wildberries */
         $exists = $this->existTypeDelivery->isExists($DeliveryUid);
@@ -71,12 +72,12 @@ class UpgradeDeliveryTypeFbsWildberriesCommand extends Command
         if(!$exists)
         {
             $io = new SymfonyStyle($input, $output);
-            $io->text('Добавляем курьерскую доставку Wildberries');
+            $io->text('Добавляем собственную доставку клиенту заказов DBS Wildberries');
 
             $DeliveryDTO = new DeliveryDTO($DeliveryUid);
 
-            $DeliveryDTO->setType(new TypeProfileUid(TypeProfileFbsWildberries::class));
-            $DeliveryDTO->setSort(TypeDeliveryFbsWildberries::priority());
+            $DeliveryDTO->setType(new TypeProfileUid(TypeProfileDbsWildberries::class));
+            $DeliveryDTO->setSort(TypeDeliveryDbsWildberries::priority());
 
 
             /** Бесплатная доставка */
@@ -96,8 +97,8 @@ class UpgradeDeliveryTypeFbsWildberriesCommand extends Command
              */
             foreach($DeliveryTransDTO as $DeliveryTrans)
             {
-                $name = $this->translator->trans('wildberries.fbs.name', domain: 'delivery.type', locale: $DeliveryTrans->getLocal()->getLocalValue());
-                $desc = $this->translator->trans('wildberries.fbs.desc', domain: 'delivery.type', locale: $DeliveryTrans->getLocal()->getLocalValue());
+                $name = $this->translator->trans('wildberries.dbs.name', domain: 'delivery.type', locale: $DeliveryTrans->getLocal()->getLocalValue());
+                $desc = $this->translator->trans('wildberries.dbs.desc', domain: 'delivery.type', locale: $DeliveryTrans->getLocal()->getLocalValue());
 
                 $DeliveryTrans->setName($name);
                 $DeliveryTrans->setDescription($desc);
@@ -114,8 +115,8 @@ class UpgradeDeliveryTypeFbsWildberriesCommand extends Command
             /** @var DeliveryFieldTransDTO $DeliveryFieldTrans */
             foreach($DeliveryFieldDTO->getTranslate() as $DeliveryFieldTrans)
             {
-                $name = $this->translator->trans('wildberries.fbs.address.name', domain: 'delivery.type', locale: $DeliveryFieldTrans->getLocal()->getLocalValue());
-                $desc = $this->translator->trans('wildberries.fbs.address.desc', domain: 'delivery.type', locale: $DeliveryFieldTrans->getLocal()->getLocalValue());
+                $name = $this->translator->trans('wildberries.dbs.address.name', domain: 'delivery.type', locale: $DeliveryFieldTrans->getLocal()->getLocalValue());
+                $desc = $this->translator->trans('wildberries.dbs.address.desc', domain: 'delivery.type', locale: $DeliveryFieldTrans->getLocal()->getLocalValue());
 
                 $DeliveryFieldTrans->setName($name);
                 $DeliveryFieldTrans->setDescription($desc);

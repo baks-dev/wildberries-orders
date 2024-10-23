@@ -1,13 +1,13 @@
 {# ПЕЧАТЬ #}
 
-<div class="d-none d-print-block" >
+<div class="d-none d-print-block">
     {% for order in item %}
 
         <div style="width: 5cm; margin-left: 0.7cm;">
             <div class="text-center w-100">
                 <img src="data:image/svg+xml;base64,{{ sticker }}"
                      style="height: 4cm; padding-top: 0;"
-                     alt="sticker" />
+                     alt="sticker"/>
             </div>
         </div>
 
@@ -20,7 +20,8 @@
             <div style="width: 5cm; margin-left: 0.7cm; margin-top: 0.3cm;">
 
                 <div class="text-center w-100">
-                    <img src='data:image/svg+xml;base64,{{ barcode }}' alt='Штрихкод {{ barcode }}' style="height: 1.2cm;"/>
+                    <img src='data:image/svg+xml;base64,{{ barcode }}' alt='Штрихкод {{ barcode }}'
+                         style="height: 1.2cm;"/>
                     <h6 class="w-100 lh-normal">{{ order.barcode }}</h6>
                 </div>
                 <div class="d-flex justify-content-between align-items-end w-100"
@@ -29,9 +30,9 @@
                 </div>
             </div>
 
-           {# {% if not loop.last %}
+            {# {% if not loop.last %}
                 <div style="page-break-after: always !important;"></div>
-            {% endif %}#}
+            {% endif %} #}
 
         {% endfor %}
 

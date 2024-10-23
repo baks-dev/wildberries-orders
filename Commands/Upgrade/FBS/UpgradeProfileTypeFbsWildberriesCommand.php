@@ -1,17 +1,17 @@
 <?php
 /*
  *  Copyright 2024.  Baks.dev <admin@baks.dev>
- *
+ *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
  *  in the Software without restriction, including without limitation the rights
  *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *  copies of the Software, and to permit persons to whom the Software is furnished
  *  to do so, subject to the following conditions:
- *
+ *  
  *  The above copyright notice and this permission notice shall be included in all
  *  copies or substantial portions of the Software.
- *
+ *  
  *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *  FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
@@ -23,7 +23,7 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Wildberries\Orders\Commands\Upgrade\DBS;
+namespace BaksDev\Wildberries\Orders\Commands\Upgrade\FBS;
 
 use BaksDev\Core\Type\Field\InputField;
 use BaksDev\Users\Profile\TypeProfile\Entity\TypeProfile;
@@ -36,7 +36,7 @@ use BaksDev\Users\Profile\TypeProfile\UseCase\Admin\NewEdit\Section\Trans\Sectio
 use BaksDev\Users\Profile\TypeProfile\UseCase\Admin\NewEdit\Trans\TransDTO;
 use BaksDev\Users\Profile\TypeProfile\UseCase\Admin\NewEdit\TypeProfileDTO;
 use BaksDev\Users\Profile\TypeProfile\UseCase\Admin\NewEdit\TypeProfileHandler;
-use BaksDev\Wildberries\Orders\Type\ProfileType\TypeProfileDbsWildberries;
+use BaksDev\Wildberries\Orders\Type\ProfileType\TypeProfileFbsWildberries;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -45,23 +45,24 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AsCommand(
-    name: 'baks:users-profile-type:wildberries-dbs',
-    description: 'Добавляет тип профилей пользователя DBS Wildberries'
+    name: 'baks:users-profile-type:wildberries-fbs',
+    description: 'Добавляет тип профилей пользователя FBS Wildberries'
 )]
-class UpgradeProfileTypeDbsWildberriesCommand extends Command
+class UpgradeProfileTypeFbsWildberriesCommand extends Command
 {
     public function __construct(
         private readonly ExistTypeProfileInterface $existTypeProfile,
         private readonly TranslatorInterface $translator,
-        private readonly TypeProfileHandler $profileHandler
-    ) {
+        private readonly TypeProfileHandler $profileHandler,
+    )
+    {
         parent::__construct();
     }
 
     /** Добавляет тип профиля Wildberries  */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $TypeProfileUid = new TypeProfileUid(TypeProfileDbsWildberries::class);
+        $TypeProfileUid = new TypeProfileUid(TypeProfileFbsWildberries::class);
 
         /** Проверяем наличие типа Wildberries */
         $exists = $this->existTypeProfile->isExistTypeProfile($TypeProfileUid);
@@ -69,10 +70,10 @@ class UpgradeProfileTypeDbsWildberriesCommand extends Command
         if(!$exists)
         {
             $io = new SymfonyStyle($input, $output);
-            $io->text('Добавляем тип профиля Wildberries DBS');
+            $io->text('Добавляем тип профиля FBS Wildberries');
 
             $TypeProfileDTO = new TypeProfileDTO();
-            $TypeProfileDTO->setSort(TypeProfileDbsWildberries::priority());
+            $TypeProfileDTO->setSort(TypeProfileFbsWildberries::priority());
             $TypeProfileDTO->setProfile($TypeProfileUid);
 
             $TypeProfileTranslateDTO = $TypeProfileDTO->getTranslate();
@@ -84,8 +85,8 @@ class UpgradeProfileTypeDbsWildberriesCommand extends Command
              */
             foreach($TypeProfileTranslateDTO as $ProfileTrans)
             {
-                $name = $this->translator->trans('wildberries.dbs.name', domain: 'profile.type', locale: $ProfileTrans->getLocal()->getLocalValue());
-                $desc = $this->translator->trans('wildberries.dbs.desc', domain: 'profile.type', locale: $ProfileTrans->getLocal()->getLocalValue());
+                $name = $this->translator->trans('wildberries.fbs.name', domain: 'profile.type', locale: $ProfileTrans->getLocal()->getLocalValue());
+                $desc = $this->translator->trans('wildberries.fbs.desc', domain: 'profile.type', locale: $ProfileTrans->getLocal()->getLocalValue());
 
                 $ProfileTrans->setName($name);
                 $ProfileTrans->setDescription($desc);
@@ -100,8 +101,8 @@ class UpgradeProfileTypeDbsWildberriesCommand extends Command
             /** @var SectionTransDTO $SectionTrans */
             foreach($SectionDTO->getTranslate() as $SectionTrans)
             {
-                $name = $this->translator->trans('wildberries.dbs.section.contact.name', domain: 'profile.type', locale: $SectionTrans->getLocal()->getLocalValue());
-                $desc = $this->translator->trans('wildberries.dbs.section.contact.desc', domain: 'profile.type', locale: $SectionTrans->getLocal()->getLocalValue());
+                $name = $this->translator->trans('wildberries.fbs.section.contact.name', domain: 'profile.type', locale: $SectionTrans->getLocal()->getLocalValue());
+                $desc = $this->translator->trans('wildberries.fbs.section.contact.desc', domain: 'profile.type', locale: $SectionTrans->getLocal()->getLocalValue());
 
                 $SectionTrans->setName($name);
                 $SectionTrans->setDescription($desc);
@@ -111,7 +112,7 @@ class UpgradeProfileTypeDbsWildberriesCommand extends Command
 
             /* Добавляем поля для заполнения */
 
-            $fields = ['name', 'email', 'phone'];
+            $fields = ['name'];
 
             foreach($fields as $sort => $field)
             {
@@ -119,39 +120,22 @@ class UpgradeProfileTypeDbsWildberriesCommand extends Command
                 $SectionFieldDTO->setSort($sort);
                 $SectionFieldDTO->setPublic(true);
                 $SectionFieldDTO->setRequired(true);
-
                 $SectionFieldDTO->setType(new InputField('input_field'));
-
-                if($field === 'name')
-                {
-                    $SectionFieldDTO->setType(new InputField('contact_field'));
-                }
-
-                if($field === 'email')
-                {
-                    $SectionFieldDTO->setType(new InputField('account_email'));
-                    $SectionFieldDTO->setRequired(false);
-                }
-
-                if($field === 'phone')
-                {
-                    $SectionFieldDTO->setType(new InputField('phone_field'));
-                }
 
 
                 /** @var SectionFieldTransDTO $SectionFieldTrans */
                 foreach($SectionFieldDTO->getTranslate() as $SectionFieldTrans)
                 {
-                    $name = $this->translator->trans('wildberries.dbs.section.contact.field.'.$field.'.name', domain: 'profile.type', locale: $SectionFieldTrans->getLocal()->getLocalValue());
-                    $desc = $this->translator->trans('wildberries.dbs.section.contact.field.'.$field.'.desc', domain: 'profile.type', locale: $SectionFieldTrans->getLocal()->getLocalValue());
+                    $name = $this->translator->trans('wildberries.section.contact.field.'.$field.'.name', domain: 'profile.type', locale: $SectionFieldTrans->getLocal()->getLocalValue());
+                    $desc = $this->translator->trans('wildberries.section.contact.field.'.$field.'.desc', domain: 'profile.type', locale: $SectionFieldTrans->getLocal()->getLocalValue());
 
                     $SectionFieldTrans->setName($name);
                     $SectionFieldTrans->setDescription($desc);
                 }
 
+
                 $SectionDTO->addField($SectionFieldDTO);
             }
-
 
             $TypeProfileDTO->addSection($SectionDTO);
 

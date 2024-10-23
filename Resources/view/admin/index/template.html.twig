@@ -20,15 +20,29 @@
             -webkit-animation: blink 2s linear infinite;
             animation: blink 2s linear infinite;
         }
+
         @-webkit-keyframes blink {
-            50% { color: rgb(255, 0, 0); }
-            51% { color: rgba(255, 0, 0, 0); }
-            100% { color: rgba(255, 0, 0, 0); }
+            50% {
+                color: rgb(255, 0, 0);
+            }
+            51% {
+                color: rgba(255, 0, 0, 0);
+            }
+            100% {
+                color: rgba(255, 0, 0, 0);
+            }
         }
+
         @keyframes blink {
-            50% { color: rgb(255, 0, 0); }
-            51% { color: rgba(255, 0, 0, 0); }
-            100% { color: rgba(255, 0, 0, 0); }
+            50% {
+                color: rgb(255, 0, 0);
+            }
+            51% {
+                color: rgba(255, 0, 0, 0);
+            }
+            100% {
+                color: rgba(255, 0, 0, 0);
+            }
         }
     </style>
 
@@ -51,17 +65,19 @@
 
 {% block javascript %}
 
-<script nonce='{{ csp_nonce() }}' async  data-src='/assets/plugins/nice-select2/nice-select2.min.js?v={{ version }}' class='lazy'></script>
+    <script nonce='{{ csp_nonce() }}' async data-src='/assets/plugins/nice-select2/nice-select2.min.js?v={{ version }}'
+            class='lazy'></script>
 
-<script nonce="{{ csp_nonce() }}">
-document.addEventListener("DOMContentLoaded", (event) => {
+    <script nonce="{{ csp_nonce() }}">
+        document.addEventListener("DOMContentLoaded", (event) =>
+        {
 
-	const form = document.forms.wb_orders_product_filter_form;
-	form.addEventListener('change', () => { setTimeout(() => { form.submit(); }, 300); });
+            const form = document.forms.wb_orders_product_filter_form;
+            form.addEventListener('change', () => { setTimeout(() => { form.submit(); }, 300); });
 
-    const  status = document.forms.wb_orders_status_filter_form;
-	status.addEventListener('change', () => { setTimeout(() => { status.submit(); }, 500); });
+            const status = document.forms.wb_orders_status_filter_form;
+            status.addEventListener('change', () => { setTimeout(() => { status.submit(); }, 500); });
 
-});
-</script>
+        });
+    </script>
 {% endblock %}

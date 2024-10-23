@@ -1,41 +1,62 @@
 <?php
+/*
+ *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  
+ *  Permission is hereby granted, free of charge, to any person obtaining a copy
+ *  of this software and associated documentation files (the "Software"), to deal
+ *  in the Software without restriction, including without limitation the rights
+ *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ *  copies of the Software, and to permit persons to whom the Software is furnished
+ *  to do so, subject to the following conditions:
+ *  
+ *  The above copyright notice and this permission notice shall be included in all
+ *  copies or substantial portions of the Software.
+ *  
+ *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ *  FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
+ *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ *  THE SOFTWARE.
+ */
 
 namespace BaksDev\Wildberries\Orders\Type\Email;
 
 final class ClientEmail
 {
     public const TYPE = 'client_email';
-    
+
     private ?string $value;
-    
+
     public function __construct(?string $value = null)
     {
         $this->value = empty($value) ? null : mb_strtolower($value);
     }
-    
+
     public function __toString(): string
     {
         return $this->value ?: '';
     }
-    
-    public function isEqual(self $other) : bool
+
+    public function isEqual(self $other): bool
     {
         return $this->getValue() === $other->getValue();
     }
-    
-    public function getValue() : ?string
+
+    public function getValue(): ?string
     {
         return $this->value;
     }
-    
-    public function getUserName() : ?string
+
+    public function getUserName(): ?string
     {
         return $this->value ? substr($this->value, 0, strrpos($this->value, '@')) : null;
     }
-    
-    public function getHostName() : ?string
+
+    public function getHostName(): ?string
     {
         return $this->value ? substr($this->value, strrpos($this->value, '@') + 1) : null;
     }
-    
+
 }

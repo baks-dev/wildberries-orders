@@ -1,9 +1,6 @@
 {% trans_default_domain('admin.wb.orders') %}
 
 
-
-
-
 <span
         class="pointer"
         role="tooltip"
@@ -15,8 +12,8 @@
 
 
 {# сборочное задание в работе #}
-{% if value == 'waiting' %}
-    <span class="badge bg-light text-dark">
+    {% if value == 'waiting' %}
+        <span class="badge bg-light text-dark">
         {{ value|trans }}
     </span>
 
@@ -24,7 +21,7 @@
 
 {# сборочное задание отсортировано  #}
 {% elseif value == 'sorted' %}
-    <span class="badge bg-warning text-dark">
+        <span class="badge bg-warning text-dark">
         {{ value|trans }}
     </span>
 
@@ -32,33 +29,33 @@
 
 {# сборочное задание получено покупателем #}
 {% elseif value == 'sold' %}
-    <span class="badge bg-success">{{ value|trans }}</span>
+        <span class="badge bg-success">{{ value|trans }}</span>
 
 
 {# отмена сборочного задания #}
 {% elseif value == 'canceled' %}
-    <span class="badge bg-danger">{{ value|trans }}</span>
+        <span class="badge bg-danger">{{ value|trans }}</span>
 
 
 
 {# отмена сборочного задания покупателем #}
 {% elseif value == 'canceled_by_client' %}
-    <span class="badge bg-danger">{{ value|trans }}</span>
+        <span class="badge bg-danger">{{ value|trans }}</span>
 
 
 {# отмена сборочного задания по причине брака #}
 {% elseif value == 'defect' %}
-    <span class="badge bg-danger">{{ value|trans }}</span>
+        <span class="badge bg-danger">{{ value|trans }}</span>
 
 
 {# сборочное задание прибыло на ПВЗ #}
 {% elseif value == 'ready_for_pickup' %}
-    <span class="badge bg-dark">{{ value|trans }}</span>
+        <span class="badge bg-dark">{{ value|trans }}</span>
 
 {% else %}
-    <span class="badge bg-light text-dark">{{ 'unknown'|trans }}</span>
+        <span class="badge bg-light text-dark">{{ 'unknown'|trans }}</span>
 
-{% endif %}
+    {% endif %}
 
 
 </span>

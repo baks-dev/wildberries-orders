@@ -1,54 +1,54 @@
 {# Пользовательское меню #}
 
 <button class="btn btn-link btn-sm p-0"
-		id="usecase-{{ item.wb_order_id }}"
-		data-bs-container="body"
-		data-bs-toggle="popover"
-		data-bs-placement="right"
-		data-bs-trigger="click"
+        id="usecase-{{ item.wb_order_id }}"
+        data-bs-container="body"
+        data-bs-toggle="popover"
+        data-bs-placement="right"
+        data-bs-trigger="click"
 >
-	<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-			fill="currentColor" class="text-muted"
-			viewBox="0 0 16 16">
-		<path fill-rule="evenodd"
-				d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z" />
-	</svg>
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+         fill="currentColor" class="text-muted"
+         viewBox="0 0 16 16">
+        <path fill-rule="evenodd"
+              d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
+    </svg>
 </button>
 
 
 {# Чекбокс #}
-{#<label>
+{# <label>
 	<input class="form-check-input ms-3 p-2" type="checkbox"
-			#}{# onchange=checkedItem(); #}{#
-			value="{{ item.event }}">
-</label>#}
+#}{# onchange=checkedItem(); #}{#
+value="{{ item.event }}">
+</label> #}
 
 
 <div id="usecase-{{ item.wb_order_id }}-content" class="d-none">
-	<ul class="leader list-group list-group-flush ">
+    <ul class="leader list-group list-group-flush ">
 
-		<li class="list-group-item d-flex justify-content-between bg-transparent border-0 text-truncate rounded-5">
-			<a href="https://seller.wildberries.ru/new-goods/goods/new-product-card?vendorCode={{ item.product_article }}"
-			   class="text-decoration-none text-dark w-100"
-			   title="Редактировать карточку WB"
-			   target="_wb"
-			>
-				Редактировать карточку WB
-			</a>
-		</li>
+        <li class="list-group-item d-flex justify-content-between bg-transparent border-0 text-truncate rounded-5">
+            <a href="https://seller.wildberries.ru/new-goods/goods/new-product-card?vendorCode={{ item.product_article }}"
+               class="text-decoration-none text-dark w-100"
+               title="Редактировать карточку WB"
+               target="_wb"
+            >
+                Редактировать карточку WB
+            </a>
+        </li>
 
-		<li class="list-group-item d-flex justify-content-between bg-transparent border-0 text-truncate rounded-5">
-			<a href="https://www.wildberries.ru/catalog/{{ item.wb_order_nomenclature }}/detail.aspx"
-			   class="text-decoration-none text-dark w-100"
-			   title="На страницу товара WB"
-			   target="_wb"
-			>
-				На страницу товара WB
-			</a>
-		</li>
+        <li class="list-group-item d-flex justify-content-between bg-transparent border-0 text-truncate rounded-5">
+            <a href="https://www.wildberries.ru/catalog/{{ item.wb_order_nomenclature }}/detail.aspx"
+               class="text-decoration-none text-dark w-100"
+               title="На страницу товара WB"
+               target="_wb"
+            >
+                На страницу товара WB
+            </a>
+        </li>
 
 
-	</ul>
+    </ul>
 </div>
 
 

@@ -12,8 +12,8 @@
 
 
 {# Новый #}
-{% if value == 'new' %}
-    <span class="badge bg-primary">
+    {% if value == 'new' %}
+        <span class="badge bg-primary">
         {{ value|trans }}
     </span>
 
@@ -21,7 +21,7 @@
 
     {# Сборка  #}
 {% elseif value == 'confirm' %}
-    <span class="badge bg-warning text-dark">
+        <span class="badge bg-warning text-dark">
         {{ value|trans }}
     </span>
 
@@ -29,19 +29,19 @@
 
     {# Доставка #}
 {% elseif value == 'complete' %}
-    <span class="badge bg-success">{{ value|trans }}</span>
+        <span class="badge bg-success">{{ value|trans }}</span>
 
 
     {# Отменено #}
 {% elseif value == 'cancel' %}
-    <span class="badge bg-danger">{{ value|trans }}</span>
+        <span class="badge bg-danger">{{ value|trans }}</span>
 
 
 
 {% else %}
-    <span class="badge bg-light text-dark">{{ 'unknown'|trans }}</span>
+        <span class="badge bg-light text-dark">{{ 'unknown'|trans }}</span>
 
-{% endif %}
+    {% endif %}
 
 
 </span>
