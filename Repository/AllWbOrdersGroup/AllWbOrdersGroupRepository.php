@@ -81,68 +81,60 @@ final class AllWbOrdersGroupRepository implements AllWbOrdersGroupInterface
         WbOrdersProductFilterInterface $filter
     ): PaginatorInterface
     {
-        $qb = $this->DBALQueryBuilder->createQueryBuilder(self::class);
+        $dbal = $this->DBALQueryBuilder->createQueryBuilder(self::class);
 
         /**
          * Wildberries заказ
          */
 
-        //$qb->select('wb_order.ord as wb_order_id');
-        $qb->from(WbOrders::TABLE, 'wb_order');
+        //$dbal->select('wb_order.ord as wb_order_id');
+        $dbal->from(WbOrders::class, 'wb_order');
 
-        $qb->addSelect('MIN(wb_order_event.created) AS wb_order_date');
-        $qb->addSelect('wb_order_event.barcode AS wb_order_barcode');
-        $qb->addSelect('wb_order_event.status AS wb_order_status');
-        $qb->addSelect('wb_order_event.wildberries AS wb_order_wildberries');
+        $dbal->addSelect('MIN(wb_order_event.created) AS wb_order_date');
+        $dbal->addSelect('wb_order_event.barcode AS wb_order_barcode');
+        $dbal->addSelect('wb_order_event.status AS wb_order_status');
+        $dbal->addSelect('wb_order_event.wildberries AS wb_order_wildberries');
 
-        $qb->join('wb_order',
-            WbOrdersEvent::TABLE,
-            'wb_order_event',
-            'wb_order_event.id = wb_order.event'
-        );
+        $dbal
+            ->join('wb_order',
+                WbOrdersEvent::class,
+                'wb_order_event',
+                'wb_order_event.id = wb_order.event'
+            );
 
-        $qb->andWhere('wb_order_event.profile = :profile');
-        $qb->setParameter('profile', $profile->getProfile(), UserProfileUid::TYPE);
+        $dbal->andWhere('wb_order_event.profile = :profile');
+        $dbal->setParameter('profile', $profile->getProfile(), UserProfileUid::TYPE);
 
-
-        $qb->andWhere('wb_order_event.status = :status');
-        $qb->setParameter('status', WbOrderStatusNew::STATUS, WbOrderStatus::TYPE);
-
-
-        //        $qb->addSelect('wb_order_sticker.sticker AS wb_order_sticker');
-        //        $qb->leftJoin('wb_order',
-        //            WbOrdersSticker::TABLE,
-        //            'wb_order_sticker',
-        //            'wb_order_sticker.event = wb_order.event'
-        //        );
+        $dbal->andWhere('wb_order_event.status = :status');
+        $dbal->setParameter('status', WbOrderStatusNew::STATUS, WbOrderStatus::TYPE);
 
 
         /**
          * Системный заказ
          */
 
-        $qb->leftJoin('wb_order',
-            Order::TABLE,
+        $dbal->leftJoin('wb_order',
+            Order::class,
             'ord',
             'ord.id = wb_order.id'
         );
 
 
-        $qb->addSelect('order_product.product AS wb_product_event');
-        $qb->addSelect('order_product.offer AS wb_product_offer');
-        $qb->addSelect('order_product.variation AS wb_product_variation');
-        $qb->addSelect('order_product.modification AS wb_product_modification');
+        $dbal->addSelect('order_product.product AS wb_product_event');
+        $dbal->addSelect('order_product.offer AS wb_product_offer');
+        $dbal->addSelect('order_product.variation AS wb_product_variation');
+        $dbal->addSelect('order_product.modification AS wb_product_modification');
 
-        $qb->leftJoin('ord',
-            OrderProduct::TABLE,
+        $dbal->leftJoin('ord',
+            OrderProduct::class,
             'order_product',
             'order_product.event = ord.event'
         );
 
-        //$qb->addSelect('order_price.price AS order_price');
-        $qb->addSelect('SUM(order_price.total) AS order_total');
-        $qb->leftJoin('order_product',
-            OrderPrice::TABLE,
+        //$dbal->addSelect('order_price.price AS order_price');
+        $dbal->addSelect('SUM(order_price.total) AS order_total');
+        $dbal->leftJoin('order_product',
+            OrderPrice::class,
             'order_price',
             'order_price.product = order_product.id'
         );
@@ -152,14 +144,14 @@ final class AllWbOrdersGroupRepository implements AllWbOrdersGroupInterface
          * Продукт
          */
 
-        $qb->leftJoin('order_product',
-            ProductEvent::TABLE,
+        $dbal->leftJoin('order_product',
+            ProductEvent::class,
             'product_event',
             'product_event.id = order_product.product'
         );
 
-        $qb->leftJoin('order_product',
-            ProductInfo::TABLE,
+        $dbal->leftJoin('order_product',
+            ProductInfo::class,
             'product_info',
             'product_info.product = product_event.main'
         );
@@ -167,35 +159,35 @@ final class AllWbOrdersGroupRepository implements AllWbOrdersGroupInterface
         if($filter->getCategory())
         {
 
-            $qb->join('order_product',
-                ProductCategory::TABLE,
+            $dbal->join('order_product',
+                ProductCategory::class,
                 'product_category',
                 'product_category.event = product_event.id AND product_category.category = :category AND product_category.root = true'
             );
 
-            $qb->setParameter('category', $filter->getCategory(), CategoryProductUid::TYPE);
+            $dbal->setParameter('category', $filter->getCategory(), CategoryProductUid::TYPE);
         }
 
 
-        $qb->addSelect('product_trans.name AS product_name');
-        $qb->leftJoin('order_product',
-            ProductTrans::TABLE,
+        $dbal->addSelect('product_trans.name AS product_name');
+        $dbal->leftJoin('order_product',
+            ProductTrans::class,
             'product_trans',
             'product_trans.event = order_product.product AND product_trans.local = :local'
         );
 
-        $qb->bindLocal();
+        $dbal->bindLocal();
 
 
         /*
          * Торговое предложение
          */
 
-        $qb->addSelect('product_offer.value as product_offer_value');
-        $qb->addSelect('product_offer.postfix as product_offer_postfix');
+        $dbal->addSelect('product_offer.value as product_offer_value');
+        $dbal->addSelect('product_offer.postfix as product_offer_postfix');
 
-        $qb->leftJoin('order_product',
-            ProductOffer::TABLE,
+        $dbal->leftJoin('order_product',
+            ProductOffer::class,
             'product_offer',
             'product_offer.id = order_product.offer'
         );
@@ -204,14 +196,14 @@ final class AllWbOrdersGroupRepository implements AllWbOrdersGroupInterface
         if(!$search->getQuery() && $filter->getOffer())
         {
 
-            $qb->andWhere('product_offer.value = :offer');
-            $qb->setParameter('offer', $filter->getOffer());
+            $dbal->andWhere('product_offer.value = :offer');
+            $dbal->setParameter('offer', $filter->getOffer());
         }
 
-        $qb->addSelect('category_offer.reference as product_offer_reference');
-        $qb->leftJoin(
+        $dbal->addSelect('category_offer.reference as product_offer_reference');
+        $dbal->leftJoin(
             'product_offer',
-            CategoryProductOffers::TABLE,
+            CategoryProductOffers::class,
             'category_offer',
             'category_offer.id = product_offer.category_offer'
         );
@@ -221,27 +213,27 @@ final class AllWbOrdersGroupRepository implements AllWbOrdersGroupInterface
         * Множественный вариант
         */
 
-        $qb->addSelect('product_variation.value as product_variation_value');
-        $qb->addSelect('product_variation.postfix as product_variation_postfix');
+        $dbal->addSelect('product_variation.value as product_variation_value');
+        $dbal->addSelect('product_variation.postfix as product_variation_postfix');
 
-        $qb->leftJoin('order_product',
-            ProductVariation::TABLE,
+        $dbal->leftJoin('order_product',
+            ProductVariation::class,
             'product_variation',
             'product_variation.id = order_product.variation'
         );
 
         if(!$search->getQuery() && $filter->getVariation())
         {
-            $qb->andWhere('product_variation.value = :variation');
-            $qb->setParameter('variation', $filter->getVariation());
+            $dbal->andWhere('product_variation.value = :variation');
+            $dbal->setParameter('variation', $filter->getVariation());
         }
 
 
         /* Тип множественного вараианта торгового предложения */
-        $qb->addSelect('category_variation.reference as product_variation_reference');
-        $qb->leftJoin(
+        $dbal->addSelect('category_variation.reference as product_variation_reference');
+        $dbal->leftJoin(
             'product_variation',
-            CategoryProductVariation::TABLE,
+            CategoryProductVariation::class,
             'category_variation',
             'category_variation.id = product_variation.category_variation'
         );
@@ -249,7 +241,7 @@ final class AllWbOrdersGroupRepository implements AllWbOrdersGroupInterface
 
         /** Артикул продукта */
 
-        $qb->addSelect("
+        $dbal->addSelect("
 					CASE
 					   WHEN product_variation.article IS NOT NULL THEN product_variation.article
 					   WHEN product_offer.article IS NOT NULL THEN product_offer.article
@@ -262,43 +254,43 @@ final class AllWbOrdersGroupRepository implements AllWbOrdersGroupInterface
 
         /** Фото продукта */
 
-        $qb->leftJoin(
+        $dbal->leftJoin(
             'order_product',
-            ProductPhoto::TABLE,
+            ProductPhoto::class,
             'product_photo',
             'product_photo.event = order_product.product AND product_photo.root = true'
         );
 
-        $qb->leftJoin(
+        $dbal->leftJoin(
             'product_offer',
-            ProductOfferImage::TABLE,
+            ProductOfferImage::class,
             'product_offer_images',
             'product_offer_images.offer = order_product.offer AND product_offer_images.root = true'
         );
 
-        $qb->leftJoin(
+        $dbal->leftJoin(
             'product_offer',
-            ProductVariationImage::TABLE,
+            ProductVariationImage::class,
             'product_variation_image',
             'product_variation_image.variation = order_product.variation AND product_variation_image.root = true'
         );
 
 
-        $qb->addSelect("
+        $dbal->addSelect("
 			CASE
 			   WHEN product_variation_image.name IS NOT NULL THEN
-					CONCAT ( '/upload/".ProductVariationImage::TABLE."' , '/', product_variation_image.name)
+					CONCAT ( '/upload/".ProductVariationImage::class."' , '/', product_variation_image.name)
 			   WHEN product_offer_images.name IS NOT NULL THEN
-					CONCAT ( '/upload/".ProductOfferImage::TABLE."' , '/', product_offer_images.name)
+					CONCAT ( '/upload/".ProductOfferImage::class."' , '/', product_offer_images.name)
 			   WHEN product_photo.name IS NOT NULL THEN
-					CONCAT ( '/upload/".ProductPhoto::TABLE."' , '/', product_photo.name)
+					CONCAT ( '/upload/".ProductPhoto::class."' , '/', product_photo.name)
 			   ELSE NULL
 			END AS product_image
 		"
         );
 
         /** Флаг загрузки файла CDN */
-        $qb->addSelect("
+        $dbal->addSelect("
 			CASE
 			   WHEN product_variation_image.name IS NOT NULL THEN
 					product_variation_image.ext
@@ -311,7 +303,7 @@ final class AllWbOrdersGroupRepository implements AllWbOrdersGroupInterface
 		");
 
         /** Флаг загрузки файла CDN */
-        $qb->addSelect("
+        $dbal->addSelect("
 			CASE
 			   WHEN product_variation_image.name IS NOT NULL THEN
 					product_variation_image.cdn
@@ -327,27 +319,27 @@ final class AllWbOrdersGroupRepository implements AllWbOrdersGroupInterface
         /* Карточка Wildberries */
 
 
-        $qb->leftJoin('wb_order',
-            WbProductCardVariation::TABLE,
+        $dbal->leftJoin('wb_order',
+            WbProductCardVariation::class,
             'wb_card_variation',
             'wb_card_variation.barcode = wb_order_event.barcode'
         );
 
-        $qb->addSelect('wb_card_offer.nomenclature AS wb_order_nomenclature');
+        $dbal->addSelect('wb_card_offer.nomenclature AS wb_order_nomenclature');
 
-        $qb->leftJoin('wb_card_variation',
-            WbProductCardOffer::TABLE,
+        $dbal->leftJoin('wb_card_variation',
+            WbProductCardOffer::class,
             'wb_card_offer',
             'wb_card_offer.card = wb_card_variation.card AND wb_card_offer.offer =  product_offer.const'
         );
 
 
-        $qb->addSelect('wb_order_stats.analog AS wb_order_analog');
-        $qb->addSelect('wb_order_stats.alarm AS wb_order_alarm');
-        $qb->addSelect('wb_order_stats.old AS wb_order_old');
+        $dbal->addSelect('wb_order_stats.analog AS wb_order_analog');
+        $dbal->addSelect('wb_order_stats.alarm AS wb_order_alarm');
+        $dbal->addSelect('wb_order_stats.old AS wb_order_old');
 
-        $qb->leftJoin('product_event',
-            WbOrdersStatistics::TABLE,
+        $dbal->leftJoin('product_event',
+            WbOrdersStatistics::class,
             'wb_order_stats',
             'wb_order_stats.product = product_event.main'
         );
@@ -356,7 +348,7 @@ final class AllWbOrdersGroupRepository implements AllWbOrdersGroupInterface
         /* Поиск */
         if($search->getQuery())
         {
-            $qb
+            $dbal
                 ->createSearchQueryBuilder($search)
                 ->addSearchEqualUid('wb_order.id')
                 ->addSearchEqualUid('order_product.product')
@@ -369,13 +361,11 @@ final class AllWbOrdersGroupRepository implements AllWbOrdersGroupInterface
                 ->addSearchLike('product_info.article');
         }
 
-        //$qb->orderBy('wb_order_event.created', 'ASC');
-        $qb->orderBy('wb_order_date', 'ASC');
+        $dbal->orderBy('wb_order_date', 'ASC');
 
+        $dbal->allGroupByExclude();
 
-        $qb->allGroupByExclude();
-
-        return $this->paginator->fetchAllAssociative($qb);
+        return $this->paginator->fetchAllAssociative($dbal);
 
     }
 }
