@@ -33,14 +33,8 @@ use BaksDev\Wildberries\Orders\Entity\WbOrders;
 
 final class WbOrderProfileRepository implements WbOrderProfileInterface
 {
-    private DBALQueryBuilder $DBALQueryBuilder;
 
-    public function __construct(
-        DBALQueryBuilder $DBALQueryBuilder,
-    )
-    {
-        $this->DBALQueryBuilder = $DBALQueryBuilder;
-    }
+    public function __construct(private readonly DBALQueryBuilder $DBALQueryBuilder) {}
 
     /**
      * Метод возвращает идентификатор профиля заказа и номер заказа Wildberries в качестве атрибута
@@ -51,7 +45,7 @@ final class WbOrderProfileRepository implements WbOrderProfileInterface
 
         $qb
             ->addSelect('wb_order.ord')
-            ->from(WbOrders::TABLE, 'wb_order')
+            ->from(WbOrders::class, 'wb_order')
             ->where('wb_order.id = :order')
             ->setParameter('order', $order, OrderUid::TYPE);
 
@@ -59,7 +53,7 @@ final class WbOrderProfileRepository implements WbOrderProfileInterface
             ->addSelect('event.profile')
             ->join(
                 'wb_order',
-                WbOrdersEvent::TABLE,
+                WbOrdersEvent::class,
                 'event',
                 'event.id = wb_order.event'
             );

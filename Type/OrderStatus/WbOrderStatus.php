@@ -32,7 +32,7 @@ use InvalidArgumentException;
 final class WbOrderStatus
 {
 
-    public const TYPE = 'wb_order_status';
+    public const string TYPE = 'wb_order_status';
 
     private WbOrderStatusInterface $status;
 

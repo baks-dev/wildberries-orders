@@ -25,6 +25,7 @@ declare(strict_types=1);
 
 namespace BaksDev\Wildberries\Orders\Repository\WbOrdersAlarm;
 
+use BaksDev\Core\Doctrine\DBALQueryBuilder;
 use BaksDev\Orders\Order\Entity\Order;
 use BaksDev\Orders\Order\Entity\Products\OrderProduct;
 use BaksDev\Products\Product\Type\Event\ProductEventUid;
@@ -32,19 +33,10 @@ use BaksDev\Wildberries\Orders\Entity\Event\WbOrdersEvent;
 use BaksDev\Wildberries\Orders\Entity\WbOrders;
 use BaksDev\Wildberries\Orders\Type\OrderStatus\Status\WbOrderStatusNew;
 use BaksDev\Wildberries\Orders\Type\OrderStatus\WbOrderStatus;
-use Doctrine\DBAL\Connection;
 
-final class WbOrdersAlarmRepository implements WbOrdersAlarmInterface
+final readonly class WbOrdersAlarmRepository implements WbOrdersAlarmInterface
 {
-
-    private Connection $connection;
-
-    public function __construct(
-        Connection $connection,
-    )
-    {
-        $this->connection = $connection;
-    }
+    public function __construct(private DBALQueryBuilder $DBALQueryBuilder) {}
 
     /**
      * Метод возвращает количеств срочных заказов продукта, требующих особое внимание
@@ -52,13 +44,13 @@ final class WbOrdersAlarmRepository implements WbOrdersAlarmInterface
      */
     public function countOrderAlarmByProduct(ProductEventUid $product): int
     {
-        $qb = $this->connection->createQueryBuilder();
+        $qb = $this->DBALQueryBuilder->createQueryBuilder(self::class);
 
         $qb->select('COUNT(*)');
-        $qb->from(OrderProduct::TABLE, 'orders_product');
+        $qb->from(OrderProduct::class, 'orders_product');
 
         $qb->join('orders_product',
-            Order::TABLE,
+            Order::class,
             'orders',
             'orders.event = orders_product.event'
         );
@@ -69,13 +61,13 @@ final class WbOrdersAlarmRepository implements WbOrdersAlarmInterface
 
 
         $qb->join('orders',
-            WbOrders::TABLE,
+            WbOrders::class,
             'alarm_wb_orders',
             'alarm_wb_orders.id = orders.id'
         );
 
         $qb->join('alarm_wb_orders',
-            WbOrdersEvent::TABLE,
+            WbOrdersEvent::class,
             'alarm_wb_orders_event',
             'alarm_wb_orders_event.id = alarm_wb_orders.event AND
 				alarm_wb_orders_event.status = :wb_orders_status AND

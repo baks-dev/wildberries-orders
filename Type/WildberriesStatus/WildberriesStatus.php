@@ -32,7 +32,7 @@ use InvalidArgumentException;
  */
 final class WildberriesStatus
 {
-    public const TYPE = 'wb_status';
+    public const string TYPE = 'wb_status';
 
     private WildberriesStatusInterface $status;
 

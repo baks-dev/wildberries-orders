@@ -25,7 +25,7 @@ namespace BaksDev\Wildberries\Orders\Type\Email;
 
 final class ClientEmail
 {
-    public const TYPE = 'client_email';
+    public const string TYPE = 'client_email';
 
     private ?string $value;
 
