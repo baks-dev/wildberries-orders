@@ -90,7 +90,7 @@ final class WbOrdersProductFilterForm extends AbstractType
                         return $category?->getValue();
                     },
                     'choice_label' => function(CategoryProductUid $category) {
-                        return ($category->getAttr() ? str_repeat('- &nbsp; &nbsp;', $category->getAttr() - 1) : '').$category->getOptions();
+                        return (is_int($category->getAttr()) ? str_repeat(' - ', $category->getAttr() - 1) : '').$category->getOptions();
                     },
                     'label' => false,
                     'required' => false,
