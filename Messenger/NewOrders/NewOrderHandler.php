@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,7 @@ use BaksDev\Products\Product\Repository\ProductByVariation\ProductByVariationInt
 use BaksDev\Reference\Money\Type\Money;
 use BaksDev\Users\Profile\UserProfile\Repository\UserByUserProfile\UserByUserProfileInterface;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
-use BaksDev\Wildberries\Api\Token\Orders\WildberriesOrdersNew;
+use BaksDev\Wildberries\Orders\Api\WildberriesOrdersNew;
 use BaksDev\Wildberries\Orders\Entity\WbOrders;
 use BaksDev\Wildberries\Orders\Repository\WbOrdersById\WbOrdersByIdInterface;
 use BaksDev\Wildberries\Orders\Type\Email\ClientEmail;
