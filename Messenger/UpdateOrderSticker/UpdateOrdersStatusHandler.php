@@ -25,7 +25,6 @@ declare(strict_types=1);
 
 namespace BaksDev\Wildberries\Orders\Messenger\UpdateOrderSticker;
 
-use BaksDev\Wildberries\Orders\Api\WildberriesOrdersStatus;
 use BaksDev\Wildberries\Orders\Api\WildberriesOrdersSticker\WildberriesOrdersSticker;
 use BaksDev\Wildberries\Orders\Entity\WbOrders;
 use BaksDev\Wildberries\Orders\Messenger\WbOrderMessage;
@@ -34,36 +33,21 @@ use BaksDev\Wildberries\Orders\Repository\WbOrdersById\WbOrdersByIdInterface;
 use BaksDev\Wildberries\Orders\Type\OrderStatus\Status\WbOrderStatusConfirm;
 use BaksDev\Wildberries\Orders\UseCase\Command\Sticker\StickerWbOrderDTO;
 use BaksDev\Wildberries\Orders\UseCase\Command\Sticker\StickerWbOrderHandler;
-use Doctrine\ORM\EntityManagerInterface;
 use DomainException;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsMessageHandler(fromTransport: 'sync')]
-final class UpdateOrdersStatusHandler
+#[AsMessageHandler]
+final readonly class UpdateOrdersStatusHandler
 {
-
-    private StickerWbOrderHandler $stickerWbOrderHandler;
-    private WbOrdersByIdInterface $wbOrdersById;
-    private WildberriesOrdersSticker $wildberriesOrdersSticker;
-    private WbOrderProfileInterface $wbOrderProfile;
-    private LoggerInterface $logger;
-
     public function __construct(
-        WbOrdersByIdInterface $wbOrdersById,
-        WbOrderProfileInterface $wbOrderProfile,
-        WildberriesOrdersSticker $wildberriesOrdersSticker,
-        StickerWbOrderHandler $stickerWbOrderHandler,
-        LoggerInterface $wildberriesOrdersLogger
-    )
-    {
-        $this->stickerWbOrderHandler = $stickerWbOrderHandler;
-        $this->wbOrdersById = $wbOrdersById;
-        $this->wildberriesOrdersSticker = $wildberriesOrdersSticker;
-        $this->wbOrderProfile = $wbOrderProfile;
-        $this->logger = $wildberriesOrdersLogger;
-    }
+        #[Target('wildberriesOrdersLogger')] private LoggerInterface $logger,
+        private WbOrdersByIdInterface $wbOrdersById,
+        private WbOrderProfileInterface $wbOrderProfile,
+        private WildberriesOrdersSticker $wildberriesOrdersSticker,
+        private StickerWbOrderHandler $stickerWbOrderHandler,
+    ) {}
 
     /**
      * При обновлении статуса заказа Confirm (Добавлен к поставке, на сборке)

@@ -40,37 +40,20 @@ use BaksDev\Wildberries\Orders\UseCase\Command\Status\StatusWbOrderHandler;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-final class UpdateOrdersStatusHandler
+final readonly class UpdateOrdersStatusHandler
 {
-    private EntityManagerInterface $entityManager;
-    private iterable $WildberriesStatus;
-    private AllOrdersByStatusInterface $allOrdersByStatus;
-    private WildberriesOrdersStatus $wildberriesOrdersStatus;
-    private LoggerInterface $logger;
-    private StatusWbOrderHandler $statusWbOrderHandler;
-
-
     public function __construct(
-        #[AutowireIterator('baks.wb.status')] iterable $WildberriesStatus,
-        EntityManagerInterface $entityManager,
-        AllOrdersByStatusInterface $allOrdersByStatus,
-        WildberriesOrdersStatus $wildberriesOrdersStatus,
-        LoggerInterface $wildberriesOrdersLogger,
-        StatusWbOrderHandler $statusWbOrderHandler
-
-    )
-    {
-        $this->entityManager = $entityManager;
-        $this->WildberriesStatus = $WildberriesStatus;
-        $this->allOrdersByStatus = $allOrdersByStatus;
-        $this->wildberriesOrdersStatus = $wildberriesOrdersStatus;
-        $this->logger = $wildberriesOrdersLogger;
-
-        $this->statusWbOrderHandler = $statusWbOrderHandler;
-    }
+        #[AutowireIterator('baks.wb.status')] private iterable $WildberriesStatus,
+        #[Target('wildberriesOrdersLogger')] private LoggerInterface $logger,
+        private EntityManagerInterface $entityManager,
+        private AllOrdersByStatusInterface $allOrdersByStatus,
+        private WildberriesOrdersStatus $wildberriesOrdersStatus,
+        private StatusWbOrderHandler $statusWbOrderHandler
+    ) {}
 
     public function __invoke(UpdateOrdersStatusMessage $message): void
     {

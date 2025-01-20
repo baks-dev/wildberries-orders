@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -25,37 +25,24 @@ declare(strict_types=1);
 
 namespace BaksDev\Wildberries\Orders\Messenger\UpdateStatistics;
 
-use BaksDev\Orders\Order\Entity\Order;
-use BaksDev\Orders\Order\Entity\Products\OrderProduct;
-use BaksDev\Products\Product\Entity\Product;
 use BaksDev\Wildberries\Orders\Entity\WbOrdersStatistics;
 use BaksDev\Wildberries\Orders\Repository\WbOrdersOld\WbOrdersOldInterface;
 use BaksDev\Wildberries\Orders\UseCase\Command\Statistic\WbOrdersStatisticsDTO;
 use BaksDev\Wildberries\Orders\UseCase\Command\Statistic\WbOrdersStatisticsHandler;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler(priority: 8)]
-final class UpdateStatisticsOldHandler
+final readonly class UpdateStatisticsOldHandler
 {
-    private EntityManagerInterface $entityManager;
-    private WbOrdersOldInterface $ordersOld;
-    private WbOrdersStatisticsHandler $ordersStatisticsHandler;
-    private LoggerInterface $logger;
-
     public function __construct(
-        EntityManagerInterface $entityManager,
-        WbOrdersOldInterface $ordersOld,
-        WbOrdersStatisticsHandler $ordersStatisticsHandler,
-        LoggerInterface $wildberriesOrdersLogger,
-    )
-    {
-        $this->entityManager = $entityManager;
-        $this->ordersOld = $ordersOld;
-        $this->ordersStatisticsHandler = $ordersStatisticsHandler;
-        $this->logger = $wildberriesOrdersLogger;
-    }
+        #[Target('wildberriesOrdersLogger')] private LoggerInterface $logger,
+        private EntityManagerInterface $entityManager,
+        private WbOrdersOldInterface $ordersOld,
+        private WbOrdersStatisticsHandler $ordersStatisticsHandler,
+    ) {}
 
     /**
      * Обновляем дату самого старого невыполненного заказа Wildberries продукции

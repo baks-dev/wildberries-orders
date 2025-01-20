@@ -53,51 +53,30 @@ use BaksDev\Wildberries\Products\UseCase\Cards\NewEdit\Variation\WbProductCardVa
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
 final class NewOrderHandler
 {
-    private WildberriesOrdersNew $wildberriesOrdersNew;
-    private WbOrdersByIdInterface $wbOrdersById;
-    private ProductByVariationInterface $productByVariation;
-    private EditOrderHandler $orderHandler;
-    private OrderStatusHandler $orderStatusHandler;
-    private CreateWbOrderHandler $WildberriesOrderHandler;
-    private EntityManagerInterface $entityManager;
-    private LoggerInterface $logger;
-    private MessageDispatchInterface $messageDispatch;
-
     private UserProfileUid $profile;
+
     private bool $WbCardUpdate = false;
 
     private string $barcode;
-    private UserByUserProfileInterface $userByUserProfile;
 
     public function __construct(
-        WildberriesOrdersNew $wildberriesOrdersNew,
-        WbOrdersByIdInterface $wbOrdersById,
-        ProductByVariationInterface $productByVariation,
-        EditOrderHandler $orderHandler,
-        OrderStatusHandler $orderStatusHandler,
-        CreateWbOrderHandler $WildberriesOrderHandler,
-        EntityManagerInterface $entityManager,
-        LoggerInterface $wildberriesOrdersLogger,
-        UserByUserProfileInterface $userByUserProfile,
-        MessageDispatchInterface $messageDispatch
-    )
-    {
-        $this->wildberriesOrdersNew = $wildberriesOrdersNew;
-        $this->wbOrdersById = $wbOrdersById;
-        $this->productByVariation = $productByVariation;
-        $this->orderHandler = $orderHandler;
-        $this->orderStatusHandler = $orderStatusHandler;
-        $this->WildberriesOrderHandler = $WildberriesOrderHandler;
-        $this->entityManager = $entityManager;
-        $this->logger = $wildberriesOrdersLogger;
-        $this->messageDispatch = $messageDispatch;
-        $this->userByUserProfile = $userByUserProfile;
-    }
+        #[Target('wildberriesOrdersLogger')] private readonly LoggerInterface $logger,
+        private readonly WildberriesOrdersNew $wildberriesOrdersNew,
+        private readonly WbOrdersByIdInterface $wbOrdersById,
+        private readonly ProductByVariationInterface $productByVariation,
+        private readonly EditOrderHandler $orderHandler,
+        private readonly OrderStatusHandler $orderStatusHandler,
+        private readonly CreateWbOrderHandler $WildberriesOrderHandler,
+        private readonly EntityManagerInterface $entityManager,
+        private readonly UserByUserProfileInterface $userByUserProfile,
+        private readonly MessageDispatchInterface $messageDispatch
+    ) {}
 
     public function __invoke(NewOrdersMessage $message): void
     {

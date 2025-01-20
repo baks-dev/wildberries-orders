@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -32,25 +32,17 @@ use BaksDev\Products\Product\Entity\Product;
 use BaksDev\Wildberries\Orders\Messenger\WbOrderMessage;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-final class UpdateStatisticsHandler
+final readonly class UpdateStatisticsHandler
 {
-    private EntityManagerInterface $entityManager;
-    private LoggerInterface $logger;
-    private MessageDispatchInterface $messageDispatch;
-
     public function __construct(
-        MessageDispatchInterface $messageDispatch,
-        EntityManagerInterface $entityManager,
-        LoggerInterface $wildberriesOrdersLogger,
-    )
-    {
-        $this->entityManager = $entityManager;
-        $this->logger = $wildberriesOrdersLogger;
-        $this->messageDispatch = $messageDispatch;
-    }
+        #[Target('wildberriesOrdersLogger')] private LoggerInterface $logger,
+        private MessageDispatchInterface $messageDispatch,
+        private EntityManagerInterface $entityManager,
+    ) {}
 
     /**
      * При обновлении заказа - обновляем статистику по продукции в заказе
