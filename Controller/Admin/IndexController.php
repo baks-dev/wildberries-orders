@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -54,13 +54,15 @@ final class IndexController extends AbstractController
          * Поиск
          */
 
-        $search = new SearchDTO($request);
-        $searchForm = $this->createForm(
-            SearchForm::class, $search, [
-                'action' => $this->generateUrl('wildberries-orders:admin.index'),
-            ]
-        );
-        $searchForm->handleRequest($request);
+        $search = new SearchDTO();
+
+        $searchForm = $this
+            ->createForm(
+                type: SearchForm::class,
+                data: $search,
+                options: ['action' => $this->generateUrl('wildberries-orders:admin.index'),]
+            )
+            ->handleRequest($request);
 
 
         /**
@@ -68,10 +70,15 @@ final class IndexController extends AbstractController
          */
 
         $filter = new WbOrdersProductFilterDTO($request);
-        $filterForm = $this->createForm(WbOrdersProductFilterForm::class, $filter, [
-            'action' => $this->generateUrl('wildberries-orders:admin.index'),
-        ]);
-        $filterForm->handleRequest($request);
+
+        $filterForm = $this
+            ->createForm(
+                type: WbOrdersProductFilterForm::class,
+                data: $filter,
+                options: ['action' => $this->generateUrl('wildberries-orders:admin.index'),]
+            )
+            ->handleRequest($request);
+
         !$filterForm->isSubmitted() ?: $this->redirectToReferer();
 
 
@@ -80,10 +87,15 @@ final class IndexController extends AbstractController
          */
 
         $status = new WbOrdersStatusFilterDTO($request);
-        $statusForm = $this->createForm(WbOrdersStatusFilterForm::class, $status, [
-            'action' => $this->generateUrl('wildberries-orders:admin.index'),
-        ]);
-        $statusForm->handleRequest($request);
+
+        $statusForm = $this
+            ->createForm(
+                type: WbOrdersStatusFilterForm::class,
+                data: $status,
+                options: ['action' => $this->generateUrl('wildberries-orders:admin.index'),]
+            )
+            ->handleRequest($request);
+
         !$statusForm->isSubmitted() ?: $this->redirectToReferer();
 
 
@@ -91,7 +103,8 @@ final class IndexController extends AbstractController
          * Получаем список
          */
 
-        $WbOrders = $allWbOrders->fetchAllWbOrdersAssociative($search, $this->getProfileUid(), $filter, $status);
+        $WbOrders = $allWbOrders
+            ->findPaginator($search, $this->getProfileUid(), $filter, $status);
 
         return $this->render(
             [

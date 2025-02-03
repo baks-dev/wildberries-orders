@@ -23,35 +23,48 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Wildberries\Orders\Type\ProfileType;
+namespace BaksDev\Wildberries\Orders\UseCase\New\User\Payment\Field;
 
-use BaksDev\Users\Profile\TypeProfile\Type\Id\Choice\Collection\TypeProfileInterface;
-use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
+use BaksDev\Orders\Order\Entity\User\Payment\Field\OrderPaymentFieldInterface;
+use BaksDev\Payment\Type\Field\PaymentFieldUid;
+use Symfony\Component\Validator\Constraints as Assert;
 
-#[AutoconfigureTag('baks.users.profile.type')]
-final class TypeProfileFbsWildberries implements TypeProfileInterface
+final class OrderPaymentFieldDTO implements OrderPaymentFieldInterface
 {
-    public const string TYPE = '69b5430f-55e4-7e61-b116-3b0486238fb3';
+    /** Идентификатор пользовательского поля в способе оплаты */
+    #[Assert\NotBlank]
+    private PaymentFieldUid $field;
 
-    /** Сортировка */
-    public static function priority(): int
+    /** Заполненное значение */
+    #[Assert\Valid]
+    private string $value;
+
+
+    /** Идентификатор пользовательского поля в способе оплаты */
+
+    public function getField(): PaymentFieldUid
     {
-        return 410;
+        return $this->field;
     }
 
-    public function __toString(): string
+
+    public function setField(PaymentFieldUid $field): void
     {
-        return self::TYPE;
+        $this->field = $field;
     }
 
-    /** Возвращает значение (value) */
+
+    /** Заполненное значение */
+
     public function getValue(): string
     {
-        return self::TYPE;
+        return $this->value;
     }
 
-    public static function equals(mixed $uid): bool
+    public function setValue(string $value): void
     {
-        return self::TYPE === (string) $uid;
+        $this->value = $value;
     }
+
+
 }

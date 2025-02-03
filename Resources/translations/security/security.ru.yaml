@@ -1,6 +1,7 @@
 # Роль
 
 ROLE_WB_ORDERS:
+  header: 'Wildberries'
   name: 'Заказы'
   desc: 'Заказы Wildberries'
 

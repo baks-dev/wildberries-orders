@@ -1,6 +1,6 @@
 # BaksDev Wildberries Orders
 
-[![Version](https://img.shields.io/badge/version-7.2.0-blue)](https://github.com/baks-dev/wildberries-orders/releases)
+[![Version](https://img.shields.io/badge/version-7.2.1-blue)](https://github.com/baks-dev/wildberries-orders/releases)
 ![php 8.4+](https://img.shields.io/badge/php-min%208.4-red.svg)
 
 Модуль заказов Wildberries
@@ -12,6 +12,24 @@ $ composer require baks-dev/wildberries-orders
 ```
 
 ## Дополнительно
+
+Для работы с заказами выполнить комманду для добавления типа профиля и доставку:
+
+* #### FBS
+
+``` bash
+php bin/console baks:users-profile-type:wildberries-fbs
+php bin/console baks:payment:wildberries-fbs
+php bin/console baks:delivery:wildberries-fbs
+```
+
+* #### DBS
+
+``` bash
+php bin/console baks:users-profile-type:wildberries-dbs
+php bin/console baks:payment:wildberries-dbs
+php bin/console baks:delivery:wildberries-dbs
+```
 
 Установка конфигурации и файловых ресурсов:
 

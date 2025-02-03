@@ -1,0 +1,171 @@
+<?php
+/*
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  
+ *  Permission is hereby granted, free of charge, to any person obtaining a copy
+ *  of this software and associated documentation files (the "Software"), to deal
+ *  in the Software without restriction, including without limitation the rights
+ *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ *  copies of the Software, and to permit persons to whom the Software is furnished
+ *  to do so, subject to the following conditions:
+ *  
+ *  The above copyright notice and this permission notice shall be included in all
+ *  copies or substantial portions of the Software.
+ *  
+ *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ *  FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
+ *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ *  THE SOFTWARE.
+ */
+
+declare(strict_types=1);
+
+namespace BaksDev\Wildberries\Orders\UseCase\New\Tests;
+
+use BaksDev\Core\Cache\AppCacheInterface;
+use BaksDev\Orders\Order\Entity\Order;
+use BaksDev\Orders\Order\UseCase\Admin\Delete\Tests\DeleteOrderTest;
+use BaksDev\Products\Product\Repository\CurrentProductByArticle\ProductConstByArticleInterface;
+use BaksDev\Users\Profile\UserProfile\Type\Event\UserProfileEventUid;
+use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
+use BaksDev\Wildberries\Orders\UseCase\New\Products\NewOrderProductDTO;
+use BaksDev\Wildberries\Orders\UseCase\New\User\OrderUserDTO;
+use BaksDev\Wildberries\Orders\UseCase\New\WildberriesOrderDTO;
+use BaksDev\Wildberries\Orders\UseCase\New\WildberriesOrderHandler;
+use BaksDev\Yandex\Market\Orders\Api\GetYaMarketOrdersNewRequest;
+use BaksDev\Yandex\Market\Orders\Type\DeliveryType\TypeDeliveryDbsYaMarket;
+use BaksDev\Yandex\Market\Orders\Type\PaymentType\TypePaymentDbsYaMarket;
+use BaksDev\Yandex\Market\Orders\Type\ProfileType\TypeProfileDbsYaMarket;
+use BaksDev\Yandex\Market\Type\Authorization\YaMarketAuthorizationToken;
+use DateInterval;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\Console\Input\StringInput;
+use Symfony\Component\Console\Output\NullOutput;
+use Symfony\Component\DependencyInjection\Attribute\When;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
+/**
+ * @group yandex-market-orders
+ * @group yandex-market-orders-new
+ */
+#[When(env: 'test')]
+class WildberriesOrderDBSTest extends KernelTestCase
+{
+    private static YaMarketAuthorizationToken $Authorization;
+
+    public static function setUpBeforeClass(): void
+    {
+        /** Токен авторизации заказов FBS - доставка курьером Яндекс Маркет */
+        self::$Authorization = new YaMarketAuthorizationToken(
+            new UserProfileUid(),
+            $_SERVER['TEST_YANDEX_MARKET_TOKEN_DBS'],
+            $_SERVER['TEST_YANDEX_MARKET_COMPANY_DBS'],
+            $_SERVER['TEST_YANDEX_MARKET_BUSINESS_DBS']
+        );
+
+        // Бросаем событие консольной комманды
+        $dispatcher = self::getContainer()->get(EventDispatcherInterface::class);
+        $event = new ConsoleCommandEvent(new Command(), new StringInput(''), new NullOutput());
+        $dispatcher->dispatch($event, 'console.command');
+
+        DeleteOrderTest::tearDownAfterClass();
+
+    }
+
+    public function testUseCase(): void
+    {
+
+        /** Кешируем на сутки результат теста */
+
+        /** @var AppCacheInterface $AppCache */
+        $AppCache = self::getContainer()->get(AppCacheInterface::class);
+        $cache = $AppCache->init('yandex-market-orders-test');
+        $item = $cache->getItem('YandexMarketOrderDBSTest');
+
+
+        if($item->isHit())
+        {
+            self::assertTrue(true);
+            return;
+        }
+
+
+        /** @var GetYaMarketOrdersNewRequest $YandexMarketNewOrdersRequest */
+        $YandexMarketNewOrdersRequest = self::getContainer()->get(GetYaMarketOrdersNewRequest::class);
+        $YandexMarketNewOrdersRequest->TokenHttpClient(self::$Authorization);
+
+        $response = $YandexMarketNewOrdersRequest
+            ->findAll(DateInterval::createFromDateString('10 day'));
+
+        if($response->valid())
+        {
+            /** @var ProductConstByArticleInterface $ProductConstByArticleInterface */
+            $ProductConstByArticleInterface = self::getContainer()->get(ProductConstByArticleInterface::class);
+
+            /** @var WildberriesOrderDTO $YandexMarketOrderDTO */
+            foreach($response as $YandexMarketOrderDTO)
+            {
+                $products = $YandexMarketOrderDTO->getProduct();
+
+                if($products->count() > 1)
+                {
+                    continue;
+                }
+
+                /** @var NewOrderProductDTO $NewOrderProductDTO */
+                foreach($products as $NewOrderProductDTO)
+                {
+                    $CurrentProductDTO = $ProductConstByArticleInterface->find($NewOrderProductDTO->getArticle());
+
+                    if($CurrentProductDTO === false)
+                    {
+                        continue 2;
+                    }
+                }
+
+                /** @var OrderUserDTO $OrderUserDTO */
+                $OrderUserDTO = $YandexMarketOrderDTO->getUsr();
+                $OrderUserDTO->setProfile(new UserProfileEventUid()); // присваиваем клиенту идентификатор тестового профиля
+
+                self::assertTrue($OrderUserDTO->getUserProfile()->getType()->equals(TypeProfileDbsYaMarket::TYPE));
+                self::assertTrue($OrderUserDTO->getDelivery()->getDelivery()->equals(TypeDeliveryDbsYaMarket::TYPE));
+                self::assertTrue($OrderUserDTO->getPayment()->getPayment()->equals(TypePaymentDbsYaMarket::TYPE));
+
+                /** @var WildberriesOrderHandler $YandexMarketOrderHandler */
+                $YandexMarketOrderHandler = self::getContainer()->get(WildberriesOrderHandler::class);
+
+                $handle = $YandexMarketOrderHandler->handle($YandexMarketOrderDTO);
+                self::assertTrue(($handle instanceof Order), $handle.': Ошибка YandexMarketOrder');
+
+
+                /** Запоминаем результат тестирования */
+                $item->expiresAfter(DateInterval::createFromDateString('1 day'));
+                $item->set(1);
+                $cache->save($item);
+
+
+                return;
+
+            }
+
+            self::assertFalse(true, message: 'Не найдено ни одного товара для заказа DBS');
+        }
+        else
+        {
+            self::assertFalse($response->valid());
+        }
+
+    }
+
+
+    public static function tearDownAfterClass(): void
+    {
+        DeleteOrderTest::tearDownAfterClass();
+    }
+
+}

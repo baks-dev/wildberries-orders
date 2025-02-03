@@ -23,35 +23,43 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Wildberries\Orders\Type\ProfileType;
+namespace BaksDev\Wildberries\Orders\Messenger\Schedules\NewOrders;
 
-use BaksDev\Users\Profile\TypeProfile\Type\Id\Choice\Collection\TypeProfileInterface;
-use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
+use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 
-#[AutoconfigureTag('baks.users.profile.type')]
-final class TypeProfileFbsWildberries implements TypeProfileInterface
+
+final class NewWildberriesOrdersScheduleMessage
 {
-    public const string TYPE = '69b5430f-55e4-7e61-b116-3b0486238fb3';
+    /**
+     * Идентификатор профиля
+     */
+    private string $profile;
 
-    /** Сортировка */
-    public static function priority(): int
+    private bool $deduplicator = true;
+
+
+    public function __construct(UserProfileUid|string $profile)
     {
-        return 410;
+        $this->profile = (string) $profile;
     }
 
-    public function __toString(): string
+    /**
+     * Profile
+     */
+    public function getProfile(): UserProfileUid
     {
-        return self::TYPE;
+        return new UserProfileUid($this->profile);
     }
 
-    /** Возвращает значение (value) */
-    public function getValue(): string
+    public function disableDeduplicator(): self
     {
-        return self::TYPE;
+        $this->deduplicator = false;
+        return $this;
     }
 
-    public static function equals(mixed $uid): bool
+    public function isDeduplicator(): bool
     {
-        return self::TYPE === (string) $uid;
+        return $this->deduplicator;
     }
+
 }

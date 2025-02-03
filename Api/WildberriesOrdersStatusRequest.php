@@ -29,7 +29,7 @@ use BaksDev\Wildberries\Api\Wildberries;
 use DomainException;
 use InvalidArgumentException;
 
-final class WildberriesOrdersStatus extends Wildberries
+final class WildberriesOrdersStatusRequest extends Wildberries
 {
 
     /**
@@ -68,16 +68,17 @@ final class WildberriesOrdersStatus extends Wildberries
 
 
     /** Получить статусы сборочных заданий
+     *
      * Возвращает статусы сборочных заданий по переданному списку идентификаторов сборочных заданий.
      *
-     * * supplierStatus - статус сборочного задания, триггером изменения которого является сам продавец.
+     * --- supplierStatus - статус сборочного задания, триггером изменения которого является сам продавец.
      *
      * new    Новое сборочное задание
      * confirm    На сборке    (При добавлении сборочного задания к поставке)
      * complete    В доставке    (При переводе в доставку соответствующей поставки)
      * cancel    Отменено продавцом
      *
-     * * wbStatus - статус сборочного задания в системе Wildberries.
+     * --- wbStatus - статус сборочного задания в системе Wildberries.
      *
      * waiting - сборочное задание в работе
      * sorted - сборочное задание отсортировано

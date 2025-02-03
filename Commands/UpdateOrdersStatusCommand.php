@@ -1,7 +1,7 @@
 <?php
 
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -81,7 +81,9 @@ class UpdateOrdersStatusCommand extends Command
             {
                 $helper = $this->getHelper('question');
 
-                $profiles = $this->allProfileToken->fetchAllWbTokenProfileAssociative();
+                $profiles = $this->allProfileToken
+                    ->onlyActiveToken()
+                    ->findAll();
 
                 $questions = null;
 
@@ -97,7 +99,7 @@ class UpdateOrdersStatusCommand extends Command
 
                 foreach($profiles as $profile)
                 {
-                    if($profile->getAttr() === $profileName)
+                    if($profile->getAttr() === $questions[$profileName])
                     {
                         break;
                     }
@@ -115,7 +117,11 @@ class UpdateOrdersStatusCommand extends Command
         }
         else
         {
-            foreach($this->allProfileToken->fetchAllWbTokenProfileAssociative() as $profile)
+            $profiles = $this->allProfileToken
+                ->onlyActiveToken()
+                ->findAll();
+
+            foreach($profiles as $profile)
             {
                 /* Отправляем сообщение в шину профиля */
                 $this->messageDispatch->dispatch(

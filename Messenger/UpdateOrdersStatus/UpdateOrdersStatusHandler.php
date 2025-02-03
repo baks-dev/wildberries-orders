@@ -25,7 +25,7 @@ declare(strict_types=1);
 
 namespace BaksDev\Wildberries\Orders\Messenger\UpdateOrdersStatus;
 
-use BaksDev\Wildberries\Orders\Api\WildberriesOrdersStatus;
+use BaksDev\Wildberries\Orders\Api\WildberriesOrdersStatusRequest;
 use BaksDev\Wildberries\Orders\Entity\Event\WbOrdersEvent;
 use BaksDev\Wildberries\Orders\Entity\WbOrders;
 use BaksDev\Wildberries\Orders\Repository\AllOrdersByStatus\AllOrdersByStatusInterface;
@@ -51,7 +51,7 @@ final readonly class UpdateOrdersStatusHandler
         #[Target('wildberriesOrdersLogger')] private LoggerInterface $logger,
         private EntityManagerInterface $entityManager,
         private AllOrdersByStatusInterface $allOrdersByStatus,
-        private WildberriesOrdersStatus $wildberriesOrdersStatus,
+        private WildberriesOrdersStatusRequest $wildberriesOrdersStatus,
         private StatusWbOrderHandler $statusWbOrderHandler
     ) {}
 

@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,7 @@ use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 
 /**
- * Проверяем новые заказы Wildberries каждые 5 минут
+ * Проверяем новые заказы Wildberries
  */
 #[AutoconfigureTag('baks.schedule')]
 final class NewOrdersSchedule implements ScheduleInterface
@@ -50,6 +50,6 @@ final class NewOrdersSchedule implements ScheduleInterface
      */
     public function getInterval(): DateInterval
     {
-        return DateInterval::createFromDateString('5 minutes');
+        return DateInterval::createFromDateString('30 seconds');
     }
 }

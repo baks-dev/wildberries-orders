@@ -25,47 +25,46 @@ declare(strict_types=1);
 
 namespace BaksDev\Wildberries\Orders\Api;
 
-use BaksDev\Wildberries\Api\Wildberries;
-use DomainException;
+use BaksDev\Wildberries\Api\WildberriesMarketplace;
+use BaksDev\Wildberries\Orders\UseCase\New\WildberriesOrderDTO;
+use Generator;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 
-final class WildberriesOrdersNew extends Wildberries
+final class WildberriesOrdersNewRequest extends WildberriesMarketplace
 {
-
-    private array $content = [];
-
-
     /**
      * Получить список новых сборочных заданий.
      * Возвращает список всех новых сборочных заданий у продавца на данный момент.
      *
-     * @see https://openapi.wildberries.ru/#tag/Marketplace-Sborochnye-zadaniya/paths/~1api~1v3~1orders~1new/get
+     * @see https://dev.wildberries.ru/openapi/orders-fbs/#tag/Sborochnye-zadaniya/paths/~1api~1v3~1orders~1new/get
      */
-    public function request(): self
+    public function findAll(): Generator|false
     {
         $response = $this->TokenHttpClient()->request(
             'GET',
             '/api/v3/orders/new',
         );
 
+        $content = $response->toArray(false);
+
         if($response->getStatusCode() !== 200)
         {
-            $content = $response->toArray(false);
-            //$this->logger->critical('curl -X POST "' . $url . '" ' . $curlHeader . ' -d "' . $data . '"');
-            throw new DomainException(
-                message: $response->getStatusCode().': '.$content['message'] ?? self::class, code: $response->getStatusCode()
+            $this->logger->critical(
+                'wildberries-orders: Ошибка при получении новых заказов',
+                [$content, self::class.':'.__LINE__]
             );
+
+            return false;
         }
-        $content = $response->toArray(false);
-        $this->content = $content['orders'];
 
-        return $this;
-    }
+        if(empty($content['orders']))
+        {
+            return false;
+        }
 
-    /**
-     * Получить список новых сборочных заданий.
-     */
-    public function getContent(): array
-    {
-        return $this->content;
+        foreach($content['orders'] as $order)
+        {
+            yield new WildberriesOrderDTO($order, $this->getProfile());
+        }
     }
 }
