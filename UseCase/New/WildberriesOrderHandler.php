@@ -41,30 +41,24 @@ use BaksDev\Orders\Order\Messenger\OrderMessage;
 use BaksDev\Orders\Order\Repository\ExistsOrderNumber\ExistsOrderNumberInterface;
 use BaksDev\Orders\Order\Repository\FieldByDeliveryChoice\FieldByDeliveryChoiceInterface;
 use BaksDev\Orders\Order\Type\Status\OrderStatus\OrderStatusNew;
-use BaksDev\Products\Product\Repository\CurrentProductByArticle\ProductConstByArticleInterface;
 use BaksDev\Products\Product\Repository\CurrentProductByArticle\ProductConstByBarcodeInterface;
 use BaksDev\Users\Address\Services\GeocodeAddressParser;
 use BaksDev\Users\Profile\UserProfile\Entity\UserProfile;
-use BaksDev\Users\Profile\UserProfile\Repository\FieldValueForm\FieldValueFormInterface;
 use BaksDev\Users\Profile\UserProfile\Repository\UserByUserProfile\UserByUserProfileInterface;
 use BaksDev\Users\Profile\UserProfile\Repository\UserProfileGps\UserProfileGpsInterface;
 use BaksDev\Users\Profile\UserProfile\UseCase\User\NewEdit\UserProfileHandler;
 use BaksDev\Wildberries\Orders\UseCase\New\User\Delivery\Field\OrderDeliveryFieldDTO;
-use BaksDev\Yandex\Market\Orders\UseCase\Status\New\ToggleUnpaidToNewYaMarketOrderHandler;
 use Doctrine\ORM\EntityManagerInterface;
 
 final class WildberriesOrderHandler extends AbstractHandler
 {
     public function __construct(
         private readonly UserProfileHandler $profileHandler,
-        private readonly ProductConstByArticleInterface $ProductConstByArticle,
         private readonly ProductConstByBarcodeInterface $ProductConstByBarcode,
         private readonly FieldByDeliveryChoiceInterface $deliveryFields,
         private readonly CurrentDeliveryEventInterface $currentDeliveryEvent,
         private readonly GeocodeAddressParser $geocodeAddressParser,
-        private readonly FieldValueFormInterface $fieldValue,
         private readonly ExistsOrderNumberInterface $existsOrderNumber,
-        private readonly ToggleUnpaidToNewYaMarketOrderHandler $newYaMarketOrderStatusHandler,
         private readonly UserByUserProfileInterface $userByUserProfile,
         private readonly PickupByGeolocationInterface $pickupByGeolocation,
 
