@@ -50,6 +50,9 @@ final class IndexController extends AbstractController
         int $page = 0,
     ): Response
     {
+
+        return new Response('Not found');
+
         /**
          * Поиск
          */
