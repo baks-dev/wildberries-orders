@@ -27,6 +27,7 @@ namespace BaksDev\Wildberries\Orders\Controller\Admin;
 
 use BaksDev\Core\Controller\AbstractController;
 use BaksDev\Core\Listeners\Event\Security\RoleSecurity;
+use BaksDev\Orders\Order\Repository\OrderProducts\OrderProductRepositoryDTO;
 use BaksDev\Orders\Order\Repository\OrderProducts\OrderProductsInterface;
 use BaksDev\Products\Product\Repository\ProductDetail\ProductDetailByUidInterface;
 use BaksDev\Wildberries\Orders\Entity\Sticker\WbOrdersSticker;
@@ -61,25 +62,30 @@ final class PrintController extends AbstractController
             ->order($WbOrdersSticker->getOrder())
             ->findAllProducts();
 
-        /* Получаем продукцию для иллюстрации */
-        $current = current($products);
-
-        if(!$current)
+        if(false === ($products || $products->valid()))
         {
             throw new RouteNotFoundException('Order Products Not Found');
         }
 
+        /**
+         * Получаем продукцию для иллюстрации
+         * @var OrderProductRepositoryDTO $current
+         */
+        $current = $products->current();
+
         $Product = $productDetail
-            ->event($current['product_event'])
-            ->offer($current['product_offer'])
-            ->variation($current['product_variation'])
-            ->modification($current['product_modification'])
+            ->event($current->getProductEvent())
+            ->offer($current->getProductOffer())
+            ->variation($current->getProductVariation())
+            ->modification($current->getProductModification())
             ->find();
 
         if(!$Product)
         {
             throw new RouteNotFoundException('Product Not Found');
         }
+
+        dd(); /* TODO: удалить !!! */
 
         /* Генерируем боковые стикеры */
         $BarcodeGenerator = new BarcodeGeneratorSVG();

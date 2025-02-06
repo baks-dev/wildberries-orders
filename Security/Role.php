@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -48,9 +48,10 @@ final class Role implements RoleInterface, MenuAdminInterface
      */
 
     /** Метод возвращает PATH раздела */
-    public function getPath(): string
+    public function getPath(): string|false
     {
-        return 'wildberries-orders:admin.index';
+        return false;
+        // return 'wildberries-orders:admin.index';
     }
 
     /**
