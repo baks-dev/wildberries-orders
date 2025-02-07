@@ -59,9 +59,12 @@ final class WildberriesOrdersStickerRequest extends Wildberries
     /**
      * Добавить в список идентификатор сборочного задания
      */
-    public function forOrder(int|string $order): self
+    public function forOrderWb(int|string $order): self
     {
+        $order = str_replace('W-', '', (string) $order);
+
         $this->order = (int) $order;
+
         return $this;
     }
 
@@ -71,6 +74,8 @@ final class WildberriesOrdersStickerRequest extends Wildberries
      * Можно запросить этикетку в формате svg, zplv (вертикальный), zplh (горизонтальный), png.
      *
      * @see https://dev.wildberries.ru/openapi/orders-fbs/#tag/Sborochnye-zadaniya/paths/~1api~1v3~1orders~1stickers/post
+     *
+     * @note По умолчанию стикер в формате SVG 40x30
      *
      */
     public function getOrderSticker(): string|false
@@ -87,14 +92,15 @@ final class WildberriesOrdersStickerRequest extends Wildberries
         $key = md5($this->getProfile().$this->order.$this->type.$this->width.$this->height.self::class);
         //$cache->deleteItem($key);
 
-
         $file = $cache->get($key, function(ItemInterface $item): string|false {
 
             $item->expiresAfter(DateInterval::createFromDateString('1 second'));
 
             $data = ["orders" => [$this->order]];
 
-            $response = $this->TokenHttpClient()->request(
+            // Member has private visibility but can be accessed via '__call' magic method
+
+            $response = $this->marketplace()->TokenHttpClient()->request(
                 'POST',
                 '/api/v3/orders/stickers?type='.$this->type.'&width='.$this->width.'&height='.$this->height,
                 ['json' => $data],

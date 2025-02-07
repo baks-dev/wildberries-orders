@@ -60,7 +60,9 @@ final class WildberriesAddOrderToSupplyRequest extends Wildberries
      */
     public function withOrder(string|int $order): self
     {
-        $this->order = (string) $order;
+        $order = str_replace('W-', '', (string) $order);
+
+        $this->order = $order;
 
         return $this;
     }

@@ -109,7 +109,7 @@ final readonly class NewWildberriesOrderScheduleHandler
                     sprintf('Добавили новый заказ %s', $WildberriesOrderDTO->getNumber()),
                     [self::class.':'.__LINE__]
                 );
-                dd($handle);
+
                 $Deduplicator->save();
                 continue;
             }

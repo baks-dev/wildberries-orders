@@ -25,143 +25,15 @@ declare(strict_types=1);
 
 namespace BaksDev\Wildberries\Orders\Messenger\UpdateOrdersStatus;
 
-use BaksDev\Wildberries\Orders\Api\WildberriesOrdersStatusRequest;
-use BaksDev\Wildberries\Orders\Entity\Event\WbOrdersEvent;
-use BaksDev\Wildberries\Orders\Entity\WbOrders;
-use BaksDev\Wildberries\Orders\Repository\AllOrdersByStatus\AllOrdersByStatusInterface;
-use BaksDev\Wildberries\Orders\Type\OrderStatus\WbOrderStatus;
-use BaksDev\Wildberries\Orders\Type\WildberriesStatus\Status\WildberriesStatusCanceled;
-use BaksDev\Wildberries\Orders\Type\WildberriesStatus\Status\WildberriesStatusCanceledClient;
-use BaksDev\Wildberries\Orders\Type\WildberriesStatus\Status\WildberriesStatusDefect;
-use BaksDev\Wildberries\Orders\Type\WildberriesStatus\Status\WildberriesStatusSold;
-use BaksDev\Wildberries\Orders\Type\WildberriesStatus\WildberriesStatus;
-use BaksDev\Wildberries\Orders\UseCase\Command\Status\StatusWbOrderDTO;
-use BaksDev\Wildberries\Orders\UseCase\Command\Status\StatusWbOrderHandler;
-use Doctrine\ORM\EntityManagerInterface;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
-use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
 final readonly class UpdateOrdersStatusHandler
 {
-    public function __construct(
-        #[AutowireIterator('baks.wb.status')] private iterable $WildberriesStatus,
-        #[Target('wildberriesOrdersLogger')] private LoggerInterface $logger,
-        private EntityManagerInterface $entityManager,
-        private AllOrdersByStatusInterface $allOrdersByStatus,
-        private WildberriesOrdersStatusRequest $wildberriesOrdersStatus,
-        private StatusWbOrderHandler $statusWbOrderHandler
-    ) {}
+    public function __construct() {}
 
     /**
      * Метод обновляет статусы заказов
      */
-    public function __invoke(UpdateOrdersStatusMessage $message): void
-    {
-
-        // TODO: Получить все заказы Wildberries, проверить статусы и обновить
-        // возможно достаточно только отмененную
-        return;
-
-        $profile = $message->getProfile();
-
-
-        foreach($this->WildberriesStatus as $wbStatus)
-        {
-            /** Пропускаем заказы которые уже выполнены (со статусом Доставлен, Отменен, Дефект) */
-            if(
-                $wbStatus instanceof WildberriesStatusSold ||
-                $wbStatus instanceof WildberriesStatusCanceled ||
-                $wbStatus instanceof WildberriesStatusCanceledClient ||
-                $wbStatus instanceof WildberriesStatusDefect
-            )
-            {
-                continue;
-            }
-
-
-            /* Получаем все заказы по статусу */
-            $orders = $this->allOrdersByStatus
-                ->fetchAllOrdersByWildberriesStatusAssociativeIndexed($profile, $wbStatus);
-
-
-            if(!$orders)
-            {
-                continue;
-            }
-
-            /** Делим все заказы по 1000 items */
-            $chunkedOrders = array_chunk($orders, 1000);
-
-            foreach($chunkedOrders as $chunkedOrder)
-            {
-                $wbOrdersAll = array_column($chunkedOrder, 'order_wb');
-
-                /** Получаем Wildberries API указанные заказы и их статусы  */
-                $apiWbOrdersStatus = $this->wildberriesOrdersStatus
-                    ->profile($profile)
-                    ->setOrders($wbOrdersAll)
-                    ->request()
-                    ->getContent();
-
-                foreach($apiWbOrdersStatus as $apiStatus)
-                {
-                    /** Не обновляем заказы со статусом Новый */
-                    if($apiStatus['supplierStatus'] === 'new' && $apiStatus['wbStatus'] === 'waiting')
-                    {
-                        continue;
-                    }
-
-                    $currentOrder = $orders[$apiStatus['id']];
-
-                    /** Если у заказа был изменен статус - обновляем заказ с новым статусом Wildberries */
-                    if(
-                        $currentOrder['event_status'] !== $apiStatus['supplierStatus'] ||
-                        $currentOrder['event_wildberries'] !== $apiStatus['wbStatus']
-                    )
-                    {
-                        $WbOrdersEvent = $this->entityManager
-                            ->getRepository(WbOrdersEvent::class)
-                            ->find($currentOrder['order_event']);
-
-                        /** @var StatusWbOrderDTO $WbOrderDTO */
-                        $WbOrderDTO = $WbOrdersEvent->getDto(StatusWbOrderDTO::class);
-
-                        $WbOrderDTO->setStatus(new WbOrderStatus($apiStatus['supplierStatus']));
-                        $WbOrderDTO->setWildberries(new WildberriesStatus($apiStatus['wbStatus']));
-
-                        $handle = $this->statusWbOrderHandler->handle($WbOrderDTO);
-
-                        if($handle instanceof WbOrders)
-                        {
-                            $this->logger
-                                ->info(
-                                    'Обновили статус заказа Wildberries',
-                                    [
-                                        'profile' => $profile,
-                                        'order' => $apiStatus['id']
-                                    ]
-                                );
-
-                            continue;
-                        }
-
-                        $this->logger
-                            ->critical(
-                                sprintf('%s: Ошибка при обновлении статуса заказа Wildberries ', $handle),
-                                [
-                                    'profile' => $profile,
-                                    'order' => $apiStatus['id'],
-                                    self::class.':'.__LINE__
-                                ]
-                            );
-
-                    }
-                }
-            }
-        }
-
-    }
+    public function __invoke(UpdateOrdersStatusMessage $message): void {}
 }
