@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,7 @@ use BaksDev\Wildberries\Orders\Type\WildberriesStatus\WildberriesStatusType;
 use BaksDev\Wildberries\Package\Entity\Package\Event\WbPackageEvent;
 use BaksDev\Wildberries\Package\Entity\Package\Orders\WbPackageOrder;
 use BaksDev\Wildberries\Package\Entity\Package\WbPackage;
-use BaksDev\Wildberries\Package\Entity\Supply\Const\WbSupplyConst;
+use BaksDev\Wildberries\Package\Entity\Supply\Invariable\WbSupplyInvariable;
 use BaksDev\Wildberries\Package\Type\Package\Id\WbPackageUid;
 use BaksDev\Wildberries\Package\Type\Package\Status\WbPackageStatus\Collection\WbPackageStatusCollection;
 use BaksDev\Wildberries\Package\Type\Package\Status\WbPackageStatus\Collection\WbPackageStatusInterface;

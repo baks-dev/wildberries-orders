@@ -25,7 +25,7 @@ declare(strict_types=1);
 
 namespace BaksDev\Wildberries\Orders\Messenger\UpdateOrderSticker;
 
-use BaksDev\Wildberries\Orders\Api\WildberriesOrdersSticker\WildberriesOrdersSticker;
+use BaksDev\Wildberries\Orders\Api\WildberriesOrdersSticker\WildberriesOrdersStickerRequest;
 use BaksDev\Wildberries\Orders\Entity\WbOrders;
 use BaksDev\Wildberries\Orders\Messenger\WbOrderMessage;
 use BaksDev\Wildberries\Orders\Repository\WbOrderProfile\WbOrderProfileInterface;
@@ -45,16 +45,20 @@ final readonly class UpdateOrdersStatusHandler
         #[Target('wildberriesOrdersLogger')] private LoggerInterface $logger,
         private WbOrdersByIdInterface $wbOrdersById,
         private WbOrderProfileInterface $wbOrderProfile,
-        private WildberriesOrdersSticker $wildberriesOrdersSticker,
+        private WildberriesOrdersStickerRequest $wildberriesOrdersSticker,
         private StickerWbOrderHandler $stickerWbOrderHandler,
     ) {}
 
     /**
-     * При обновлении статуса заказа Confirm (Добавлен к поставке, на сборке)
-     * получаем и обновляет стикер
+     * При обновлении статуса заказа Confirm (Добавлен к поставке, на сборке) получаем и обновляет стикер
      */
     public function __invoke(WbOrderMessage $message): void
     {
+
+        // TODO: Запустить прогрев стикеров заказов
+        return;
+
+
         $WbOrdersEvent = $this->wbOrdersById->getWbOrderByOrderUidOrNullResult($message->getId());
 
         if(!$WbOrdersEvent || !$WbOrdersEvent->statusEquals(WbOrderStatusConfirm::class))
@@ -77,7 +81,7 @@ final readonly class UpdateOrdersStatusHandler
 
         $WildberriesOrdersSticker = $this->wildberriesOrdersSticker
             ->profile($UserProfileUid)
-            ->addOrder($UserProfileUid->getAttr())
+            ->forOrder($UserProfileUid->getAttr())
             ->getOrderSticker();
 
         $WbStickerDTO->setSticker($WildberriesOrdersSticker->getSticker());

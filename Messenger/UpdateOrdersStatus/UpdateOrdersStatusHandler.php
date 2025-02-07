@@ -55,9 +55,18 @@ final readonly class UpdateOrdersStatusHandler
         private StatusWbOrderHandler $statusWbOrderHandler
     ) {}
 
+    /**
+     * Метод обновляет статусы заказов
+     */
     public function __invoke(UpdateOrdersStatusMessage $message): void
     {
+
+        // TODO: Получить все заказы Wildberries, проверить статусы и обновить
+        // возможно достаточно только отмененную
+        return;
+
         $profile = $message->getProfile();
+
 
         foreach($this->WildberriesStatus as $wbStatus)
         {
@@ -72,9 +81,11 @@ final readonly class UpdateOrdersStatusHandler
                 continue;
             }
 
+
             /* Получаем все заказы по статусу */
             $orders = $this->allOrdersByStatus
                 ->fetchAllOrdersByWildberriesStatusAssociativeIndexed($profile, $wbStatus);
+
 
             if(!$orders)
             {

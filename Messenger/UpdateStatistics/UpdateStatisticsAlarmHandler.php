@@ -49,13 +49,13 @@ final readonly class UpdateStatisticsAlarmHandler
      */
     public function __invoke(UpdateStatisticMessage $message): void
     {
-
         $this->logger->info(
             'Обновляем статистику срочных заказов Wildberries',
             [
                 'ProductUid' => $message->getProduct(),
                 self::class.':'.__LINE__
-            ]);
+            ]
+        );
 
         /**
          * Получаем объект статистики, если не найден - будет создан новый
