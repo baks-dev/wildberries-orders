@@ -29,7 +29,7 @@ use BaksDev\Wildberries\Api\Wildberries;
 use DomainException;
 use InvalidArgumentException;
 
-final class WildberriesOrdersStatusRequest extends Wildberries
+final class FindAllWildberriesOrdersStatusRequest extends Wildberries
 {
 
     /**
@@ -67,7 +67,8 @@ final class WildberriesOrdersStatusRequest extends Wildberries
     }
 
 
-    /** Получить статусы сборочных заданий
+    /**
+     * Получить статусы сборочных заданий
      *
      * Возвращает статусы сборочных заданий по переданному списку идентификаторов сборочных заданий.
      *
@@ -90,7 +91,7 @@ final class WildberriesOrdersStatusRequest extends Wildberries
      * @see https://openapi.wildberries.ru/#tag/Marketplace-Sborochnye-zadaniya/paths/~1api~1v3~1orders~1status/post
      *
      */
-    public function request(): self
+    public function findAll(): self
     {
 
         if(empty($this->orders))

@@ -27,7 +27,7 @@ namespace BaksDev\Wildberries\Orders\Api;
 
 use BaksDev\Wildberries\Api\Wildberries;
 
-final class WildberriesSgtinRequest extends Wildberries
+final class PostWildberriesSgtinRequest extends Wildberries
 {
     private string $order;
 
@@ -56,6 +56,12 @@ final class WildberriesSgtinRequest extends Wildberries
      */
     public function update(): bool
     {
+        if($this->isExecuteEnvironment() === false)
+        {
+            $this->logger->critical('Запрос может быть выполнен только в PROD окружении', [self::class.':'.__LINE__]);
+            return true;
+        }
+
         $data['sgtins'] = [$this->sgtin];
 
         $response = $this->marketplace()->TokenHttpClient()->request(

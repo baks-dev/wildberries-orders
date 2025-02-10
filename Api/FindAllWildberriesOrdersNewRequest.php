@@ -30,7 +30,7 @@ use BaksDev\Wildberries\Orders\UseCase\New\WildberriesOrderDTO;
 use Generator;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 
-final class WildberriesOrdersNewRequest extends WildberriesMarketplace
+final class FindAllWildberriesOrdersNewRequest extends WildberriesMarketplace
 {
     /**
      * Получить список новых сборочных заданий.

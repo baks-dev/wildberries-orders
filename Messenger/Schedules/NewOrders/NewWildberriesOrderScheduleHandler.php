@@ -27,7 +27,7 @@ namespace BaksDev\Wildberries\Orders\Messenger\Schedules\NewOrders;
 
 use BaksDev\Core\Deduplicator\DeduplicatorInterface;
 use BaksDev\Orders\Order\Entity\Order;
-use BaksDev\Wildberries\Orders\Api\WildberriesOrdersNewRequest;
+use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersNewRequest;
 use BaksDev\Wildberries\Orders\UseCase\New\WildberriesOrderDTO;
 use BaksDev\Wildberries\Orders\UseCase\New\WildberriesOrderHandler;
 use Psr\Log\LoggerInterface;
@@ -39,7 +39,7 @@ final readonly class NewWildberriesOrderScheduleHandler
 {
     public function __construct(
         #[Target('wildberriesOrdersLogger')] private LoggerInterface $logger,
-        private WildberriesOrdersNewRequest $wildberriesOrdersNew,
+        private FindAllWildberriesOrdersNewRequest $wildberriesOrdersNew,
         private DeduplicatorInterface $deduplicator,
         private WildberriesOrderHandler $WildberriesOrderHandler,
     )

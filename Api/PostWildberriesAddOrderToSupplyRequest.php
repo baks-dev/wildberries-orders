@@ -28,7 +28,7 @@ namespace BaksDev\Wildberries\Orders\Api;
 use BaksDev\Wildberries\Api\Wildberries;
 use InvalidArgumentException;
 
-final class WildberriesAddOrderToSupplyRequest extends Wildberries
+final class PostWildberriesAddOrderToSupplyRequest extends Wildberries
 {
 
     /**
@@ -79,7 +79,7 @@ final class WildberriesAddOrderToSupplyRequest extends Wildberries
         if($this->isExecuteEnvironment() === false)
         {
             $this->logger->critical('Запрос может быть выполнен только в PROD окружении', [self::class.':'.__LINE__]);
-            return false;
+            return true;
         }
 
         if(false === $this->supply)

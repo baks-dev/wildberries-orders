@@ -29,7 +29,7 @@ use BaksDev\Orders\Order\Entity\Order;
 use BaksDev\Orders\Order\UseCase\Admin\Edit\Tests\OrderNewTest;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Users\Profile\UserProfile\UseCase\User\NewEdit\Tests\UserNewUserProfileHandleTest;
-use BaksDev\Wildberries\Orders\Api\WildberriesOrdersNewRequest;
+use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersNewRequest;
 use BaksDev\Wildberries\Orders\UseCase\New\WildberriesOrderDTO;
 use BaksDev\Wildberries\Orders\UseCase\New\WildberriesOrderHandler;
 use BaksDev\Wildberries\Type\Authorization\WbAuthorizationToken;
@@ -59,8 +59,8 @@ class WildberriesOrdersNewTest extends KernelTestCase
         UserNewUserProfileHandleTest::setUpBeforeClass();
 
 
-        /** @var WildberriesOrdersNewRequest $WildberriesOrdersNewRequest */
-        $WildberriesOrdersNewRequest = self::getContainer()->get(WildberriesOrdersNewRequest::class);
+        /** @var FindAllWildberriesOrdersNewRequest $WildberriesOrdersNewRequest */
+        $WildberriesOrdersNewRequest = self::getContainer()->get(FindAllWildberriesOrdersNewRequest::class);
         $WildberriesOrdersNewRequest->TokenHttpClient(self::$Authorization);
 
         /** @var WildberriesOrderHandler $WildberriesOrderHandler */

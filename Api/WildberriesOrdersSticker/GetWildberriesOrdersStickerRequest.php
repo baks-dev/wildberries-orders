@@ -25,14 +25,13 @@ declare(strict_types=1);
 
 namespace BaksDev\Wildberries\Orders\Api\WildberriesOrdersSticker;
 
-use App\Kernel;
 use BaksDev\Wildberries\Api\Wildberries;
 use DateInterval;
 use InvalidArgumentException;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Contracts\Cache\ItemInterface;
 
-final class WildberriesOrdersStickerRequest extends Wildberries
+final class GetWildberriesOrdersStickerRequest extends Wildberries
 {
 
     /**
