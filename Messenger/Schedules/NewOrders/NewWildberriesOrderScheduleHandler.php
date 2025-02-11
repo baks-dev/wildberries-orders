@@ -103,23 +103,22 @@ final readonly class NewWildberriesOrderScheduleHandler
                 continue;
             }
 
-            if($handle instanceof Order)
+            if(false === ($handle instanceof Order))
             {
-                $this->logger->info(
-                    sprintf('Добавили новый заказ %s', $WildberriesOrderDTO->getNumber()),
-                    [self::class.':'.__LINE__]
+                $this->logger->critical(
+                    sprintf('wildberries-orders: Ошибка при добавлении нового заказа %s', $WildberriesOrderDTO->getNumber()),
+                    [$handle, self::class.':'.__LINE__]
                 );
 
-                $Deduplicator->save();
                 continue;
             }
 
-            $this->logger->critical(
-                sprintf('wildberries-orders: Ошибка при добавлении нового заказа %s', $WildberriesOrderDTO->getNumber()),
-                [$handle, self::class.':'.__LINE__]
+            $this->logger->info(
+                sprintf('Добавили новый заказ %s', $WildberriesOrderDTO->getNumber()),
+                [self::class.':'.__LINE__]
             );
 
-
+            $Deduplicator->save();
         }
 
         $DeduplicatorExecuted->delete();

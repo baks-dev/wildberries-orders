@@ -85,7 +85,7 @@ final class PrintController extends AbstractController
             throw new RouteNotFoundException('Product Not Found');
         }
 
-        dd(); /* TODO: удалить !!! */
+        dd(); /* TODO: Переписать генерацию на BARCODE !!! */
 
         /* Генерируем боковые стикеры */
         $BarcodeGenerator = new BarcodeGeneratorSVG();
