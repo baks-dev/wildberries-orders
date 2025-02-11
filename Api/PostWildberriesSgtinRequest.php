@@ -31,7 +31,7 @@ final class PostWildberriesSgtinRequest extends Wildberries
 {
     private string $order;
 
-    private string $sgtin;
+    private array $sgtin;
 
     public function forOrder(string $order): self
     {
@@ -44,7 +44,7 @@ final class PostWildberriesSgtinRequest extends Wildberries
 
     public function sgtin(string $sgtin): self
     {
-        $this->sgtin = $sgtin;
+        $this->sgtin[] = $sgtin;
 
         return $this;
     }
@@ -62,7 +62,17 @@ final class PostWildberriesSgtinRequest extends Wildberries
             return true;
         }
 
-        $data['sgtins'] = [$this->sgtin];
+        if(empty($this->sgtin))
+        {
+            $this->logger->warning(
+                sprintf('%s: Отсутствуют честные знаки на заказ', $this->order),
+                [self::class.':'.__LINE__]
+            );
+
+            return true;
+        }
+
+        $data['sgtins'] = $this->sgtin;
 
         $response = $this->marketplace()->TokenHttpClient()->request(
             'PUT',

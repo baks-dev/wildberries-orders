@@ -96,7 +96,7 @@ final class PostWildberriesAddOrderToSupplyRequest extends Wildberries
             );
         }
 
-        $response = $this->TokenHttpClient()->request(
+        $response = $this->marketplace()->TokenHttpClient()->request(
             'PATCH',
             '/api/v3/supplies/'.$this->supply.'/orders/'.$this->order,
         );
