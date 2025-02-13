@@ -48,6 +48,10 @@ final class NewOrdersScheduleHandler
 
     public function __invoke(NewOrdersScheduleMessage $message): void
     {
+
+        /* TODO: ВРЕМЕННО !!! */
+        return;
+
         $profiles = $this->allProfileToken
             ->onlyActiveToken()
             ->findAll();

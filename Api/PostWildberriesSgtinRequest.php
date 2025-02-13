@@ -44,7 +44,26 @@ final class PostWildberriesSgtinRequest extends Wildberries
 
     public function sgtin(string $sgtin): self
     {
-        $this->sgtin[] = $sgtin;
+        /** Обрезаем честный знак до длины */
+
+        // Позиция для третьей группы
+        $thirdGroupPos = -1;
+
+        preg_match_all('/\((\d{2})\)/', $sgtin, $matches, PREG_OFFSET_CAPTURE);
+
+        if(count($matches[0]) >= 3)
+        {
+            $thirdGroupPos = $matches[0][2][1];
+        }
+
+        // Если находимся на третьей группе, обрезаем строку
+        if($thirdGroupPos !== -1)
+        {
+            $markingcode = substr($sgtin, 0, $thirdGroupPos);
+
+            // Убираем круглые скобки
+            $this->sgtin[] = preg_replace('/\((\d{2})\)/', '$1', $markingcode);
+        }
 
         return $this;
     }
@@ -85,7 +104,7 @@ final class PostWildberriesSgtinRequest extends Wildberries
             $content = $response->toArray(false);
 
             $this->logger->critical(
-                'wildberries-orders: Ошибка при получении честных заказов',
+                'wildberries-orders: Ошибка при передаче честных заказов',
                 [$content, self::class.':'.__LINE__]
             );
 
