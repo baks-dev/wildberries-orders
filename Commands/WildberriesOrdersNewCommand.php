@@ -112,7 +112,7 @@ class WildberriesOrdersNewCommand extends Command
                 $this->update($profile, $key === '+');
             }
 
-            $this->io->success('Все заявки на скидку успешно согласованы');
+            $this->io->success('Заказы успешно обновлены');
             return Command::SUCCESS;
         }
 
