@@ -28,6 +28,7 @@ namespace BaksDev\Wildberries\Orders\Api\WildberriesOrdersSticker;
 use BaksDev\Wildberries\Api\Wildberries;
 use DateInterval;
 use InvalidArgumentException;
+use Symfony\Component\Cache\Adapter\ApcuAdapter;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Contracts\Cache\ItemInterface;
 
@@ -87,7 +88,7 @@ final class GetWildberriesOrdersStickerRequest extends Wildberries
             );
         }
 
-        $cache = new FilesystemAdapter('wildberries-orders');
+        $cache = new ApcuAdapter('wildberries-orders');
         $key = md5($this->getProfile().$this->order.$this->type.$this->width.$this->height.self::class);
         //$cache->deleteItem($key);
 
@@ -96,8 +97,6 @@ final class GetWildberriesOrdersStickerRequest extends Wildberries
             $item->expiresAfter(DateInterval::createFromDateString('1 second'));
 
             $data = ["orders" => [$this->order]];
-
-            // Member has private visibility but can be accessed via '__call' magic method
 
             $response = $this->marketplace()->TokenHttpClient()->request(
                 'POST',
@@ -131,7 +130,8 @@ final class GetWildberriesOrdersStickerRequest extends Wildberries
 
             $item->expiresAfter(DateInterval::createFromDateString('1 day'));
 
-            return $sticker['file'];
+            $file = base64_decode($sticker['file']);
+            return str_replace(array('width="400"', 'height="300"'), array('width="180"', ''), $file);
         });
 
         return $file;
