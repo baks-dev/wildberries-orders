@@ -28,8 +28,6 @@ namespace BaksDev\Wildberries\Orders\Api\WildberriesOrdersSticker;
 use BaksDev\Wildberries\Api\Wildberries;
 use DateInterval;
 use InvalidArgumentException;
-use Symfony\Component\Cache\Adapter\ApcuAdapter;
-use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use Symfony\Contracts\Cache\ItemInterface;
 
 final class GetWildberriesOrdersStickerRequest extends Wildberries
@@ -88,7 +86,8 @@ final class GetWildberriesOrdersStickerRequest extends Wildberries
             );
         }
 
-        $cache = new ApcuAdapter('wildberries-orders');
+
+        $cache = $this->getCacheInit('wildberries-orders');
         $key = md5($this->getProfile().$this->order.$this->type.$this->width.$this->height.self::class);
         //$cache->deleteItem($key);
 
