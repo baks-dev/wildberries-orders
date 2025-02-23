@@ -41,13 +41,14 @@ final readonly class WbOrdersAlarmRepository implements WbOrdersAlarmInterface
 
     /**
      * Метод возвращает количеств срочных заказов продукта, требующих особое внимание
-     * Заказы с интервалом 36 часов
+     * Заказы с интервалом 24 часов
      */
     public function countOrderAlarmByProduct(ProductEventUid $product): int
     {
         $dbal = $this->DBALQueryBuilder->createQueryBuilder(self::class);
 
         $dbal
+            ->addSelect('COUNT(*)')
             ->from(OrderProduct::class, 'orders_product')
             ->where('orders_product.product = :product')
             ->setParameter('product', $product, ProductEventUid::TYPE);
@@ -87,6 +88,6 @@ final readonly class WbOrdersAlarmRepository implements WbOrdersAlarmInterface
             '
         );
 
-        return $dbal->count();
+        return $dbal->fetchOne();
     }
 }

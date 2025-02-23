@@ -48,6 +48,7 @@ final readonly class WbOrdersAnalogRepository implements WbOrdersAnalogInterface
         $dbal = $this->DBALQueryBuilder->createQueryBuilder(self::class);
 
         $dbal
+            ->addSelect('COUNT(*)')
             ->from(OrderProduct::class, 'orders_product')
             ->where('orders_product.product = :product')
             ->setParameter('product', $product, ProductEventUid::TYPE);
@@ -88,6 +89,6 @@ final readonly class WbOrdersAnalogRepository implements WbOrdersAnalogInterface
             );
 
 
-        return $dbal->count();
+        return $dbal->fetchOne();
     }
 }

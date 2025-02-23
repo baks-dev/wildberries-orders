@@ -43,14 +43,12 @@ final readonly class NewWildberriesOrderScheduleDispatcher
         private FindAllWildberriesOrdersNewRequest $wildberriesOrdersNew,
         private DeduplicatorInterface $deduplicator,
         private WildberriesOrderHandler $WildberriesOrderHandler,
-    )
-    {
-        $this->deduplicator->namespace('wildberries-orders');
-    }
+    ) {}
 
     public function __invoke(NewWildberriesOrdersScheduleMessage $message): void
     {
         $DeduplicatorExecuted = $this->deduplicator
+            ->namespace('wildberries-orders')
             ->expiresAfter(UpdateWildberriesOrdersNewSchedules::INTERVAL)
             ->deduplication([$message->getProfile(), self::class]);
 
@@ -72,23 +70,23 @@ final readonly class NewWildberriesOrderScheduleDispatcher
 
         if(false === $orders || false === $orders->valid())
         {
-            $DeduplicatorExecuted->delete();
             return;
         }
 
         /** Добавляем новые заказы Wildberries */
 
-        $this->deduplicator->expiresAfter('1 minute');
 
         /** @var WildberriesOrderDTO $WildberriesOrderDTO */
         foreach($orders as $WildberriesOrderDTO)
         {
             $Deduplicator = $this->deduplicator
+                ->namespace('wildberries-orders')
+                ->expiresAfter('1 week')
                 ->deduplication([$WildberriesOrderDTO->getNumber(), self::class]);
 
             if($message->isDeduplicator() && $Deduplicator->isExecuted())
             {
-                return;
+                continue;
             }
 
             $handle = $this->WildberriesOrderHandler->handle($WildberriesOrderDTO);
@@ -121,7 +119,5 @@ final readonly class NewWildberriesOrderScheduleDispatcher
 
             $Deduplicator->save();
         }
-
-        $DeduplicatorExecuted->delete();
     }
 }
