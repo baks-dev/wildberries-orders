@@ -44,37 +44,37 @@ final readonly class WbOrdersOldRepository implements WbOrdersOldInterface
      */
     public function getOldOrderDateByProduct(ProductEventUid $product): ?DateTimeImmutable
     {
-        $qb = $this->DBALQueryBuilder->createQueryBuilder(self::class);
+        $dbal = $this->DBALQueryBuilder->createQueryBuilder(self::class);
 
-        $qb->select('MIN(wb_orders_event.created)');
-        $qb->from(OrderProduct::class, 'orders_product');
+        $dbal->select('MIN(wb_orders_event.created)');
+        $dbal->from(OrderProduct::class, 'orders_product');
 
-        $qb->join('orders_product',
+        $dbal->join('orders_product',
             Order::class,
             'orders',
             'orders.event = orders_product.event'
         );
 
 
-        $qb->where('orders_product.product = :product');
-        $qb->setParameter('product', $product, ProductEventUid::TYPE);
+        $dbal->where('orders_product.product = :product');
+        $dbal->setParameter('product', $product, ProductEventUid::TYPE);
 
 
-        $qb->join('orders',
+        $dbal->join('orders',
             WbOrders::class,
             'wb_orders',
             'wb_orders.id = orders.id'
         );
 
-        $qb->join('wb_orders',
+        $dbal->join('wb_orders',
             WbOrdersEvent::class,
             'wb_orders_event',
             'wb_orders_event.id = wb_orders.event AND wb_orders_event.status = :wb_orders_status'
         );
 
-        $qb->setParameter('wb_orders_status', WbOrderStatusNew::STATUS, WbOrderStatus::TYPE);
+        $dbal->setParameter('wb_orders_status', WbOrderStatusNew::STATUS, WbOrderStatus::TYPE);
 
-        $oldDate = $qb->fetchOne();
+        $oldDate = $dbal->fetchOne();
 
         return !empty($oldDate) ? new DateTimeImmutable($oldDate) : null;
     }

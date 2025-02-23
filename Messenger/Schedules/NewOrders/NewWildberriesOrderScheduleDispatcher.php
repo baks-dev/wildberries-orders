@@ -36,7 +36,7 @@ use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-final readonly class NewWildberriesOrderScheduleHandler
+final readonly class NewWildberriesOrderScheduleDispatcher
 {
     public function __construct(
         #[Target('wildberriesOrdersLogger')] private LoggerInterface $logger,

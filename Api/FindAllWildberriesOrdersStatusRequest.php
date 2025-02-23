@@ -40,21 +40,12 @@ final class FindAllWildberriesOrdersStatusRequest extends Wildberries
      */
     public function addOrder(int|string $order): self
     {
-        $order = str_replace('W-', '', (string) $order);
+        $order = (int) str_replace('W-', '', (string) $order);
 
-        $this->orders[] = (int) $order;
-
-        return $this;
-    }
-
-
-    public function setOrders(array $orders): self
-    {
-        $this->orders = $orders;
+        $this->orders[$order] = $order;
 
         return $this;
     }
-
 
     /**
      * Получить статусы сборочных заданий
@@ -82,35 +73,45 @@ final class FindAllWildberriesOrdersStatusRequest extends Wildberries
      */
     private function request(): array|false
     {
-
         if(empty($this->orders))
         {
             return false;
         }
 
-        $data = ["orders" => $this->orders];
 
-        $response = $this->TokenHttpClient()->request(
-            'POST',
-            '/api/v3/orders/status',
-            ['json' => $data],
-        );
+        $chunk = array_chunk($this->orders, 1000);
 
+        $result = [];
         $this->orders = [];
 
-        $content = $response->toArray(false);
-
-        if($response->getStatusCode() !== 200)
+        foreach($chunk as $orders)
         {
-            $this->logger->critical(
-                'wildberries-orders: Ошибка при получении статусов сборочных заданий',
-                [$data, $content, self::class.':'.__LINE__]
+            $data = ["orders" => $orders];
+
+            $response = $this->TokenHttpClient()->request(
+                'POST',
+                '/api/v3/orders/status',
+                ['json' => $data],
             );
 
-            return false;
+            $content = $response->toArray(false);
+
+            if($response->getStatusCode() !== 200)
+            {
+                $this->logger->critical(
+                    'wildberries-orders: Ошибка при получении статусов сборочных заданий',
+                    [$orders, $content, self::class.':'.__LINE__]
+                );
+
+                continue;
+            }
+
+            $result = array_merge($content['orders'], $result);
+
         }
 
-        return $content['orders'];
+
+        return $result;
     }
 
 
@@ -123,7 +124,7 @@ final class FindAllWildberriesOrdersStatusRequest extends Wildberries
             return false;
         }
 
-        $orders = array_filter($request, function($item) {
+        $orders = array_filter($request, static function($item) {
             return in_array($item['wbStatus'], ['declined_by_client', 'canceled']);
         });
 
@@ -133,6 +134,5 @@ final class FindAllWildberriesOrdersStatusRequest extends Wildberries
                 return 'W-'.$item['id'];
             }, $orders);
     }
-
 
 }

@@ -45,41 +45,42 @@ final readonly class WbOrdersAnalogRepository implements WbOrdersAnalogInterface
      */
     public function countOrderAnalogByProduct(ProductEventUid $product): int
     {
-        $qb = $this->DBALQueryBuilder->createQueryBuilder(self::class);
+        $dbal = $this->DBALQueryBuilder->createQueryBuilder(self::class);
 
-        $qb
+        $dbal
             ->from(OrderProduct::class, 'orders_product')
             ->where('orders_product.product = :product')
             ->setParameter('product', $product, ProductEventUid::TYPE);
 
-        $qb->join('orders_product',
+        $dbal->join('orders_product',
             Order::class,
             'orders',
             'orders.event = orders_product.event'
         );
 
-        $qb->join('orders',
-            OrderEvent::class,
-            'orders_event',
-            '
+        $dbal
+            ->join('orders',
+                OrderEvent::class,
+                'orders_event',
+                '
                 orders_event.id = orders.event AND
                 orders_event.status = :status
             '
-        )
+            )
             ->setParameter(
                 key: 'status',
                 value: OrderStatusNew::class,
                 type: OrderStatus::TYPE
             );
 
-        $qb
+        $dbal
             ->leftJoin('orders',
                 OrderUser::class,
                 'orders_user',
                 'orders_user.event = orders.event'
             );
 
-        $qb
+        $dbal
             ->join('orders_user',
                 OrderDelivery::class,
                 'orders_delivery',
@@ -87,6 +88,6 @@ final readonly class WbOrdersAnalogRepository implements WbOrdersAnalogInterface
             );
 
 
-        return $qb->count();
+        return $dbal->count();
     }
 }

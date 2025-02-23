@@ -33,46 +33,88 @@ use BaksDev\Orders\Order\Entity\User\Delivery\OrderDelivery;
 use BaksDev\Orders\Order\Entity\User\OrderUser;
 use BaksDev\Orders\Order\Type\Id\OrderUid;
 use BaksDev\Orders\Order\Type\Status\OrderStatus;
+use BaksDev\Users\Profile\UserProfile\Entity\UserProfile;
+use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Wildberries\Orders\Type\DeliveryType\TypeDeliveryDbsWildberries;
 use BaksDev\Wildberries\Orders\Type\DeliveryType\TypeDeliveryFbsWildberries;
 use Doctrine\DBAL\ArrayParameterType;
 use Generator;
+use InvalidArgumentException;
 
 
 final readonly class AllWbOrdersNewRepository implements AllWbOrdersNewInterface
 {
+    private UserProfileUid|false $profile;
+
     public function __construct(private DBALQueryBuilder $DBALQueryBuilder) {}
+
+    public function forProfile(UserProfile|UserProfileUid|string $profile): self
+    {
+        if(is_string($profile))
+        {
+            $profile = new UserProfileUid($profile);
+        }
+
+        if($profile instanceof UserProfile)
+        {
+            $profile = $profile->getId();
+        }
+
+        $this->profile = $profile;
+
+        return $this;
+    }
 
     /**
      * Метод возвращает идентификаторы системных заказов и идентификаторы заказа Wildberries качестве атрибута
      */
     public function findAll(): Generator|false
     {
+        if(false === ($this->profile instanceof UserProfileUid))
+        {
+            throw new InvalidArgumentException('Invalid Argument UserProfile');
+        }
+
         $dbal = $this->DBALQueryBuilder->createQueryBuilder(self::class);
 
         $dbal
             ->select('ord.id AS value')
             ->from(Order::class, 'ord');
 
-        $dbal->join(
-            'ord',
-            OrderEvent::class,
-            'event',
-            'event.id = ord.event AND event.status = :status'
-        )
+        $dbal
+            ->addSelect('invariable.number AS attr')
+            ->join(
+                'ord',
+                OrderInvariable::class,
+                'invariable',
+                'invariable.main = ord.id AND invariable.profile = :profile',
+            )
+            ->setParameter(
+                key: 'profile',
+                value: $this->profile,
+                type: UserProfileUid::TYPE
+            );
+
+        $dbal
+            ->join(
+                'ord',
+                OrderEvent::class,
+                'event',
+                'event.id = ord.event AND event.status = :status'
+            )
             ->setParameter(
                 'status',
                 OrderStatus\OrderStatusNew::class,
                 OrderStatus::TYPE
             );
 
-        $dbal->leftJoin(
-            'event',
-            OrderUser::class,
-            'usr',
-            'usr.event = event.id'
-
-        );
+        $dbal
+            ->leftJoin(
+                'event',
+                OrderUser::class,
+                'usr',
+                'usr.event = event.id'
+            );
 
         $dbal
             ->join(
@@ -88,15 +130,6 @@ final readonly class AllWbOrdersNewRepository implements AllWbOrdersNewInterface
                 type: ArrayParameterType::STRING
             );
 
-
-        $dbal
-            ->addSelect('invariable.number AS attr')
-            ->leftJoin(
-                'ord',
-                OrderInvariable::class,
-                'invariable',
-                'invariable.main = ord.id',
-            );
 
         return $dbal->fetchAllHydrate(OrderUid::class);
     }

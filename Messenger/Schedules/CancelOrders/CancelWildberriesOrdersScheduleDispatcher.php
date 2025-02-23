@@ -40,7 +40,7 @@ use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-final readonly class CancelWildberriesOrdersScheduleHandler
+final readonly class CancelWildberriesOrdersScheduleDispatcher
 {
     public function __construct(
         #[Target('wildberriesOrdersLogger')] private LoggerInterface $logger,
@@ -76,7 +76,10 @@ final readonly class CancelWildberriesOrdersScheduleHandler
          * Получаем все новые заказы Wildberries
          */
 
-        $orders = $this->AllWbOrdersNewInterface->findAll();
+        $orders = $this->AllWbOrdersNewInterface
+            ->forProfile($message->getProfile())
+            ->findAll();
+
         $orders = iterator_to_array($orders);
 
         $this->FindAllWildberriesOrdersStatusRequest
@@ -84,7 +87,8 @@ final readonly class CancelWildberriesOrdersScheduleHandler
 
         /** Добавляем в объект Request идентификатор заказа Wildberries для получения его статуса */
         array_map(function($OrderUid) {
-            $this->FindAllWildberriesOrdersStatusRequest->addOrder($OrderUid->getAttr());
+            $this->FindAllWildberriesOrdersStatusRequest
+                ->addOrder($OrderUid->getAttr());
         }, iterator_to_array($orders));
 
         $cancels = $this->FindAllWildberriesOrdersStatusRequest->findOrderCancel();
@@ -110,7 +114,7 @@ final readonly class CancelWildberriesOrdersScheduleHandler
              */
 
             $filter = array_filter($orders, static function($OrderUid) use ($cancel) {
-                return (int) str_replace('W-', '', $OrderUid->getAttr()) === (int) $cancel;
+                return $OrderUid->getAttr() === $cancel;
             });
 
             $OrderUid = current($filter);
@@ -149,7 +153,9 @@ final readonly class CancelWildberriesOrdersScheduleHandler
 
             $OrderCanceledDTO = new CanceledOrderDTO();
             $OrderEvent->getDto($OrderCanceledDTO);
-            $OrderCanceledDTO->setComment('Отмена пользователем');
+            $OrderCanceledDTO
+                ->setProfile($message->getProfile())
+                ->setComment('Отмена пользователем');
 
             $Order = $this->OrderStatusHandler->handle($OrderCanceledDTO);
 

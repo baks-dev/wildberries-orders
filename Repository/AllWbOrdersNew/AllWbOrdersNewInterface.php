@@ -23,12 +23,17 @@
 
 namespace BaksDev\Wildberries\Orders\Repository\AllWbOrdersNew;
 
+use BaksDev\Users\Profile\UserProfile\Entity\UserProfile;
+use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use Generator;
 
 interface AllWbOrdersNewInterface
 {
+    public function forProfile(UserProfile|UserProfileUid|string $profile): self;
+
     /**
      * Метод возвращает идентификаторы системных заказов и идентификаторы заказа Wildberries качестве атрибута
      */
     public function findAll(): Generator|false;
+
 }

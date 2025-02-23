@@ -37,7 +37,6 @@ final class NewWildberriesOrdersScheduleMessage
 
     private bool $deduplicator = true;
 
-
     public function __construct(UserProfileUid|string $profile)
     {
         $this->profile = (string) $profile;

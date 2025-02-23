@@ -45,21 +45,20 @@ final readonly class WbOrdersAlarmRepository implements WbOrdersAlarmInterface
      */
     public function countOrderAlarmByProduct(ProductEventUid $product): int
     {
-        $qb = $this->DBALQueryBuilder->createQueryBuilder(self::class);
+        $dbal = $this->DBALQueryBuilder->createQueryBuilder(self::class);
 
-        $qb
-            ->select('COUNT(*)')
+        $dbal
             ->from(OrderProduct::class, 'orders_product')
             ->where('orders_product.product = :product')
             ->setParameter('product', $product, ProductEventUid::TYPE);
 
-        $qb->join('orders_product',
+        $dbal->join('orders_product',
             Order::class,
             'orders',
             'orders.event = orders_product.event'
         );
 
-        $qb->join('orders',
+        $dbal->join('orders',
             OrderEvent::class,
             'orders_event',
             '
@@ -73,13 +72,13 @@ final readonly class WbOrdersAlarmRepository implements WbOrdersAlarmInterface
                 type: OrderStatus::TYPE
             );
 
-        $qb->leftJoin('orders',
+        $dbal->leftJoin('orders',
             OrderUser::class,
             'orders_user',
             'orders_user.event = orders.event'
         );
 
-        $qb->join('orders_user',
+        $dbal->join('orders_user',
             OrderDelivery::class,
             'orders_delivery',
             '
@@ -88,6 +87,6 @@ final readonly class WbOrdersAlarmRepository implements WbOrdersAlarmInterface
             '
         );
 
-        return $qb->count();
+        return $dbal->count();
     }
 }

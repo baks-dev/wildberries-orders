@@ -35,8 +35,7 @@ final class CancelWildberriesOrdersScheduleMessage
      */
     private string $profile;
 
-    private false $deduplicator;
-
+    private bool $deduplicator = true;
 
     public function __construct(UserProfileUid|string $profile)
     {
