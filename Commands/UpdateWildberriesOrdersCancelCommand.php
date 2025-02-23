@@ -26,7 +26,7 @@ namespace BaksDev\Wildberries\Orders\Commands;
 
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
-use BaksDev\Wildberries\Orders\Messenger\Schedules\NewOrders\NewWildberriesOrdersScheduleMessage;
+use BaksDev\Wildberries\Orders\Messenger\Schedules\CancelOrders\CancelWildberriesOrdersScheduleMessage;
 use BaksDev\Wildberries\Repository\AllProfileToken\AllProfileTokenInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -34,23 +34,40 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
+use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+
 #[AsCommand(
-    name: 'baks:wildberries-orders:new',
-    description: 'Получаем "НОВЫЕ" заказы Wildberries')
+    name: 'baks:wildberries-orders:cancel',
+    description: 'Получаем все заказы, и обновляем отмененные'
+)
 ]
-class WildberriesOrdersNewCommand extends Command
+class UpdateWildberriesOrdersCancelCommand extends Command
 {
     private SymfonyStyle $io;
 
+    private AllProfileTokenInterface $allProfileToken;
+
+    private MessageDispatchInterface $messageDispatch;
+
     public function __construct(
-        private readonly AllProfileTokenInterface $allProfileToken,
-        private readonly MessageDispatchInterface $messageDispatch,
+        AllProfileTokenInterface $allProfileToken,
+        MessageDispatchInterface $messageDispatch,
     )
     {
         parent::__construct();
+
+        $this->allProfileToken = $allProfileToken;
+        $this->messageDispatch = $messageDispatch;
     }
+
+
+    protected function configure(): void
+    {
+        $this->addArgument('profile', InputArgument::OPTIONAL, 'Идентификатор профиля');
+    }
+
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -147,11 +164,11 @@ class WildberriesOrdersNewCommand extends Command
 
     public function update(UserProfileUid $profile, bool $async = false): void
     {
-        $this->io->note(sprintf('Обновляем новые заказы профиля %s', $profile->getAttr()));
+        $this->io->note(sprintf('Обновляем отмененные заказы профиля %s', $profile->getAttr()));
 
         /* Отправляем сообщение в шину профиля */
         $this->messageDispatch->dispatch(
-            message: new NewWildberriesOrdersScheduleMessage($profile)->disableDeduplicator(),
+            message: new CancelWildberriesOrdersScheduleMessage($profile)->disableDeduplicator(),
             transport: $async === true ? (string) $profile : null
         );
     }

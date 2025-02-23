@@ -23,17 +23,30 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Wildberries\Orders\Messenger\UpdateOrdersStatus;
+namespace BaksDev\Wildberries\Orders\Repository\WbOrdersAlarm\Tests;
 
-use Symfony\Component\Messenger\Attribute\AsMessageHandler;
+use BaksDev\Products\Product\Type\Event\ProductEventUid;
+use BaksDev\Wildberries\Orders\Repository\WbOrdersAlarm\WbOrdersAlarmInterface;
+use BaksDev\Wildberries\Orders\Repository\WbOrdersAlarm\WbOrdersAlarmRepository;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\DependencyInjection\Attribute\When;
 
-#[AsMessageHandler]
-final readonly class UpdateOrdersStatusHandler
+
+/**
+ * @group wildberries-orders
+ */
+#[When(env: 'test')]
+class WbOrdersAlarmRepositoryTest extends KernelTestCase
 {
-    public function __construct() {}
+    public function testUseCase(): void
+    {
+        /** @var WbOrdersAlarmRepository $WbOrdersAlarmRepository */
+        $WbOrdersAlarmRepository = self::getContainer()->get(WbOrdersAlarmInterface::class);
 
-    /**
-     * Метод обновляет статусы заказов
-     */
-    public function __invoke(UpdateOrdersStatusMessage $message): void {}
+        $count = $WbOrdersAlarmRepository->countOrderAlarmByProduct(new ProductEventUid('0194bd11-7c2f-7852-9256-5612b8b8bb2f'));
+
+        self::assertIsInt($count);
+
+    }
+
 }

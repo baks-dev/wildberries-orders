@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -26,13 +26,14 @@ declare(strict_types=1);
 namespace BaksDev\Wildberries\Orders\Repository\WbOrdersAnalog;
 
 use BaksDev\Core\Doctrine\DBALQueryBuilder;
+use BaksDev\Orders\Order\Entity\Event\OrderEvent;
 use BaksDev\Orders\Order\Entity\Order;
 use BaksDev\Orders\Order\Entity\Products\OrderProduct;
+use BaksDev\Orders\Order\Entity\User\Delivery\OrderDelivery;
+use BaksDev\Orders\Order\Entity\User\OrderUser;
+use BaksDev\Orders\Order\Type\Status\OrderStatus;
+use BaksDev\Orders\Order\Type\Status\OrderStatus\OrderStatusNew;
 use BaksDev\Products\Product\Type\Event\ProductEventUid;
-use BaksDev\Wildberries\Orders\Entity\Event\WbOrdersEvent;
-use BaksDev\Wildberries\Orders\Entity\WbOrders;
-use BaksDev\Wildberries\Orders\Type\OrderStatus\Status\WbOrderStatusNew;
-use BaksDev\Wildberries\Orders\Type\OrderStatus\WbOrderStatus;
 
 final readonly class WbOrdersAnalogRepository implements WbOrdersAnalogInterface
 {
@@ -46,8 +47,10 @@ final readonly class WbOrdersAnalogRepository implements WbOrdersAnalogInterface
     {
         $qb = $this->DBALQueryBuilder->createQueryBuilder(self::class);
 
-        $qb->select('COUNT(*)');
-        $qb->from(OrderProduct::class, 'orders_product');
+        $qb
+            ->from(OrderProduct::class, 'orders_product')
+            ->where('orders_product.product = :product')
+            ->setParameter('product', $product, ProductEventUid::TYPE);
 
         $qb->join('orders_product',
             Order::class,
@@ -55,28 +58,35 @@ final readonly class WbOrdersAnalogRepository implements WbOrdersAnalogInterface
             'orders.event = orders_product.event'
         );
 
+        $qb->join('orders',
+            OrderEvent::class,
+            'orders_event',
+            '
+                orders_event.id = orders.event AND
+                orders_event.status = :status
+            '
+        )
+            ->setParameter(
+                key: 'status',
+                value: OrderStatusNew::class,
+                type: OrderStatus::TYPE
+            );
 
-        $qb->where('orders_product.product = :product');
-        $qb->setParameter('product', $product, ProductEventUid::TYPE);
+        $qb
+            ->leftJoin('orders',
+                OrderUser::class,
+                'orders_user',
+                'orders_user.event = orders.event'
+            );
+
+        $qb
+            ->join('orders_user',
+                OrderDelivery::class,
+                'orders_delivery',
+                'orders_delivery.usr = orders_user.id'
+            );
 
 
-        $qb->join(
-            'orders',
-            WbOrders::class,
-            'count_wb_orders',
-            'count_wb_orders.id = orders.id'
-        );
-
-        $qb->join(
-            'count_wb_orders',
-            WbOrdersEvent::class,
-            'count_wb_orders_event',
-            'count_wb_orders_event.id = count_wb_orders.event AND count_wb_orders_event.status = :wb_orders_status'
-        );
-
-        //$status = new WbOrderStatus(WbOrderStatusEnum::NEW);
-        $qb->setParameter('wb_orders_status', WbOrderStatusNew::STATUS, WbOrderStatus::TYPE);
-
-        return $qb->fetchOne();
+        return $qb->count();
     }
 }

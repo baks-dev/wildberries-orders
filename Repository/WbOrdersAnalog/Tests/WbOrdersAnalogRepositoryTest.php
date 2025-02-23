@@ -23,27 +23,31 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Wildberries\Orders\Security;
+namespace BaksDev\Wildberries\Orders\Repository\WbOrdersAnalog\Tests;
 
-use BaksDev\Users\Profile\Group\Security\RoleInterface;
-use BaksDev\Users\Profile\Group\Security\VoterInterface;
-use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
+use BaksDev\Core\Doctrine\DBALQueryBuilder;
+use BaksDev\Products\Product\Type\Event\ProductEventUid;
+use BaksDev\Wildberries\Orders\Repository\WbOrdersAnalog\WbOrdersAnalogInterface;
+use BaksDev\Wildberries\Orders\Repository\WbOrdersAnalog\WbOrdersAnalogRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\DependencyInjection\Attribute\When;
 
-#[AutoconfigureTag('baks.security.voter')]
-final class VoterNew implements VoterInterface
+
+/**
+ * @group wildberries-orders
+ */
+#[When(env: 'test')]
+class WbOrdersAnalogRepositoryTest extends KernelTestCase
 {
-    /**
-     * Добавить
-     */
-    public const string VOTER = 'NEW';
 
-    public static function getVoter(): string
+    public function testUseCase(): void
     {
-        return Role::ROLE.'_'.self::VOTER;
-    }
+        /** @var WbOrdersAnalogRepository $WbOrdersAnalogRepository */
+        $WbOrdersAnalogRepository = self::getContainer()->get(WbOrdersAnalogInterface::class);
 
-    public function equals(RoleInterface $role): bool
-    {
-        return $role->getRole() === Role::ROLE;
+        $count = $WbOrdersAnalogRepository->countOrderAnalogByProduct(new ProductEventUid('0194bd11-7c2f-7852-9256-5612b8b8bb2f'));
+
+        self::assertIsInt($count);
     }
 }

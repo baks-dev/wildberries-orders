@@ -25,30 +25,7 @@ declare(strict_types=1);
 
 namespace BaksDev\Wildberries\Orders\Schedule\UpdateOrdersStatus;
 
-use BaksDev\Core\Schedule\ScheduleInterface;
-use DateInterval;
-use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
-
-/**
- * Обновляем статусы заказов каждые 5 минут
- */
-#[AutoconfigureTag('baks.schedule')]
-final class UpdateOrdersStatusSchedule implements ScheduleInterface
+final class UpdateWildberriesOrdersCancelSchedulesMessage
 {
-    /**
-     * Возвращает объект сообщения
-     */
-    public function getMessage(): object
-    {
-        return new UpdateOrdersStatusScheduleMessage();
-    }
 
-    /**
-     * Интервал повтора
-     * @see https://www.php.net/manual/en/dateinterval.createfromdatestring.php
-     */
-    public function getInterval(): DateInterval
-    {
-        return DateInterval::createFromDateString('5 minutes');
-    }
 }

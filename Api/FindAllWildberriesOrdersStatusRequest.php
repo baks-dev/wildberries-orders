@@ -26,25 +26,9 @@ declare(strict_types=1);
 namespace BaksDev\Wildberries\Orders\Api;
 
 use BaksDev\Wildberries\Api\Wildberries;
-use DomainException;
-use InvalidArgumentException;
 
 final class FindAllWildberriesOrdersStatusRequest extends Wildberries
 {
-
-    /**
-     * Список статусов сборочных заданий
-     *
-     * "id": 5632423 - Идентификатор сборочного задания
-     *
-     * "supplierStatus": "new" - Статус сборочного задания продавца (устанавливается продавцом)
-     * ( Enum: "new" "confirm" "complete" "cancel")
-     *
-     * "wbStatus": "waiting" - Статус сборочного задания в системе Wildberries
-     * ( Enum: "waiting" "sorted" "sold" "canceled" "canceled_by_client")
-     */
-    private array $content = [];
-
     /**
      * Список идентификаторов сборочных заданий
      */
@@ -54,15 +38,20 @@ final class FindAllWildberriesOrdersStatusRequest extends Wildberries
     /**
      * Добавить в список идентификатор сборочного задания
      */
-    public function addOrder(int|string $order): void
+    public function addOrder(int|string $order): self
     {
-        $this->orders[] = $order;
+        $order = str_replace('W-', '', (string) $order);
+
+        $this->orders[] = (int) $order;
+
+        return $this;
     }
 
 
     public function setOrders(array $orders): self
     {
         $this->orders = $orders;
+
         return $this;
     }
 
@@ -88,17 +77,15 @@ final class FindAllWildberriesOrdersStatusRequest extends Wildberries
      * canceled_by_client - отмена сборочного задания покупателем
      *
      *
-     * @see https://openapi.wildberries.ru/#tag/Marketplace-Sborochnye-zadaniya/paths/~1api~1v3~1orders~1status/post
+     * @see https://marketplace-api.wildberries.ru/api/v3/orders/status
      *
      */
-    public function findAll(): self
+    private function request(): array|false
     {
 
         if(empty($this->orders))
         {
-            throw new InvalidArgumentException(
-                'Не указан cписок идентификаторов сборочных заданий через вызов метода addOrder: ->addOrder(5632423)'
-            );
+            return false;
         }
 
         $data = ["orders" => $this->orders];
@@ -109,35 +96,43 @@ final class FindAllWildberriesOrdersStatusRequest extends Wildberries
             ['json' => $data],
         );
 
+        $this->orders = [];
+
+        $content = $response->toArray(false);
+
         if($response->getStatusCode() !== 200)
         {
-            $content = $response->toArray(false);
-            //$this->logger->critical('curl -X POST "' . $url . '" ' . $curlHeader . ' -d "' . $data . '"');
-            throw new DomainException(
-                message: $response->getStatusCode().': '.$content['message'] ?? self::class,
-                code: $response->getStatusCode()
+            $this->logger->critical(
+                'wildberries-orders: Ошибка при получении статусов сборочных заданий',
+                [$data, $content, self::class.':'.__LINE__]
             );
+
+            return false;
         }
-        $content = $response->toArray(false);
-        $this->content = $content['orders'];
 
-        return $this;
+        return $content['orders'];
     }
 
 
-    /**
-     * Список статусов сборочных заданий
-     *
-     * "id": 5632423 - Идентификатор сборочного задания
-     *
-     * "supplierStatus": "new" - Статус сборочного задания продавца (устанавливается продавцом)
-     * ( Enum: "new" "confirm" "complete" "cancel")
-     *
-     * "wbStatus": "waiting" - Статус сборочного задания в системе Wildberries
-     * ( Enum: "waiting" "sorted" "sold" "canceled" "canceled_by_client")
-     */
-    public function getContent(): array
+    public function findOrderCancel(): array|false
     {
-        return $this->content;
+        $request = $this->request();
+
+        if(empty($request))
+        {
+            return false;
+        }
+
+        $orders = array_filter($request, function($item) {
+            return in_array($item['wbStatus'], ['declined_by_client', 'canceled']);
+        });
+
+        return empty($orders) ? false :
+
+            array_map(static function($item) {
+                return 'W-'.$item['id'];
+            }, $orders);
     }
+
+
 }

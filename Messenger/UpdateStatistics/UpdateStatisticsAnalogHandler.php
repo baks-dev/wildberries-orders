@@ -59,17 +59,19 @@ final readonly class UpdateStatisticsAnalogHandler
         /**
          * Получаем объект статистики, если не найден - создаем новый
          */
+
         $WbOrdersProductStats = $this->entityManager
             ->getRepository(WbOrdersStatistics::class)
             ->find($message->getProduct());
 
         $WbOrdersStatisticsDTO = new WbOrdersStatisticsDTO();
         $WbOrdersStatisticsDTO->setProduct($message->getProduct());
-        $WbOrdersProductStats ? $WbOrdersProductStats->getDto($WbOrdersStatisticsDTO) : false;
+        false === ($WbOrdersProductStats instanceof WbOrdersStatistics) ?: $WbOrdersProductStats->getDto($WbOrdersStatisticsDTO);
 
         /**
          * Получаем и обновляем аналоги
          */
+
         $analog = $this->ordersAnalog->countOrderAnalogByProduct($message->getProductEvent());
         $WbOrdersStatisticsDTO->setAnalog($analog);
         $StatisticsHandler = $this->ordersStatisticsHandler->handle($WbOrdersStatisticsDTO);

@@ -23,15 +23,15 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Wildberries\Orders\Schedule\UpdateOrdersStatus;
+namespace BaksDev\Wildberries\Orders\Schedule\NewOrders;
 
 use BaksDev\Core\Messenger\MessageDispatchInterface;
-use BaksDev\Wildberries\Orders\Messenger\UpdateOrdersStatus\UpdateOrdersStatusMessage;
+use BaksDev\Wildberries\Orders\Messenger\Schedules\NewOrders\NewWildberriesOrdersScheduleMessage;
 use BaksDev\Wildberries\Repository\AllProfileToken\AllProfileTokenInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-final class UpdateOrdersStatusScheduleHandler
+final class UpdateWildberriesOrdersNewSchedulesHandler
 {
     private AllProfileTokenInterface $allProfileToken;
 
@@ -47,20 +47,20 @@ final class UpdateOrdersStatusScheduleHandler
     }
 
     /**
-     * Обновляем статусы заказов которые изменились
+     * Добавляем новые заказы
      */
-    public function __invoke(UpdateOrdersStatusScheduleMessage $message): void
+    public function __invoke(UpdateWildberriesOrdersNewSchedulesMessage $message): void
     {
-        $profiles = $this->allProfileToken->onlyActiveToken()->findAll();
+        $profiles = $this->allProfileToken
+            ->onlyActiveToken()
+            ->findAll();
 
         foreach($profiles as $profile)
         {
-            /* Отправляем сообщение в шину профиля */
             $this->messageDispatch->dispatch(
-                message: new UpdateOrdersStatusMessage($profile),
+                message: new NewWildberriesOrdersScheduleMessage($profile),
                 transport: (string) $profile,
             );
         }
     }
-
 }

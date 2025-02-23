@@ -23,27 +23,9 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Wildberries\Orders\Security;
+namespace BaksDev\Wildberries\Orders\Schedule\NewOrders;
 
-use BaksDev\Users\Profile\Group\Security\RoleInterface;
-use BaksDev\Users\Profile\Group\Security\VoterInterface;
-use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
-
-#[AutoconfigureTag('baks.security.voter')]
-final class VoterDelete implements VoterInterface
+final class UpdateWildberriesOrdersNewSchedulesMessage
 {
-    /**
-     * Удалить
-     */
-    public const string VOTER = 'DELETE';
 
-    public static function getVoter(): string
-    {
-        return Role::ROLE.'_'.self::VOTER;
-    }
-
-    public function equals(RoleInterface $role): bool
-    {
-        return $role->getRole() === Role::ROLE;
-    }
 }

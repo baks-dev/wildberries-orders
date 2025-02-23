@@ -31,7 +31,7 @@ final class PostWildberriesSgtinRequest extends Wildberries
 {
     private string $order;
 
-    private string|false $sgtin = false;
+    private array $sgtin;
 
     public function forOrder(string $order): self
     {
@@ -44,6 +44,8 @@ final class PostWildberriesSgtinRequest extends Wildberries
 
     public function sgtin(string $sgtin): self
     {
+        $this->sgtin = [];
+
         /** Обрезаем честный знак до длины */
 
         // Позиция для третьей группы
@@ -62,7 +64,7 @@ final class PostWildberriesSgtinRequest extends Wildberries
             $markingcode = substr($sgtin, 0, $thirdGroupPos);
 
             // Убираем круглые скобки
-            $this->sgtin = preg_replace('/\((\d{2})\)/', '$1', $markingcode);
+            $this->sgtin[] = preg_replace('/\((\d{2})\)/', '$1', $markingcode);
         }
 
         return $this;
@@ -81,7 +83,7 @@ final class PostWildberriesSgtinRequest extends Wildberries
             return true;
         }
 
-        if(false === $this->sgtin)
+        if(empty($this->sgtin))
         {
             $this->logger->warning(
                 sprintf('%s: Отсутствуют честные знаки на заказ', $this->order),
@@ -91,7 +93,7 @@ final class PostWildberriesSgtinRequest extends Wildberries
             return true;
         }
 
-        $data['sgtins'] = [$this->sgtin];
+        $data['sgtins'] = $this->sgtin;
 
         $response = $this->marketplace()->TokenHttpClient()->request(
             'PUT',
@@ -99,7 +101,7 @@ final class PostWildberriesSgtinRequest extends Wildberries
             ['json' => $data]
         );
 
-        if($response->getStatusCode() !== 200)
+        if($response->getStatusCode() !== 204)
         {
             $content = $response->toArray(false);
 

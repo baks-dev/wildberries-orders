@@ -23,15 +23,16 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Wildberries\Orders\Schedule\NewOrders;
+namespace BaksDev\Wildberries\Orders\Schedule\UpdateOrdersStatus;
 
 use BaksDev\Core\Messenger\MessageDispatchInterface;
-use BaksDev\Wildberries\Orders\Messenger\Schedules\NewOrders\NewWildberriesOrdersScheduleMessage;
+use BaksDev\Wildberries\Orders\Messenger\Schedules\CancelOrders\CancelWildberriesOrdersScheduleMessage;
+use BaksDev\Wildberries\Orders\Messenger\UpdateOrdersStatus\UpdateOrdersStatusMessage;
 use BaksDev\Wildberries\Repository\AllProfileToken\AllProfileTokenInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-final class NewOrdersScheduleHandler
+final class UpdateWildberriesOrdersCancelSchedulesHandler
 {
     private AllProfileTokenInterface $allProfileToken;
 
@@ -46,20 +47,20 @@ final class NewOrdersScheduleHandler
         $this->messageDispatch = $messageDispatch;
     }
 
-    public function __invoke(NewOrdersScheduleMessage $message): void
+    /**
+     * Обновляем статусы отмененных заказов которые изменились
+     */
+    public function __invoke(UpdateWildberriesOrdersCancelSchedulesMessage $message): void
     {
-
-        /* TODO: ВРЕМЕННО !!! */
-        return;
-
         $profiles = $this->allProfileToken
             ->onlyActiveToken()
             ->findAll();
 
         foreach($profiles as $profile)
         {
+            /* Отправляем сообщение в шину профиля */
             $this->messageDispatch->dispatch(
-                message: new NewWildberriesOrdersScheduleMessage($profile),
+                message: new CancelWildberriesOrdersScheduleMessage($profile),
                 transport: (string) $profile,
             );
         }

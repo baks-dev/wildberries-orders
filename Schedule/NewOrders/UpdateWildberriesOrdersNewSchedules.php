@@ -23,27 +23,35 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Wildberries\Orders\Security;
+namespace BaksDev\Wildberries\Orders\Schedule\NewOrders;
 
-use BaksDev\Users\Profile\Group\Security\RoleInterface;
-use BaksDev\Users\Profile\Group\Security\VoterInterface;
+use BaksDev\Core\Schedule\ScheduleInterface;
+use DateInterval;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
-#[AutoconfigureTag('baks.security.voter')]
-final class VoterEdit implements VoterInterface
-{
-    /**
-     * Редактировать
-     */
-    public const string VOTER = 'EDIT';
 
-    public static function getVoter(): string
+/**
+ * Проверяем новые заказы Wildberries
+ */
+#[AutoconfigureTag('baks.schedule')]
+final class UpdateWildberriesOrdersNewSchedules implements ScheduleInterface
+{
+    public const string INTERVAL = '30 seconds';
+
+    /**
+     * Возвращает класс сообщение
+     */
+    public function getMessage(): object
     {
-        return Role::ROLE.'_'.self::VOTER;
+        return new UpdateWildberriesOrdersNewSchedulesMessage();
     }
 
-    public function equals(RoleInterface $role): bool
+    /**
+     * Интервал повтора
+     * @see https://www.php.net/manual/en/dateinterval.createfromdatestring.php
+     */
+    public function getInterval(): DateInterval
     {
-        return $role->getRole() === Role::ROLE;
+        return DateInterval::createFromDateString(self::INTERVAL);
     }
 }

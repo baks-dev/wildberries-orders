@@ -28,6 +28,7 @@ namespace BaksDev\Wildberries\Orders\Messenger\Schedules\NewOrders;
 use BaksDev\Core\Deduplicator\DeduplicatorInterface;
 use BaksDev\Orders\Order\Entity\Order;
 use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersNewRequest;
+use BaksDev\Wildberries\Orders\Schedule\NewOrders\UpdateWildberriesOrdersNewSchedules;
 use BaksDev\Wildberries\Orders\UseCase\New\WildberriesOrderDTO;
 use BaksDev\Wildberries\Orders\UseCase\New\WildberriesOrderHandler;
 use Psr\Log\LoggerInterface;
@@ -50,7 +51,7 @@ final readonly class NewWildberriesOrderScheduleHandler
     public function __invoke(NewWildberriesOrdersScheduleMessage $message): void
     {
         $DeduplicatorExecuted = $this->deduplicator
-            ->expiresAfter('1 minute')
+            ->expiresAfter(UpdateWildberriesOrdersNewSchedules::INTERVAL)
             ->deduplication([$message->getProfile(), self::class]);
 
         if($message->isDeduplicator() && $DeduplicatorExecuted->isExecuted())

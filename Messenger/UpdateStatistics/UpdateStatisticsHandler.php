@@ -26,82 +26,39 @@ declare(strict_types=1);
 namespace BaksDev\Wildberries\Orders\Messenger\UpdateStatistics;
 
 use BaksDev\Core\Messenger\MessageDispatchInterface;
-use BaksDev\Orders\Order\Entity\Order;
-use BaksDev\Orders\Order\Entity\Products\OrderProduct;
-use BaksDev\Products\Product\Entity\Product;
-use BaksDev\Wildberries\Orders\Messenger\WbOrderMessage;
-use Doctrine\ORM\EntityManagerInterface;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\Attribute\Target;
+use BaksDev\Orders\Order\Messenger\OrderMessage;
+use BaksDev\Orders\Order\Repository\OrderProducts\OrderProductResultDTO;
+use BaksDev\Orders\Order\Repository\OrderProducts\OrderProductsInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-#[AsMessageHandler]
+#[AsMessageHandler(priority: -100)]
 final readonly class UpdateStatisticsHandler
 {
     public function __construct(
-        #[Target('wildberriesOrdersLogger')] private LoggerInterface $logger,
         private MessageDispatchInterface $messageDispatch,
-        private EntityManagerInterface $entityManager,
+        private OrderProductsInterface $OrderProducts,
     ) {}
 
     /**
      * При обновлении заказа - обновляем статистику по продукции в заказе
      */
-    public function __invoke(WbOrderMessage $message): void
+    public function __invoke(OrderMessage $message): void
     {
+        $products = $this->OrderProducts
+            ->order($message->getId())
+            ->findAllProducts();
 
-        /**
-         * Получаем заказ по идентификатору
-         */
-
-        $Order = $this->entityManager->getRepository(Order::class)->find($message->getId());
-
-        if(!$Order)
+        if(false === ($products || $products->valid()))
         {
-            $this->logger->warning(
-                sprintf('Невозможно найти заказ ( %s id=\'%s\' )', Order::class, $message->getId()),
-                [self::class.':'.__LINE__]);
             return;
         }
 
-        /**
-         * Получаем всю продукцию в заказе
-         */
-
-        $products = $this->entityManager
-            ->getRepository(OrderProduct::class)
-            ->findBy(['event' => $Order->getEvent()]);
-
-        if(!$products)
+        /** @var OrderProductResultDTO $OrderProductResultDTO */
+        foreach($products as $OrderProductResultDTO)
         {
-            $this->logger->warning(
-                'Невозможно найти продукцию',
-                [
-                    'table' => OrderProduct::class,
-                    'event' => $Order->getEvent(),
-                    self::class.':'.__LINE__
-                ]
-            );
-            return;
-        }
-
-        $this->entityManager->clear();
-
-        foreach($products as $data)
-        {
-            /** @var Product $Product */
-            $Product = $this->entityManager
-                ->getRepository(Product::class)
-                ->findOneBy(['event' => $data->getProduct()]);
-
-            if(!$Product)
-            {
-                continue;
-            }
-
             /* Отправляем сообщение в шину для обновления статистики */
             $this->messageDispatch->dispatch(
-                message: new UpdateStatisticMessage($Product->getId(), $Product->getEvent()),
+                message: new UpdateStatisticMessage($OrderProductResultDTO->getProduct(), $OrderProductResultDTO->getProductEvent()),
                 transport: 'async'
             );
         }

@@ -23,24 +23,34 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Wildberries\Orders\Security;
+namespace BaksDev\Wildberries\Orders\Schedule\UpdateOrdersStatus;
 
-use BaksDev\Users\Profile\Group\Security\RoleInterface;
-use BaksDev\Users\Profile\Group\Security\VoterInterface;
+use BaksDev\Core\Schedule\ScheduleInterface;
+use DateInterval;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
-#[AutoconfigureTag('baks.security.voter')]
-final class VoterIndex implements VoterInterface
+/**
+ * Обновляем статусы заказов каждые 5 минут
+ */
+#[AutoconfigureTag('baks.schedule')]
+final class UpdateWildberriesOrdersCancelSchedules implements ScheduleInterface
 {
-    public const string VOTER = 'INDEX';
+    public const string INTERVAL = '5 minutes';
 
-    public static function getVoter(): string
+    /**
+     * Возвращает объект сообщения
+     */
+    public function getMessage(): object
     {
-        return Role::ROLE.'_'.self::VOTER;
+        return new UpdateWildberriesOrdersCancelSchedulesMessage();
     }
 
-    public function equals(RoleInterface $role): bool
+    /**
+     * Интервал повтора
+     * @see https://www.php.net/manual/en/dateinterval.createfromdatestring.php
+     */
+    public function getInterval(): DateInterval
     {
-        return $role->getRole() === Role::ROLE;
+        return DateInterval::createFromDateString(self::INTERVAL);
     }
 }

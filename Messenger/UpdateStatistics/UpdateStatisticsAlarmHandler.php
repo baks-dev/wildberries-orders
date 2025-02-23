@@ -60,17 +60,19 @@ final readonly class UpdateStatisticsAlarmHandler
         /**
          * Получаем объект статистики, если не найден - будет создан новый
          */
+
         $WbOrdersProductStats = $this->entityManager
             ->getRepository(WbOrdersStatistics::class)
             ->find($message->getProduct());
 
         $WbOrdersStatisticsDTO = new WbOrdersStatisticsDTO();
         $WbOrdersStatisticsDTO->setProduct($message->getProduct());
-        $WbOrdersProductStats ? $WbOrdersProductStats->getDto($WbOrdersStatisticsDTO) : false;
+        false === ($WbOrdersProductStats instanceof WbOrdersStatistics) ?: $WbOrdersProductStats->getDto($WbOrdersStatisticsDTO);
 
         /**
          * Получаем и обновляем срочные
          */
+
         $alarm = $this->ordersAlarm->countOrderAlarmByProduct($message->getProductEvent());
         $WbOrdersStatisticsDTO->setAlarm($alarm);
         $StatisticsHandler = $this->ordersStatisticsHandler->handle($WbOrdersStatisticsDTO);

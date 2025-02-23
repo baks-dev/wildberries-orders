@@ -53,7 +53,7 @@ final class WildberriesOrderDTO implements OrderEventInterface
     #[Assert\Uuid]
     private ?OrderEventUid $id = null;
 
-    /** Идентификатор заказа YandexMarket */
+    /** Идентификатор заказа Wildberries */
     private string $number;
 
     /** Постоянная величина */
@@ -123,15 +123,15 @@ final class WildberriesOrderDTO implements OrderEventInterface
         // Доставка Магазином (DBS)
         if($order['deliveryType'] === 'dbs')
         {
-            /** Тип профиля DBS Yandex Market */
+            /** Тип профиля DBS Wildberries */
             $Profile = new TypeProfileUid(TypeProfileDbsWildberries::class);
             $OrderProfileDTO?->setType($Profile);
 
-            /** Способ доставки Магазином (DBS Yandex Market) */
+            /** Способ доставки Магазином (DBS Wildberries) */
             $Delivery = new DeliveryUid(TypeDeliveryDbsWildberries::class);
             $OrderDeliveryDTO->setDelivery($Delivery);
 
-            /** Способ оплаты DBS Yandex Market  */
+            /** Способ оплаты DBS Wildberries  */
             $Payment = new PaymentUid(TypePaymentDbsWildberries::class);
             $OrderPaymentDTO->setPayment($Payment);
         }

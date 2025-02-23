@@ -23,33 +23,43 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Wildberries\Orders\Schedule\NewOrders;
+namespace BaksDev\Wildberries\Orders\Messenger\Schedules\CancelOrders;
 
-use BaksDev\Core\Schedule\ScheduleInterface;
-use DateInterval;
-use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
+use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 
 
-/**
- * Проверяем новые заказы Wildberries
- */
-#[AutoconfigureTag('baks.schedule')]
-final class NewOrdersSchedule implements ScheduleInterface
+final class CancelWildberriesOrdersScheduleMessage
 {
     /**
-     * Возвращает класс сообщение
+     * Идентификатор профиля
      */
-    public function getMessage(): object
+    private string $profile;
+
+    private false $deduplicator;
+
+
+    public function __construct(UserProfileUid|string $profile)
     {
-        return new NewOrdersScheduleMessage();
+        $this->profile = (string) $profile;
     }
 
     /**
-     * Интервал повтора
-     * @see https://www.php.net/manual/en/dateinterval.createfromdatestring.php
+     * Profile
      */
-    public function getInterval(): DateInterval
+    public function getProfile(): UserProfileUid
     {
-        return DateInterval::createFromDateString('30 seconds');
+        return new UserProfileUid($this->profile);
     }
+
+    public function disableDeduplicator(): self
+    {
+        $this->deduplicator = false;
+        return $this;
+    }
+
+    public function isDeduplicator(): bool
+    {
+        return $this->deduplicator;
+    }
+
 }
