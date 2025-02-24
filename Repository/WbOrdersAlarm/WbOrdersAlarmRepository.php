@@ -48,7 +48,7 @@ final readonly class WbOrdersAlarmRepository implements WbOrdersAlarmInterface
         $dbal = $this->DBALQueryBuilder->createQueryBuilder(self::class);
 
         $dbal
-            ->addSelect('COUNT(*)')
+            ->select('COUNT(*)')
             ->from(OrderProduct::class, 'orders_product')
             ->where('orders_product.product = :product')
             ->setParameter('product', $product, ProductEventUid::TYPE);
@@ -88,6 +88,6 @@ final readonly class WbOrdersAlarmRepository implements WbOrdersAlarmInterface
             '
         );
 
-        return $dbal->fetchOne();
+        return $dbal->fetchOne() ?: 0;
     }
 }
