@@ -43,7 +43,7 @@ final readonly class WbOrdersAnalogRepository implements WbOrdersAnalogInterface
     /**
      * Метод возвращает количество аналогичных НОВЫХ заказов продукта (все ТП и множественные варианты)
      */
-    public function countOrderAnalogByProduct(ProductEventUid $product): int|false
+    public function countOrderAnalogByProduct(ProductEventUid $product): int
     {
         $dbal = $this->DBALQueryBuilder->createQueryBuilder(self::class);
 
