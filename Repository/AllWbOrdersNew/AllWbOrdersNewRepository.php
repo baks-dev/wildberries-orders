@@ -32,7 +32,9 @@ use BaksDev\Orders\Order\Entity\Order;
 use BaksDev\Orders\Order\Entity\User\Delivery\OrderDelivery;
 use BaksDev\Orders\Order\Entity\User\OrderUser;
 use BaksDev\Orders\Order\Type\Id\OrderUid;
-use BaksDev\Orders\Order\Type\Status\OrderStatus;
+use BaksDev\Orders\Order\Type\Status\OrderStatus\OrderStatusNew;
+use BaksDev\Orders\Order\Type\Status\OrderStatus\OrderStatusPackage;
+use BaksDev\Orders\Order\Type\Status\OrderStatus\OrderStatusUnpaid;
 use BaksDev\Users\Profile\UserProfile\Entity\UserProfile;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Wildberries\Orders\Type\DeliveryType\TypeDeliveryDbsWildberries;
@@ -103,9 +105,9 @@ final readonly class AllWbOrdersNewRepository implements AllWbOrdersNewInterface
                 'event.id = ord.event AND event.status = :status'
             )
             ->setParameter(
-                'status',
-                OrderStatus\OrderStatusNew::class,
-                OrderStatus::TYPE
+                key: 'status',
+                value: [OrderStatusNew::STATUS, OrderStatusUnpaid::STATUS, OrderStatusPackage::STATUS],
+                type: ArrayParameterType::STRING
             );
 
         $dbal
