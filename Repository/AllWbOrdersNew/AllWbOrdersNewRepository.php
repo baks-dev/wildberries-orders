@@ -102,7 +102,7 @@ final readonly class AllWbOrdersNewRepository implements AllWbOrdersNewInterface
                 'ord',
                 OrderEvent::class,
                 'event',
-                'event.id = ord.event AND event.status = :status'
+                'event.id = ord.event AND event.status IN (:status)'
             )
             ->setParameter(
                 key: 'status',

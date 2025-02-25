@@ -167,7 +167,7 @@ final readonly class CancelWildberriesOrdersScheduleDispatcher
 
             $Deduplicator->save();
 
-            $this->logger->info('wildberries-orders: Заказ %s успешно отменен', $cancel);
+            $this->logger->info(sprintf('wildberries-orders: Заказ %s успешно отменен', $cancel));
         }
 
 
