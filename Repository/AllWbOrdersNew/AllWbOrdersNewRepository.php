@@ -106,7 +106,11 @@ final readonly class AllWbOrdersNewRepository implements AllWbOrdersNewInterface
             )
             ->setParameter(
                 key: 'status',
-                value: [OrderStatusNew::STATUS, OrderStatusUnpaid::STATUS, OrderStatusPackage::STATUS],
+                value: [
+                    OrderStatusNew::STATUS,
+                    OrderStatusUnpaid::STATUS,
+                    OrderStatusPackage::STATUS
+                ],
                 type: ArrayParameterType::STRING
             );
 

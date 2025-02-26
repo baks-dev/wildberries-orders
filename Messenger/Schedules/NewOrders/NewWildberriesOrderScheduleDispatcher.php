@@ -106,7 +106,7 @@ final readonly class NewWildberriesOrderScheduleDispatcher
             {
                 $this->logger->critical(
                     sprintf('wildberries-orders: Ошибка при добавлении нового заказа %s', $WildberriesOrderDTO->getNumber()),
-                    [$handle, self::class.':'.__LINE__]
+                    [$handle, $message->getProfile(), self::class.':'.__LINE__]
                 );
 
                 continue;
