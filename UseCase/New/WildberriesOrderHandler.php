@@ -118,7 +118,7 @@ final class WildberriesOrderHandler extends AbstractHandler
 
             if(!$ProductData)
             {
-                $error = sprintf('Артикул товара %s не найде (%s)', $product->getArticle(), $product->getBarcode());
+                $error = sprintf('%s: Артикул товара не найден (%s)', $product->getArticle(), $product->getBarcode());
                 //throw new InvalidArgumentException($error);
                 return $error;
             }

@@ -26,11 +26,13 @@ declare(strict_types=1);
 namespace BaksDev\Wildberries\Orders\Messenger\Schedules\NewOrders;
 
 use BaksDev\Core\Deduplicator\DeduplicatorInterface;
+use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Orders\Order\Entity\Order;
 use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersNewRequest;
 use BaksDev\Wildberries\Orders\Schedule\NewOrders\UpdateWildberriesOrdersNewSchedules;
 use BaksDev\Wildberries\Orders\UseCase\New\WildberriesOrderDTO;
 use BaksDev\Wildberries\Orders\UseCase\New\WildberriesOrderHandler;
+use BaksDev\Wildberries\Products\Messenger\Cards\CardNew\WildberriesCardNewMassage;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -43,6 +45,7 @@ final readonly class NewWildberriesOrderScheduleDispatcher
         private FindAllWildberriesOrdersNewRequest $wildberriesOrdersNew,
         private DeduplicatorInterface $deduplicator,
         private WildberriesOrderHandler $WildberriesOrderHandler,
+        private MessageDispatchInterface $messageDispatch
     ) {}
 
     public function __invoke(NewWildberriesOrdersScheduleMessage $message): void
@@ -108,6 +111,26 @@ final readonly class NewWildberriesOrderScheduleDispatcher
                     sprintf('wildberries-orders: Ошибка при добавлении нового заказа %s', $WildberriesOrderDTO->getNumber()),
                     [$handle, $message->getProfile(), self::class.':'.__LINE__]
                 );
+
+                /**
+                 * Пробуем обновить карточку по артикулу
+                 */
+
+                $article = explode(':', $handle);
+                $article = explode('-', current($article));
+                $article = explode(' ', current($article));
+                $article = current($article);
+
+                $WildberriesCardNewMassage = new WildberriesCardNewMassage(
+                    $message->getProfile(),
+                    $article
+                );
+
+                $this->messageDispatch
+                    ->dispatch(
+                        message: $WildberriesCardNewMassage,
+                        transport: (string) $message->getProfile()
+                    );
 
                 continue;
             }
