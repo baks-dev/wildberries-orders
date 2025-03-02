@@ -50,10 +50,7 @@ final readonly class CancelWildberriesOrdersScheduleDispatcher
         private CentrifugoPublishInterface $CentrifugoPublish,
         private OrderStatusHandler $OrderStatusHandler,
         private DeduplicatorInterface $deduplicator
-    )
-    {
-        $this->deduplicator->namespace('wildberries-orders');
-    }
+    ) {}
 
     /**
      * Метод обновляет статусы заказов
@@ -62,6 +59,7 @@ final readonly class CancelWildberriesOrdersScheduleDispatcher
     {
 
         $DeduplicatorExecuted = $this->deduplicator
+            ->namespace('wildberries-orders')
             ->expiresAfter(UpdateWildberriesOrdersCancelSchedules::INTERVAL)
             ->deduplication([$message->getProfile(), self::class]);
 
