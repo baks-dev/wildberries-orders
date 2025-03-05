@@ -68,7 +68,7 @@ final class FindAllWildberriesOrdersStatusRequest extends Wildberries
      * canceled_by_client - отмена сборочного задания покупателем
      *
      *
-     * @see https://marketplace-api.wildberries.ru/api/v3/orders/status
+     * @see https://dev.wildberries.ru/openapi/orders-fbs/#tag/Sborochnye-zadaniya/paths/~1api~1v3~1orders~1status/post
      *
      */
     private function request(): array|false
@@ -88,7 +88,7 @@ final class FindAllWildberriesOrdersStatusRequest extends Wildberries
         {
             $data = ["orders" => $orders];
 
-            $response = $this->TokenHttpClient()->request(
+            $response = $this->marketplace()->TokenHttpClient()->request(
                 'POST',
                 '/api/v3/orders/status',
                 ['json' => $data],
