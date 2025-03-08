@@ -44,11 +44,11 @@ use Generator;
 use InvalidArgumentException;
 
 
-final readonly class AllWbOrdersNewRepository implements AllWbOrdersNewInterface
+final class AllWbOrdersNewRepository implements AllWbOrdersNewInterface
 {
     private UserProfileUid|false $profile;
 
-    public function __construct(private DBALQueryBuilder $DBALQueryBuilder) {}
+    public function __construct(private readonly DBALQueryBuilder $DBALQueryBuilder) {}
 
     public function forProfile(UserProfile|UserProfileUid|string $profile): self
     {
