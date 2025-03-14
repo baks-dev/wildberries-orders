@@ -25,12 +25,11 @@ declare(strict_types=1);
 
 namespace BaksDev\Wildberries\Orders\Api;
 
-use BaksDev\Wildberries\Api\WildberriesMarketplace;
+use BaksDev\Wildberries\Api\Wildberries;
 use BaksDev\Wildberries\Orders\UseCase\New\WildberriesOrderDTO;
 use Generator;
-use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 
-final class FindAllWildberriesOrdersNewRequest extends WildberriesMarketplace
+final class FindAllWildberriesOrdersNewRequest extends Wildberries
 {
     /**
      * Получить список новых сборочных заданий.
@@ -40,7 +39,7 @@ final class FindAllWildberriesOrdersNewRequest extends WildberriesMarketplace
      */
     public function findAll(): Generator|false
     {
-        $response = $this->TokenHttpClient()->request(
+        $response = $this->marketplace()->TokenHttpClient()->request(
             'GET',
             '/api/v3/orders/new',
         );
