@@ -24,7 +24,6 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use BaksDev\Wildberries\Orders\BaksDevWildberriesOrdersBundle;
-use BaksDev\Wildberries\Orders\Messenger\CompletedOrders\WildberriesOrderCompletedDispatcher;
 
 return static function(ContainerConfigurator $configurator) {
 
@@ -53,14 +52,4 @@ return static function(ContainerConfigurator $configurator) {
         $NAMESPACE.'Type\WildberriesStatus\Status\\',
         $PATH.implode(DIRECTORY_SEPARATOR, ['Type', 'WildberriesStatus', 'Status'])
     );
-
-
-    // Регистрируем ваш сервис
-    $services->set(WildberriesOrderCompletedDispatcher::class)
-        ->args([
-            // Используем "@?" для указания необязательной зависимости
-            '$externalService' => $services->get(ExternalServiceInterface::class)->nullOnInvalid(),
-        ]);
-
-
 };
