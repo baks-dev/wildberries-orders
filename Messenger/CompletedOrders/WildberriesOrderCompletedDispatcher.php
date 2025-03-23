@@ -25,14 +25,19 @@ declare(strict_types=1);
 
 namespace BaksDev\Wildberries\Orders\Messenger\CompletedOrders;
 
+use BaksDev\Core\Doctrine\DBALQueryBuilder;
 use BaksDev\Core\Messenger\MessageDelay;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
+use BaksDev\Materials\Sign\BaksDevMaterialsSignBundle;
+use BaksDev\Materials\Sign\Repository\MaterialSignByOrder\MaterialSignByOrderRepository;
 use BaksDev\Orders\Order\Entity\Event\OrderEvent;
 use BaksDev\Orders\Order\Entity\Order;
 use BaksDev\Orders\Order\Repository\CurrentOrderEvent\CurrentOrderEventInterface;
 use BaksDev\Orders\Order\Type\Status\OrderStatus\OrderStatusCompleted;
 use BaksDev\Orders\Order\UseCase\Admin\Status\OrderStatusDTO;
 use BaksDev\Orders\Order\UseCase\Admin\Status\OrderStatusHandler;
+use BaksDev\Products\Sign\BaksDevProductsSignBundle;
+use BaksDev\Products\Sign\Repository\ProductSignByOrder\ProductSignByOrderRepository;
 use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersStatusRequest;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Target;
@@ -47,6 +52,7 @@ final class WildberriesOrderCompletedDispatcher
         private MessageDispatchInterface $messageDispatch,
         private CurrentOrderEventInterface $CurrentOrderEvent,
         private OrderStatusHandler $OrderStatusHandler,
+        private DBALQueryBuilder $DBALQueryBuilder,
     ) {}
 
     public function __invoke(WildberriesOrderCompletedMessage $message): bool
@@ -79,6 +85,48 @@ final class WildberriesOrderCompletedDispatcher
             return false;
         }
 
+
+        /**
+         * Поиск сырьевого честного знака
+         */
+
+        if(class_exists(BaksDevMaterialsSignBundle::class))
+        {
+            $MaterialSignByOrderRepository = new MaterialSignByOrderRepository($this->DBALQueryBuilder);
+
+            $MaterialSigns = $MaterialSignByOrderRepository
+                ->forOrder($message->getOrder())
+                ->findAll();
+
+            if($MaterialSigns)
+            {
+                dd($MaterialSigns); /* TODO: удалить !!! */
+            }
+
+        }
+
+
+        /**
+         * Поиск продуктового честного знака
+         */
+
+        if(class_exists(BaksDevProductsSignBundle::class))
+        {
+            $ProductSignByOrderRepository = new ProductSignByOrderRepository($this->DBALQueryBuilder);
+
+            $ProductSigns = $ProductSignByOrderRepository
+                ->forOrder($message->getOrder())
+                ->findAll();
+
+            if($ProductSigns)
+            {
+                dd($ProductSigns); /* TODO: удалить !!! */
+            }
+
+        }
+
+
+        dd('.....................'); /* TODO: удалить !!! */
 
         /**
          * Обновляем статус заказа на Completed «Выполнен»
