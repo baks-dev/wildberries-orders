@@ -34,9 +34,11 @@ use BaksDev\Orders\Order\Entity\User\Delivery\OrderDelivery;
 use BaksDev\Orders\Order\Entity\User\OrderUser;
 use BaksDev\Orders\Order\Type\Status\OrderStatus;
 use BaksDev\Orders\Order\Type\Status\OrderStatus\OrderStatusMarketplace;
+use BaksDev\Orders\Order\Type\Status\OrderStatus\OrderStatusNew;
 use BaksDev\Users\Profile\UserProfile\Entity\UserProfile;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Wildberries\Orders\Type\DeliveryType\TypeDeliveryFbsWildberries;
+use Doctrine\DBAL\ArrayParameterType;
 use Generator;
 use InvalidArgumentException;
 
@@ -123,14 +125,13 @@ final class AllWbOrdersMarketplaceRepository implements AllWbOrdersMarketplaceIn
             )
             ->setParameter(
                 key: 'status',
-                value: OrderStatusMarketplace::class,
-                type: OrderStatus::TYPE
+                value: [
+                    OrderStatusNew::STATUS,
+                    OrderStatusMarketplace::STATUS
+                ],
+                type: ArrayParameterType::STRING
             );
 
-        $dbal->setMaxResults(100000);
-
-        return $dbal
-            ->enableCache('orders-order', '1 hour')
-            ->fetchAllHydrate(AllWbOrdersMarketplaceResult::class);
+        return $dbal->fetchAllHydrate(AllWbOrdersMarketplaceResult::class);
     }
 }
