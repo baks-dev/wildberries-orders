@@ -176,6 +176,8 @@ class UpdateWildberriesOrdersCompletedCommand extends Command
         /** @var AllWbOrdersMarketplaceResult $order */
         foreach($orders as $order)
         {
+            usleep(500000);
+
             /* Отправляем сообщение в шину профиля */
             $this->messageDispatch->dispatch(
                 message: new WildberriesOrderCompletedMessage(
