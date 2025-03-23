@@ -185,7 +185,7 @@ class UpdateWildberriesOrdersCompletedCommand extends Command
             /** Пропускаем, если заказ был добавлен в очередь на проверку */
             if($Deduplicator->isExecuted())
             {
-                return;
+                continue;
             }
 
             /** Делаем задержку от блока */
