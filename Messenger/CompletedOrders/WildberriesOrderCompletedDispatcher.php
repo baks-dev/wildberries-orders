@@ -105,7 +105,6 @@ final readonly class WildberriesOrderCompletedDispatcher
             return;
         }
 
-
         /**
          * Поиск сырьевого честного знака
          */
