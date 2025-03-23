@@ -135,4 +135,27 @@ final class FindAllWildberriesOrdersStatusRequest extends Wildberries
             }, $orders);
     }
 
+    /**
+     * Метод получает статус сборочного задания со статусом Sold «Cборочное задание получено покупателем»
+     */
+    public function findOrderCompleted(): array|false
+    {
+        $request = $this->request();
+
+        if(empty($request))
+        {
+            return false;
+        }
+
+        $orders = array_filter($request, static function($item) {
+            return $item['wbStatus'] === 'sold';
+        });
+
+        return empty($orders) ? false :
+
+            array_map(static function($item) {
+                return 'W-'.$item['id'];
+            }, $orders);
+    }
+
 }
