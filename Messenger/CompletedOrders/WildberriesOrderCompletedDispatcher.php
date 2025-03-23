@@ -213,6 +213,11 @@ final readonly class WildberriesOrderCompletedDispatcher
             return;
         }
 
+        if($OrderEvent->isStatusEquals(OrderStatusCompleted::class))
+        {
+            return;
+        }
+
         $OrderStatusDTO = new OrderStatusDTO(
             OrderStatusCompleted::class,
             $OrderEvent->getId(),
