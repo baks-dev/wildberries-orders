@@ -33,6 +33,7 @@ final readonly class WildberriesOrderCompletedMessage
     private string $profile;
 
     private string $order;
+
     private string $identifier;
 
     public function __construct(

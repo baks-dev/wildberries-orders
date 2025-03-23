@@ -83,7 +83,7 @@ final class AllWbOrdersMarketplaceRepository implements AllWbOrdersMarketplaceIn
 
         $dbal
             ->addSelect('invariable.number')
-            ->leftJoin(
+            ->join(
                 'ord',
                 OrderInvariable::class,
                 'invariable',
@@ -112,7 +112,7 @@ final class AllWbOrdersMarketplaceRepository implements AllWbOrdersMarketplaceIn
             )
             ->setParameter(
                 key: 'delivery',
-                value: TypeDeliveryFbsWildberries::class,
+                value: TypeDeliveryFbsWildberries::TYPE,
                 type: DeliveryUid::TYPE
             );
 
@@ -121,7 +121,7 @@ final class AllWbOrdersMarketplaceRepository implements AllWbOrdersMarketplaceIn
                 'ord',
                 OrderEvent::class,
                 'event',
-                'event.id = order.event AND event.status = :status'
+                'event.id = ord.event AND event.status IN (:status)'
             )
             ->setParameter(
                 key: 'status',

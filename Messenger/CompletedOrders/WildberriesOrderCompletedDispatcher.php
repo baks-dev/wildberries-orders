@@ -25,11 +25,15 @@ declare(strict_types=1);
 
 namespace BaksDev\Wildberries\Orders\Messenger\CompletedOrders;
 
-use BaksDev\Core\Doctrine\DBALQueryBuilder;
 use BaksDev\Core\Messenger\MessageDelay;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Materials\Sign\BaksDevMaterialsSignBundle;
-use BaksDev\Materials\Sign\Repository\MaterialSignByOrder\MaterialSignByOrderRepository;
+use BaksDev\Materials\Sign\Entity\Event\MaterialSignEvent;
+use BaksDev\Materials\Sign\Entity\MaterialSign;
+use BaksDev\Materials\Sign\Repository\CurrentEvent\MaterialSignCurrentEventInterface;
+use BaksDev\Materials\Sign\Repository\MaterialSignByOrder\MaterialSignByOrderInterface;
+use BaksDev\Materials\Sign\UseCase\Admin\Status\MaterialSignDoneDTO;
+use BaksDev\Materials\Sign\UseCase\Admin\Status\MaterialSignStatusHandler;
 use BaksDev\Orders\Order\Entity\Event\OrderEvent;
 use BaksDev\Orders\Order\Entity\Order;
 use BaksDev\Orders\Order\Repository\CurrentOrderEvent\CurrentOrderEventInterface;
@@ -37,14 +41,19 @@ use BaksDev\Orders\Order\Type\Status\OrderStatus\OrderStatusCompleted;
 use BaksDev\Orders\Order\UseCase\Admin\Status\OrderStatusDTO;
 use BaksDev\Orders\Order\UseCase\Admin\Status\OrderStatusHandler;
 use BaksDev\Products\Sign\BaksDevProductsSignBundle;
-use BaksDev\Products\Sign\Repository\ProductSignByOrder\ProductSignByOrderRepository;
+use BaksDev\Products\Sign\Entity\Event\ProductSignEvent;
+use BaksDev\Products\Sign\Entity\ProductSign;
+use BaksDev\Products\Sign\Repository\CurrentEvent\ProductSignCurrentEventInterface;
+use BaksDev\Products\Sign\Repository\ProductSignByOrder\ProductSignByOrderInterface;
+use BaksDev\Products\Sign\UseCase\Admin\Status\ProductSignDoneDTO;
+use BaksDev\Products\Sign\UseCase\Admin\Status\ProductSignStatusHandler;
 use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersStatusRequest;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler(priority: 0)]
-final class WildberriesOrderCompletedDispatcher
+final readonly class WildberriesOrderCompletedDispatcher
 {
     public function __construct(
         #[Target('wildberriesOrdersLogger')] private LoggerInterface $logger,
@@ -52,12 +61,19 @@ final class WildberriesOrderCompletedDispatcher
         private MessageDispatchInterface $messageDispatch,
         private CurrentOrderEventInterface $CurrentOrderEvent,
         private OrderStatusHandler $OrderStatusHandler,
-        private DBALQueryBuilder $DBALQueryBuilder,
+
+        private ?MaterialSignByOrderInterface $MaterialSignByOrder = null,
+        private ?MaterialSignCurrentEventInterface $MaterialSignCurrentEvent = null,
+        private ?MaterialSignStatusHandler $MaterialSignStatusHandler = null,
+
+        private ?ProductSignByOrderInterface $ProductSignByOrder = null,
+        private ?ProductSignCurrentEventInterface $ProductSignCurrentEvent = null,
+        private ?ProductSignStatusHandler $ProductSignStatusHandler = null,
+
     ) {}
 
-    public function __invoke(WildberriesOrderCompletedMessage $message): bool
+    public function __invoke(WildberriesOrderCompletedMessage $message): void
     {
-
         $isCompleted = $this->FindAllWildberriesOrdersStatusRequest
             ->profile($message->getProfile())
             ->addOrder($message->getIdentifier())
@@ -71,10 +87,14 @@ final class WildberriesOrderCompletedDispatcher
 
             if(false !== $isCancel)
             {
-                return false;
+                return;
             }
 
             /**  Делаем повторную проверку позже */
+
+            $this->logger->warning(
+                sprintf('Заказ %s еще не выполнен! Делаем проверку позже', $message->getIdentifier())
+            );
 
             $this->messageDispatch->dispatch(
                 message: $message,
@@ -82,7 +102,7 @@ final class WildberriesOrderCompletedDispatcher
                 transport: 'wildberries-orders-low',
             );
 
-            return false;
+            return;
         }
 
 
@@ -92,15 +112,43 @@ final class WildberriesOrderCompletedDispatcher
 
         if(class_exists(BaksDevMaterialsSignBundle::class))
         {
-            $MaterialSignByOrderRepository = new MaterialSignByOrderRepository($this->DBALQueryBuilder);
-
-            $MaterialSigns = $MaterialSignByOrderRepository
+            $MaterialSigns = $this->MaterialSignByOrder
                 ->forOrder($message->getOrder())
                 ->findAll();
 
             if($MaterialSigns)
             {
-                dd($MaterialSigns); /* TODO: удалить !!! */
+                foreach($MaterialSigns as $MaterialSign)
+                {
+                    $MaterialSignEvent = $this->MaterialSignCurrentEvent
+                        ->forMaterialSign($MaterialSign['id'])
+                        ->find();
+
+                    if(false === ($MaterialSignEvent instanceof MaterialSignEvent))
+                    {
+                        continue;
+                    }
+
+                    $MaterialSignDoneDTO = new MaterialSignDoneDTO();
+                    $MaterialSignEvent->getDto($MaterialSignDoneDTO);
+
+                    $MaterialSignHandle = $this->MaterialSignStatusHandler->handle($MaterialSignDoneDTO);
+
+                    if(false === ($MaterialSignHandle instanceof MaterialSign))
+                    {
+                        $this->logger->critical(
+                            sprintf('wildberries-orders: Ошибка %s при изменении статуса сырьевого честного знака на Done «Выполнен»', $MaterialSignHandle),
+                            [
+                                var_export($message, true),
+                                self::class.':'.__LINE__
+                            ]
+                        );
+
+                        continue;
+                    }
+
+                    $this->logger->info(sprintf('%s: применили статус сырьевого честного знака на Done «Выполнен»', $message->getIdentifier()));
+                }
             }
 
         }
@@ -112,21 +160,45 @@ final class WildberriesOrderCompletedDispatcher
 
         if(class_exists(BaksDevProductsSignBundle::class))
         {
-            $ProductSignByOrderRepository = new ProductSignByOrderRepository($this->DBALQueryBuilder);
-
-            $ProductSigns = $ProductSignByOrderRepository
+            $ProductSigns = $this->ProductSignByOrder
                 ->forOrder($message->getOrder())
                 ->findAll();
 
             if($ProductSigns)
             {
-                dd($ProductSigns); /* TODO: удалить !!! */
+                foreach($ProductSigns as $ProductSign)
+                {
+                    $ProductSignEvent = $this->ProductSignCurrentEvent
+                        ->forProductSign($ProductSign['id'])
+                        ->find();
+
+                    if(false === ($ProductSignEvent instanceof ProductSignEvent))
+                    {
+                        continue;
+                    }
+
+                    $ProductSignDoneDTO = new ProductSignDoneDTO();
+                    $ProductSignEvent->getDto($ProductSignDoneDTO);
+
+                    $ProductSignHandle = $this->ProductSignStatusHandler->handle($ProductSignDoneDTO);
+
+                    if(false === ($ProductSignHandle instanceof ProductSign))
+                    {
+                        $this->logger->critical(
+                            sprintf('wildberries-orders: Ошибка %s при изменении статуса продуктового честного знака на Done «Выполнен»', $ProductSignHandle),
+                            [
+                                var_export($message, true),
+                                self::class.':'.__LINE__
+                            ]
+                        );
+
+                        continue;
+                    }
+
+                    $this->logger->info(sprintf('%s: применили статус продуктового честного знака на Done «Выполнен»', $message->getIdentifier()));
+                }
             }
-
         }
-
-
-        dd('.....................'); /* TODO: удалить !!! */
 
         /**
          * Обновляем статус заказа на Completed «Выполнен»
@@ -138,7 +210,7 @@ final class WildberriesOrderCompletedDispatcher
 
         if(false === ($OrderEvent instanceof OrderEvent))
         {
-            return false;
+            return;
         }
 
         $OrderStatusDTO = new OrderStatusDTO(
@@ -155,9 +227,9 @@ final class WildberriesOrderCompletedDispatcher
                 [$message, self::class.':'.__LINE__]
             );
 
-            return false;
+            return;
         }
 
-        return true;
+        $this->logger->info(sprintf('%s: применили статус заказа на Completed «Выполнен»', $message->getIdentifier()));
     }
 }

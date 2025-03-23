@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,7 @@
 namespace Symfony\Component\DependencyInjection\Loader\Configurator;
 
 use BaksDev\Wildberries\Orders\BaksDevWildberriesOrdersBundle;
+use BaksDev\Wildberries\Orders\Messenger\CompletedOrders\WildberriesOrderCompletedDispatcher;
 
 return static function(ContainerConfigurator $configurator) {
 
@@ -52,5 +53,14 @@ return static function(ContainerConfigurator $configurator) {
         $NAMESPACE.'Type\WildberriesStatus\Status\\',
         $PATH.implode(DIRECTORY_SEPARATOR, ['Type', 'WildberriesStatus', 'Status'])
     );
+
+
+    // Регистрируем ваш сервис
+    $services->set(WildberriesOrderCompletedDispatcher::class)
+        ->args([
+            // Используем "@?" для указания необязательной зависимости
+            '$externalService' => $services->get(ExternalServiceInterface::class)->nullOnInvalid(),
+        ]);
+
 
 };

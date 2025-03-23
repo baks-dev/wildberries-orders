@@ -167,6 +167,7 @@ class UpdateWildberriesOrdersCompletedCommand extends Command
             ->forProfile($profile)
             ->findAll();
 
+
         if(false === $orders || $orders->valid() === false)
         {
             return;
@@ -176,7 +177,7 @@ class UpdateWildberriesOrdersCompletedCommand extends Command
         foreach($orders as $order)
         {
             /* Отправляем сообщение в шину профиля */
-            $isCompleted = $this->messageDispatch->dispatch(
+            $this->messageDispatch->dispatch(
                 message: new WildberriesOrderCompletedMessage(
                     $profile,
                     $order->getId(),
@@ -185,14 +186,8 @@ class UpdateWildberriesOrdersCompletedCommand extends Command
                 transport: $async === true ? (string) $profile : null
             );
 
-            if($isCompleted)
-            {
-                $this->io->writeln(sprintf('<fg=green>Заказ %s выполнен</>', $order->getNumber()));
+            $this->io->writeln(sprintf('<fg=green>Проверили заказ %s</>', $order->getNumber()));
 
-                continue;
-            }
-
-            $this->io->writeln(sprintf('<fg=yellow>Заказ %s еще не доставлен</>', $order->getNumber()));
         }
     }
 }
