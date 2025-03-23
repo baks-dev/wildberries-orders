@@ -24,6 +24,7 @@
 
 namespace BaksDev\Wildberries\Orders\Commands;
 
+use BaksDev\Core\Deduplicator\DeduplicatorInterface;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Wildberries\Orders\Messenger\CompletedOrders\WildberriesOrderCompletedMessage;
@@ -52,6 +53,7 @@ class UpdateWildberriesOrdersCompletedCommand extends Command
         private readonly AllProfileTokenInterface $allProfileToken,
         private readonly AllWbOrdersMarketplaceInterface $AllWbOrdersMarketplace,
         private readonly MessageDispatchInterface $messageDispatch,
+        private readonly DeduplicatorInterface $deduplicator
     )
     {
         parent::__construct();
@@ -176,6 +178,17 @@ class UpdateWildberriesOrdersCompletedCommand extends Command
         /** @var AllWbOrdersMarketplaceResult $order */
         foreach($orders as $order)
         {
+            $Deduplicator = $this->deduplicator
+                ->namespace('wildberries-orders')
+                ->deduplication([$order->getNumber(), self::class]);
+
+            /** Пропускаем, если заказ был добавлен в очередь на проверку */
+            if($Deduplicator->isExecuted())
+            {
+                return;
+            }
+
+            /** Делаем задержку от блока */
             usleep(500000);
 
             /* Отправляем сообщение в шину профиля */
@@ -189,6 +202,8 @@ class UpdateWildberriesOrdersCompletedCommand extends Command
             );
 
             $this->io->writeln(sprintf('<fg=green>Проверили заказ %s</>', $order->getNumber()));
+
+            $Deduplicator->save();
 
         }
     }
