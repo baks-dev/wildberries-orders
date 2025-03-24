@@ -47,7 +47,7 @@ final class CheckStatusWhenChangeOrderStatusDispatcher
     public function __construct(
         private CurrentOrderEventInterface $CurrentOrderEvent,
         private DeduplicatorInterface $deduplicator,
-        private MessageDispatchInterface $messageDispatch
+        private MessageDispatchInterface $messageDispatch,
     ) {}
 
     public function __invoke(OrderMessage $message): void

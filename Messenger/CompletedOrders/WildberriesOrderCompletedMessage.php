@@ -36,15 +36,19 @@ final readonly class WildberriesOrderCompletedMessage
 
     private string $identifier;
 
+    private bool $deduplication;
+
     public function __construct(
         UserProfileUid|string $profile,
         OrderUid|string $order,
         string $identifier,
+        bool $deduplication = false,
     )
     {
         $this->profile = (string) $profile;
         $this->order = (string) $order;
         $this->identifier = $identifier;
+        $this->deduplication = $deduplication;
     }
 
     /**
@@ -71,4 +75,11 @@ final readonly class WildberriesOrderCompletedMessage
         return $this->identifier;
     }
 
+    /**
+     * Deduplication
+     */
+    public function isDeduplication(): bool
+    {
+        return $this->deduplication;
+    }
 }

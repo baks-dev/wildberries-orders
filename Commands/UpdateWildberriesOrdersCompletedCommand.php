@@ -178,6 +178,10 @@ class UpdateWildberriesOrdersCompletedCommand extends Command
         /** @var AllWbOrdersMarketplaceResult $order */
         foreach($orders as $order)
         {
+            /**
+             * Пропускаем, если заказ был добавлен при упаковке
+             * @see WildberriesOrderCompletedDispatcher
+             */
             $Deduplicator = $this->deduplicator
                 ->namespace('wildberries-orders')
                 ->deduplication([$order->getNumber(), self::class]);
@@ -197,6 +201,7 @@ class UpdateWildberriesOrdersCompletedCommand extends Command
                     $profile,
                     $order->getId(),
                     $order->getNumber(),
+                    true
                 ),
                 transport: $async === true ? (string) $profile : null
             );

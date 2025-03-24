@@ -25,6 +25,7 @@ declare(strict_types=1);
 
 namespace BaksDev\Wildberries\Orders\Messenger\CompletedOrders;
 
+use BaksDev\Core\Deduplicator\DeduplicatorInterface;
 use BaksDev\Core\Messenger\MessageDelay;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Materials\Sign\BaksDevMaterialsSignBundle;
@@ -48,6 +49,7 @@ use BaksDev\Products\Sign\Repository\ProductSignByOrder\ProductSignByOrderInterf
 use BaksDev\Products\Sign\UseCase\Admin\Status\ProductSignDoneDTO;
 use BaksDev\Products\Sign\UseCase\Admin\Status\ProductSignStatusHandler;
 use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersStatusRequest;
+use BaksDev\Wildberries\Orders\Commands\UpdateWildberriesOrdersNewCommand;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -61,6 +63,7 @@ final readonly class WildberriesOrderCompletedDispatcher
         private MessageDispatchInterface $messageDispatch,
         private CurrentOrderEventInterface $CurrentOrderEvent,
         private OrderStatusHandler $OrderStatusHandler,
+        private DeduplicatorInterface $deduplicator,
 
         private ?MaterialSignByOrderInterface $MaterialSignByOrder = null,
         private ?MaterialSignCurrentEventInterface $MaterialSignCurrentEvent = null,
@@ -74,6 +77,18 @@ final readonly class WildberriesOrderCompletedDispatcher
 
     public function __invoke(WildberriesOrderCompletedMessage $message): void
     {
+        $Deduplicator = $this->deduplicator
+            ->namespace('wildberries-orders')
+            ->deduplication([$message->getIdentifier(), UpdateWildberriesOrdersNewCommand::class]);
+
+        /** Пропускаем, если заказ был добавлен в очередь на проверку через консоль */
+        if($message->isDeduplication() && $Deduplicator->isExecuted())
+        {
+            return;
+        }
+
+        $Deduplicator->isExecuted() ?: $Deduplicator->save();
+
         $isCompleted = $this->FindAllWildberriesOrdersStatusRequest
             ->profile($message->getProfile())
             ->addOrder($message->getIdentifier())
