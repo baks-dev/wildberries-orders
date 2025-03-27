@@ -50,6 +50,7 @@ use BaksDev\Products\Sign\UseCase\Admin\Status\ProductSignDoneDTO;
 use BaksDev\Products\Sign\UseCase\Admin\Status\ProductSignStatusHandler;
 use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersStatusRequest;
 use BaksDev\Wildberries\Orders\Commands\UpdateWildberriesOrdersNewCommand;
+use BaksDev\Wildberries\Orders\Type\DeliveryType\TypeDeliveryFbsWildberries;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -88,6 +89,25 @@ final readonly class WildberriesOrderCompletedDispatcher
         }
 
         $Deduplicator->isExecuted() ?: $Deduplicator->save();
+
+        $OrderEvent = $this->CurrentOrderEvent
+            ->forOrder($message->getOrder())
+            ->find();
+
+        if(false === ($OrderEvent instanceof OrderEvent))
+        {
+            return;
+        }
+
+        if(false === $OrderEvent->isDeliveryTypeEquals(TypeDeliveryFbsWildberries::TYPE))
+        {
+            return;
+        }
+
+        if($OrderEvent->isStatusEquals(OrderStatusCompleted::class))
+        {
+            return;
+        }
 
         $isCompleted = $this->FindAllWildberriesOrdersStatusRequest
             ->profile($message->getProfile())
@@ -217,20 +237,6 @@ final readonly class WildberriesOrderCompletedDispatcher
         /**
          * Обновляем статус заказа на Completed «Выполнен»
          */
-
-        $OrderEvent = $this->CurrentOrderEvent
-            ->forOrder($message->getOrder())
-            ->find();
-
-        if(false === ($OrderEvent instanceof OrderEvent))
-        {
-            return;
-        }
-
-        if($OrderEvent->isStatusEquals(OrderStatusCompleted::class))
-        {
-            return;
-        }
 
         $OrderStatusDTO = new OrderStatusDTO(
             OrderStatusCompleted::class,
