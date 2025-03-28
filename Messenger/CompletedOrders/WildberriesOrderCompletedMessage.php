@@ -27,6 +27,7 @@ namespace BaksDev\Wildberries\Orders\Messenger\CompletedOrders;
 
 use BaksDev\Orders\Order\Type\Id\OrderUid;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
+use ReflectionProperty;
 
 final readonly class WildberriesOrderCompletedMessage
 {
@@ -80,6 +81,11 @@ final readonly class WildberriesOrderCompletedMessage
      */
     public function isDeduplication(): bool
     {
+        if(false === (new ReflectionProperty(self::class, 'deduplication')->isInitialized($this)))
+        {
+            return false;
+        }
+
         return $this->deduplication;
     }
 }
