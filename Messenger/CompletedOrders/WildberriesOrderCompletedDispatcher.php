@@ -49,7 +49,7 @@ use BaksDev\Products\Sign\Repository\ProductSignByOrder\ProductSignByOrderInterf
 use BaksDev\Products\Sign\UseCase\Admin\Status\ProductSignDoneDTO;
 use BaksDev\Products\Sign\UseCase\Admin\Status\ProductSignStatusHandler;
 use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersStatusRequest;
-use BaksDev\Wildberries\Orders\Commands\UpdateWildberriesOrdersNewCommand;
+use BaksDev\Wildberries\Orders\Commands\UpdateWildberriesOrdersCompletedCommand;
 use BaksDev\Wildberries\Orders\Type\DeliveryType\TypeDeliveryFbsWildberries;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Target;
@@ -80,7 +80,7 @@ final readonly class WildberriesOrderCompletedDispatcher
     {
         $Deduplicator = $this->deduplicator
             ->namespace('wildberries-orders')
-            ->deduplication([$message->getIdentifier(), UpdateWildberriesOrdersNewCommand::class]);
+            ->deduplication([$message->getIdentifier(), UpdateWildberriesOrdersCompletedCommand::class]);
 
         /** Пропускаем, если заказ был добавлен в очередь на проверку через консоль */
         if($message->isDeduplication() && $Deduplicator->isExecuted())
