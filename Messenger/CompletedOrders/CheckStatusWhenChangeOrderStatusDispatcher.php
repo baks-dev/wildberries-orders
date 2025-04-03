@@ -32,6 +32,7 @@ use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Orders\Order\Entity\Event\OrderEvent;
 use BaksDev\Orders\Order\Messenger\OrderMessage;
 use BaksDev\Orders\Order\Repository\CurrentOrderEvent\CurrentOrderEventInterface;
+use BaksDev\Orders\Order\Repository\OrderEvent\OrderEventInterface;
 use BaksDev\Orders\Order\Type\Status\OrderStatus\OrderStatusMarketplace;
 use BaksDev\Orders\Order\Type\Status\OrderStatus\OrderStatusNew;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
@@ -45,6 +46,7 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 final class CheckStatusWhenChangeOrderStatusDispatcher
 {
     public function __construct(
+        private OrderEventInterface $OrderEventRepository,
         private CurrentOrderEventInterface $CurrentOrderEvent,
         private DeduplicatorInterface $deduplicator,
         private MessageDispatchInterface $messageDispatch,
@@ -66,10 +68,8 @@ final class CheckStatusWhenChangeOrderStatusDispatcher
             return;
         }
 
-        /** Получаем активное событие заказа */
-        $OrderEvent = $this->CurrentOrderEvent
-            ->forOrder($message->getId())
-            ->find();
+        $OrderEvent = $this->OrderEventRepository
+            ->find($message->getEvent());
 
         if(false === ($OrderEvent instanceof OrderEvent))
         {
@@ -83,11 +83,22 @@ final class CheckStatusWhenChangeOrderStatusDispatcher
         }
 
         /** Если тип заказа не FBS Wildberries «Доставка службой Wildberries» */
-        $DeliveryUid = $OrderEvent->getDelivery()?->getDeliveryType();
-
-        if(is_null($DeliveryUid) || false === $DeliveryUid->equals(TypeDeliveryFbsWildberries::class))
+        if($OrderEvent->isDeliveryTypeEquals(TypeDeliveryFbsWildberries::TYPE))
         {
             return;
+        }
+
+        /** Получаем активное событие заказа в случае если статус заказа изменился */
+        if(false === ($OrderEvent->getOrderProfile() instanceof UserProfileUid))
+        {
+            $OrderEvent = $this->CurrentOrderEvent
+                ->forOrder($message->getId())
+                ->find();
+
+            if(false === ($OrderEvent instanceof OrderEvent))
+            {
+                return;
+            }
         }
 
         /** Запускаем ежедневную проверку статусов  */
