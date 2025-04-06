@@ -48,7 +48,7 @@ final readonly class UpdateStatisticsHandler
             ->order($message->getId())
             ->findAllProducts();
 
-        if(false === ($products || $products->valid()))
+        if(false === $products || false === $products->valid())
         {
             return;
         }
