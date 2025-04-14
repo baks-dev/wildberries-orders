@@ -21,26 +21,35 @@
  *  THE SOFTWARE.
  */
 
-namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+declare(strict_types=1);
 
-use BaksDev\Wildberries\Orders\BaksDevWildberriesOrdersBundle;
+namespace BaksDev\Wildberries\Orders\Type\DeliveryType\Tests;
 
-return static function(ContainerConfigurator $configurator) {
+use BaksDev\Core\Doctrine\DBALQueryBuilder;
+use BaksDev\Delivery\Type\Id\DeliveryUid;
+use BaksDev\Wildberries\Orders\Type\DeliveryType\TypeDeliveryFbsWildberries;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\DependencyInjection\Attribute\When;
 
-    $services = $configurator->services()
-        ->defaults()
-        ->autowire()
-        ->autoconfigure();
 
-    $NAMESPACE = BaksDevWildberriesOrdersBundle::NAMESPACE;
-    $PATH = BaksDevWildberriesOrdersBundle::PATH;
+/**
+ * @group wildberries-orders
+ * @group wildberries-orders-type-delivery
+ */
+#[When(env: 'test')]
+class TypeDeliveryFbsWildberriesTest extends KernelTestCase
+{
+    public function testUseCase(): void
+    {
+        $DeliveryUid = new DeliveryUid(TypeDeliveryFbsWildberries::TYPE);
+        self::assertTrue($DeliveryUid->equals(new DeliveryUid(TypeDeliveryFbsWildberries::TYPE)));
 
-    $services->load($NAMESPACE, $PATH)
-        ->exclude([
-            $PATH.'{Entity,Resources,Type}',
-            $PATH.'**'.DIRECTORY_SEPARATOR.'*Message.php',
-            $PATH.'**'.DIRECTORY_SEPARATOR.'*DTO.php',
-            $PATH.'**'.DIRECTORY_SEPARATOR.'*Test.php',
-        ]);
+        self::assertTrue($DeliveryUid->equals(TypeDeliveryFbsWildberries::class));
+        self::assertTrue($DeliveryUid->equals(TypeDeliveryFbsWildberries::TYPE));
 
-};
+        self::assertTrue($DeliveryUid->equals(new DeliveryUid(TypeDeliveryFbsWildberries::class)));
+        self::assertTrue($DeliveryUid->equals(new DeliveryUid(TypeDeliveryFbsWildberries::TYPE)));
+
+    }
+}

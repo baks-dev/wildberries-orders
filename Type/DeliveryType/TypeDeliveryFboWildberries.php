@@ -21,26 +21,37 @@
  *  THE SOFTWARE.
  */
 
-namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+declare(strict_types=1);
 
-use BaksDev\Wildberries\Orders\BaksDevWildberriesOrdersBundle;
+namespace BaksDev\Wildberries\Orders\Type\DeliveryType;
 
-return static function(ContainerConfigurator $configurator) {
+use BaksDev\Delivery\Type\Id\Choice\Collection\TypeDeliveryInterface;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
-    $services = $configurator->services()
-        ->defaults()
-        ->autowire()
-        ->autoconfigure();
+#[AutoconfigureTag('baks.delivery.type')]
+final class TypeDeliveryFboWildberries implements TypeDeliveryInterface
+{
+    public const string TYPE = '1175ef68-66cb-7f1f-a3e5-83a5aa854812';
 
-    $NAMESPACE = BaksDevWildberriesOrdersBundle::NAMESPACE;
-    $PATH = BaksDevWildberriesOrdersBundle::PATH;
+    /** Сортировка */
+    public static function priority(): int
+    {
+        return 412;
+    }
 
-    $services->load($NAMESPACE, $PATH)
-        ->exclude([
-            $PATH.'{Entity,Resources,Type}',
-            $PATH.'**'.DIRECTORY_SEPARATOR.'*Message.php',
-            $PATH.'**'.DIRECTORY_SEPARATOR.'*DTO.php',
-            $PATH.'**'.DIRECTORY_SEPARATOR.'*Test.php',
-        ]);
+    public function __toString(): string
+    {
+        return self::TYPE;
+    }
 
-};
+    /** Возвращает значение (value) */
+    public function getValue(): string
+    {
+        return self::TYPE;
+    }
+
+    public static function equals(mixed $uid): bool
+    {
+        return self::TYPE === (string) $uid;
+    }
+}

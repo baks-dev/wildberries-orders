@@ -21,26 +21,37 @@
  *  THE SOFTWARE.
  */
 
-namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+declare(strict_types=1);
 
-use BaksDev\Wildberries\Orders\BaksDevWildberriesOrdersBundle;
+namespace BaksDev\Wildberries\Orders\Type\ProfileType;
 
-return static function(ContainerConfigurator $configurator) {
+use BaksDev\Users\Profile\TypeProfile\Type\Id\Choice\Collection\TypeProfileInterface;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
-    $services = $configurator->services()
-        ->defaults()
-        ->autowire()
-        ->autoconfigure();
+#[AutoconfigureTag('baks.users.profile.type')]
+final class TypeProfileFboWildberries implements TypeProfileInterface
+{
+    public const string TYPE = 'aa454824-7b76-7442-bca5-3db6542a4291';
 
-    $NAMESPACE = BaksDevWildberriesOrdersBundle::NAMESPACE;
-    $PATH = BaksDevWildberriesOrdersBundle::PATH;
+    /** Сортировка */
+    public static function priority(): int
+    {
+        return 412;
+    }
 
-    $services->load($NAMESPACE, $PATH)
-        ->exclude([
-            $PATH.'{Entity,Resources,Type}',
-            $PATH.'**'.DIRECTORY_SEPARATOR.'*Message.php',
-            $PATH.'**'.DIRECTORY_SEPARATOR.'*DTO.php',
-            $PATH.'**'.DIRECTORY_SEPARATOR.'*Test.php',
-        ]);
+    public function __toString(): string
+    {
+        return self::TYPE;
+    }
 
-};
+    /** Возвращает значение (value) */
+    public function getValue(): string
+    {
+        return self::TYPE;
+    }
+
+    public static function equals(mixed $uid): bool
+    {
+        return self::TYPE === (string) $uid;
+    }
+}

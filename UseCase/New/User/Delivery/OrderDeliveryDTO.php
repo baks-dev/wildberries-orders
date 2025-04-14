@@ -197,9 +197,9 @@ final class OrderDeliveryDTO implements OrderDeliveryInterface
         return $this->address;
     }
 
-    public function setAddress(string $address): self
+    public function setAddress(?string $address): self
     {
-        $this->address = $address;
+        $this->address = $address ?? 'Арес доставки не указан';
         return $this;
     }
 

@@ -3,6 +3,10 @@ wildberries:
     name: 'Wildberries'
     desc: 'Payment for FBS Wildberries'
 
+  fbo:
+    name: 'Wildberries'
+    desc: 'Payment for FBS Wildberries'
+
   dbs:
     name: 'DBS Wildberries'
     desc: 'Payment for DBS Wildberries'

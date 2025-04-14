@@ -21,26 +21,33 @@
  *  THE SOFTWARE.
  */
 
-namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+declare(strict_types=1);
 
-use BaksDev\Wildberries\Orders\BaksDevWildberriesOrdersBundle;
+namespace BaksDev\Wildberries\Orders\Type\PaymentType\Tests;
 
-return static function(ContainerConfigurator $configurator) {
+use BaksDev\Payment\Type\Id\PaymentUid;
+use BaksDev\Wildberries\Orders\Type\PaymentType\TypePaymentFboWildberries;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\DependencyInjection\Attribute\When;
 
-    $services = $configurator->services()
-        ->defaults()
-        ->autowire()
-        ->autoconfigure();
 
-    $NAMESPACE = BaksDevWildberriesOrdersBundle::NAMESPACE;
-    $PATH = BaksDevWildberriesOrdersBundle::PATH;
+/**
+ * @group wildberries-orders
+ * @group wildberries-orders-type-payment
+ */
+#[When(env: 'test')]
+class TypePaymentFboWildberriesTest extends KernelTestCase
+{
+    public function testUseCase(): void
+    {
+        $PaymentUid = new PaymentUid(TypePaymentFboWildberries::TYPE);
+        self::assertTrue($PaymentUid->equals(new PaymentUid(TypePaymentFboWildberries::TYPE)));
 
-    $services->load($NAMESPACE, $PATH)
-        ->exclude([
-            $PATH.'{Entity,Resources,Type}',
-            $PATH.'**'.DIRECTORY_SEPARATOR.'*Message.php',
-            $PATH.'**'.DIRECTORY_SEPARATOR.'*DTO.php',
-            $PATH.'**'.DIRECTORY_SEPARATOR.'*Test.php',
-        ]);
+        self::assertTrue($PaymentUid->equals(TypePaymentFboWildberries::class));
+        self::assertTrue($PaymentUid->equals(TypePaymentFboWildberries::TYPE));
 
-};
+        self::assertTrue($PaymentUid->equals(new PaymentUid(TypePaymentFboWildberries::class)));
+        self::assertTrue($PaymentUid->equals(new PaymentUid(TypePaymentFboWildberries::TYPE)));
+    }
+
+}

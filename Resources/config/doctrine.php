@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -35,13 +35,8 @@ use BaksDev\Wildberries\Orders\Type\WildberriesStatus\WildberriesStatusType;
 use Symfony\Config\DoctrineConfig;
 
 return static function(ContainerConfigurator $container, DoctrineConfig $doctrine) {
-    $doctrine->dbal()->type(ClientEmail::TYPE)->class(ClientEmailType::class);
 
     $doctrine->dbal()->type(WbOrdersEventUid::TYPE)->class(WbOrdersEventUidType::class);
-
-    /* Status */
-    $doctrine->dbal()->type(WbOrderStatus::TYPE)->class(WbOrderStatusType::class);
-    $doctrine->dbal()->type(WildberriesStatus::TYPE)->class(WildberriesStatusType::class);
 
     $emDefault = $doctrine->orm()->entityManager('default')->autoMapping(true);
 

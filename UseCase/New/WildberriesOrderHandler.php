@@ -168,7 +168,7 @@ final class WildberriesOrderHandler extends AbstractHandler
         /** Сохраняем */
 
         $Order = new Order();
-        $Order->setNumber($command->getNumber());
+        //$Order->setNumber($command->getNumber());
 
         $this
             ->setCommand($command)
@@ -179,7 +179,6 @@ final class WildberriesOrderHandler extends AbstractHandler
         {
             return $this->validatorCollection->getErrorUniqid();
         }
-
 
         $this->flush();
 

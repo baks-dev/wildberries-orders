@@ -21,26 +21,34 @@
  *  THE SOFTWARE.
  */
 
-namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+declare(strict_types=1);
 
-use BaksDev\Wildberries\Orders\BaksDevWildberriesOrdersBundle;
+namespace BaksDev\Wildberries\Orders\Type\PaymentType\Tests;
 
-return static function(ContainerConfigurator $configurator) {
 
-    $services = $configurator->services()
-        ->defaults()
-        ->autowire()
-        ->autoconfigure();
+use BaksDev\Payment\Type\Id\PaymentUid;
+use BaksDev\Wildberries\Orders\Type\PaymentType\TypePaymentFbsWildberries;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\DependencyInjection\Attribute\When;
 
-    $NAMESPACE = BaksDevWildberriesOrdersBundle::NAMESPACE;
-    $PATH = BaksDevWildberriesOrdersBundle::PATH;
 
-    $services->load($NAMESPACE, $PATH)
-        ->exclude([
-            $PATH.'{Entity,Resources,Type}',
-            $PATH.'**'.DIRECTORY_SEPARATOR.'*Message.php',
-            $PATH.'**'.DIRECTORY_SEPARATOR.'*DTO.php',
-            $PATH.'**'.DIRECTORY_SEPARATOR.'*Test.php',
-        ]);
+/**
+ * @group wildberries-orders
+ * @group wildberries-orders-type-payment
+ */
+#[When(env: 'test')]
+class TypePaymentFbsWildberriesTest extends KernelTestCase
+{
+    public function testUseCase(): void
+    {
+        $PaymentUid = new PaymentUid(TypePaymentFbsWildberries::TYPE);
+        self::assertTrue($PaymentUid->equals(new PaymentUid(TypePaymentFbsWildberries::TYPE)));
 
-};
+        self::assertTrue($PaymentUid->equals(TypePaymentFbsWildberries::class));
+        self::assertTrue($PaymentUid->equals(TypePaymentFbsWildberries::TYPE));
+
+        self::assertTrue($PaymentUid->equals(new PaymentUid(TypePaymentFbsWildberries::class)));
+        self::assertTrue($PaymentUid->equals(new PaymentUid(TypePaymentFbsWildberries::TYPE)));
+    }
+
+}

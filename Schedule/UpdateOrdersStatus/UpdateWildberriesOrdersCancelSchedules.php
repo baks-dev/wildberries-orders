@@ -30,7 +30,7 @@ use DateInterval;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
 /**
- * Обновляем статусы заказов каждые 5 минут
+ * Обновляем статусы отмененных заказов каждые 5 минут
  */
 #[AutoconfigureTag('baks.schedule')]
 final class UpdateWildberriesOrdersCancelSchedules implements ScheduleInterface

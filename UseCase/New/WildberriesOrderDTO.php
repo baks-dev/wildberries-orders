@@ -81,6 +81,7 @@ final class WildberriesOrderDTO implements OrderEventInterface
     public function __construct(array $order, UserProfileUid $profile)
     {
 
+
         /** Постоянная величина */
         $NewOrderInvariable = new Invariable\NewOrderInvariable();
         $NewOrderInvariable->setCreated(new DateTimeImmutable($order['createdAt'] ?: 'now'));
@@ -152,8 +153,9 @@ final class WildberriesOrderDTO implements OrderEventInterface
         $OrderDeliveryDTO->setDeliveryDate($deliveryDate);
 
         /** Адрес доставки */
+        false === isset($order['address']) ?: $deliveryAddress[] = $order['address'];
+        false === isset($order['offices']) ?: $deliveryAddress[] = implode(', ', str_replace('_', ' ', $order['offices']));
 
-        $deliveryAddress[] = $order['address'];
         $OrderDeliveryDTO->setAddress(implode(', ', $deliveryAddress));
 
 

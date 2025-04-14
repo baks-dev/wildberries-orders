@@ -27,7 +27,6 @@ namespace BaksDev\Wildberries\Orders\Schedule\UpdateOrdersStatus;
 
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Wildberries\Orders\Messenger\Schedules\CancelOrders\CancelWildberriesOrdersScheduleMessage;
-use BaksDev\Wildberries\Orders\Messenger\UpdateOrdersStatus\UpdateOrdersStatusMessage;
 use BaksDev\Wildberries\Repository\AllProfileToken\AllProfileTokenInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 

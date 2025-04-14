@@ -1,17 +1,30 @@
-wildberries:
-  fbs:
-    name: 'Wildberries warehouse'
-    desc: 'Wildberries courier delivery'
-
-    address:
-      name: 'Wildberries pick-up point address'
-      desc: 'Address of the Wildberries order pick-up point selected by the client'
+Wildberries:
 
 
-  dbs:
-    name: 'Delivery to Wildberries client'
-    desc: 'Delivery to Wildberries client'
+  FBS:
+    NAME: 'Wildberries Warehouse'
+    Desc: 'Courier delivery Wildberries'
 
-    address:
-      name: 'Client address'
-      desc: 'Delivery address of the order to the Wildberries client'
+    Address:
+      NAME: 'Wildberries Warehouse Address'
+      Desc:
+
+
+
+  FBO:
+    NAME: 'Wildberries Warehouse'
+    Desc: 'Valdberries sale from the warehouse'
+
+    Address:
+      NAME: 'Address of PVZ Wildberries'
+      Desc: 'Address of Wildberries issuing orders selected by the client'
+
+
+
+  DBS:
+    NAME: 'Delivery to the client Wildberries'
+    Desc: 'Delivery to the client Wildberries'
+
+    Address:
+      NAME: 'Client Address'
+      Desc: 'Address Address to the client Wildberries'

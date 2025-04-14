@@ -21,26 +21,30 @@
  *  THE SOFTWARE.
  */
 
-namespace Symfony\Component\DependencyInjection\Loader\Configurator;
+declare(strict_types=1);
 
-use BaksDev\Wildberries\Orders\BaksDevWildberriesOrdersBundle;
+namespace BaksDev\Wildberries\Orders\Type\ProfileType\Tests;
 
-return static function(ContainerConfigurator $configurator) {
+use BaksDev\Users\Profile\TypeProfile\Type\Id\TypeProfileUid;
+use BaksDev\Wildberries\Orders\Type\ProfileType\TypeProfileFbsWildberries;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-    $services = $configurator->services()
-        ->defaults()
-        ->autowire()
-        ->autoconfigure();
+/**
+ * @group wildberries-orders
+ * @group wildberries-orders-type-profile
+ */
+#[When(env: 'test')]
+class TypeProfileFbsWildberriesTest extends KernelTestCase
+{
+    public function testUseCase(): void
+    {
+        $TypeProfileUid = new TypeProfileUid(TypeProfileFbsWildberries::TYPE);
+        self::assertTrue($TypeProfileUid->equals(new TypeProfileUid(TypeProfileFbsWildberries::TYPE)));
 
-    $NAMESPACE = BaksDevWildberriesOrdersBundle::NAMESPACE;
-    $PATH = BaksDevWildberriesOrdersBundle::PATH;
+        self::assertTrue($TypeProfileUid->equals(TypeProfileFbsWildberries::class));
+        self::assertTrue($TypeProfileUid->equals(TypeProfileFbsWildberries::TYPE));
 
-    $services->load($NAMESPACE, $PATH)
-        ->exclude([
-            $PATH.'{Entity,Resources,Type}',
-            $PATH.'**'.DIRECTORY_SEPARATOR.'*Message.php',
-            $PATH.'**'.DIRECTORY_SEPARATOR.'*DTO.php',
-            $PATH.'**'.DIRECTORY_SEPARATOR.'*Test.php',
-        ]);
-
-};
+        self::assertTrue($TypeProfileUid->equals(new TypeProfileUid(TypeProfileFbsWildberries::class)));
+        self::assertTrue($TypeProfileUid->equals(new TypeProfileUid(TypeProfileFbsWildberries::TYPE)));
+    }
+}

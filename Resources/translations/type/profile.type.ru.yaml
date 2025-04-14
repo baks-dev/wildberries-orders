@@ -17,9 +17,18 @@ wildberries:
             desc: 'ФИО пользователя'
 
 
+
+  fbo:
+
+    name: 'FBO: Wildberries'
+    desc: 'Склад Wildberries'
+
+
+
+
   dbs:
 
-    name: 'DBS Wildberries'
+    name: 'DBS: Wildberries'
     desc: 'Пользователь DBS Wildberries'
 
     section:
@@ -40,3 +49,5 @@ wildberries:
           phone:
             name: 'Контактный телефон'
             desc: 'Контактный телефон для связи'
+
+

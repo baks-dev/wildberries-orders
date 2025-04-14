@@ -28,6 +28,7 @@ namespace BaksDev\Wildberries\Orders\Api\New\Tests;
 use BaksDev\Orders\Order\Entity\Order;
 use BaksDev\Orders\Order\UseCase\Admin\Edit\Tests\OrderNewTest;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
+use BaksDev\Users\Profile\UserProfile\UseCase\Admin\NewEdit\Tests\NewUserProfileHandlerTest;
 use BaksDev\Users\Profile\UserProfile\UseCase\User\NewEdit\Tests\UserNewUserProfileHandleTest;
 use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersNewRequest;
 use BaksDev\Wildberries\Orders\UseCase\New\WildberriesOrderDTO;
@@ -57,7 +58,7 @@ class WildberriesOrdersNewTest extends KernelTestCase
     {
         OrderNewTest::setUpBeforeClass();
         UserNewUserProfileHandleTest::setUpBeforeClass();
-
+        NewUserProfileHandlerTest::setUpBeforeClass();
 
         /** @var FindAllWildberriesOrdersNewRequest $WildberriesOrdersNewRequest */
         $WildberriesOrdersNewRequest = self::getContainer()->get(FindAllWildberriesOrdersNewRequest::class);
@@ -66,26 +67,28 @@ class WildberriesOrdersNewTest extends KernelTestCase
         /** @var WildberriesOrderHandler $WildberriesOrderHandler */
         $WildberriesOrderHandler = self::getContainer()->get(WildberriesOrderHandler::class);
 
-
         $data = $WildberriesOrdersNewRequest->findAll();
 
-        if($data->valid())
+        if(false === $data || false === $data->valid())
         {
-            foreach($data as $order)
-            {
-
-                self::assertInstanceOf(WildberriesOrderDTO::class, $order);
-                $handle = $WildberriesOrderHandler->handle($order);
-
-                if($handle === true)
-                {
-                    continue;
-                }
-
-                self::assertInstanceOf(Order::class, $handle);
-            }
+            self::assertTrue(false);
         }
 
-        self::assertTrue(true);
+        foreach($data as $order)
+        {
+            self::assertInstanceOf(WildberriesOrderDTO::class, $order);
+
+            $handle = $WildberriesOrderHandler->handle($order);
+
+            if($handle === true)
+            {
+                break;
+            }
+
+            self::assertInstanceOf(Order::class, $handle);
+
+            break;
+        }
+
     }
 }
