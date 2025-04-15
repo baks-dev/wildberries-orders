@@ -134,7 +134,7 @@ final readonly class WildberriesOrderCompletedDispatcher
             $this->messageDispatch->dispatch(
                 message: $message,
                 stamps: [new MessageDelay('1 day')],
-                transport: 'wildberries-orders-low',
+                transport: $message->getProfile().'-low',
             );
 
             return;
