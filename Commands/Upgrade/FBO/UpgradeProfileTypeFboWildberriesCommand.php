@@ -45,8 +45,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AsCommand(
-    name: 'baks:users-profile-type:wildberries-dbs',
-    description: 'Добавляет тип профилей пользователя DBS Wildberries'
+    name: 'baks:users-profile-type:wildberries-fbo',
+    description: 'Добавляет тип профилей пользователя FBO Wildberries'
 )]
 class UpgradeProfileTypeFboWildberriesCommand extends Command
 {
@@ -70,7 +70,7 @@ class UpgradeProfileTypeFboWildberriesCommand extends Command
         if(!$exists)
         {
             $io = new SymfonyStyle($input, $output);
-            $io->text('Добавляем тип профиля Wildberries DBS');
+            $io->text('Добавляем тип профиля FBO Wildberries');
 
             $TypeProfileDTO = new TypeProfileDTO();
             $TypeProfileDTO->setSort(TypeProfileFboWildberries::priority());
@@ -92,69 +92,68 @@ class UpgradeProfileTypeFboWildberriesCommand extends Command
                 $ProfileTrans->setDescription($desc);
             }
 
-            /**
-             * Создаем секцию Контактные данные
-             */
-            $SectionDTO = new SectionDTO();
-            $SectionDTO->setSort(100);
+            //            /**
+            //             * Создаем секцию Контактные данные
+            //             */
+            //            $SectionDTO = new SectionDTO();
+            //            $SectionDTO->setSort(100);
+            //
+            //            /** @var SectionTransDTO $SectionTrans */
+            //            foreach($SectionDTO->getTranslate() as $SectionTrans)
+            //            {
+            //                $name = $this->translator->trans('wildberries.fbo.section.contact.name', domain: 'profile.type', locale: $SectionTrans->getLocal()->getLocalValue());
+            //                $desc = $this->translator->trans('wildberries.fbo.section.contact.desc', domain: 'profile.type', locale: $SectionTrans->getLocal()->getLocalValue());
+            //
+            //                $SectionTrans->setName($name);
+            //                $SectionTrans->setDescription($desc);
+            //            }
 
-            /** @var SectionTransDTO $SectionTrans */
-            foreach($SectionDTO->getTranslate() as $SectionTrans)
-            {
-                $name = $this->translator->trans('wildberries.fbo.section.contact.name', domain: 'profile.type', locale: $SectionTrans->getLocal()->getLocalValue());
-                $desc = $this->translator->trans('wildberries.fbo.section.contact.desc', domain: 'profile.type', locale: $SectionTrans->getLocal()->getLocalValue());
+            //            $TypeProfileDTO->addSection($SectionDTO);
 
-                $SectionTrans->setName($name);
-                $SectionTrans->setDescription($desc);
-            }
+            //            /* Добавляем поля для заполнения */
+            //
+            //            $fields = ['name', 'email', 'phone'];
+            //
+            //            foreach($fields as $sort => $field)
+            //            {
+            //                $SectionFieldDTO = new SectionFieldDTO();
+            //                $SectionFieldDTO->setSort($sort);
+            //                $SectionFieldDTO->setPublic(true);
+            //                $SectionFieldDTO->setRequired(true);
+            //
+            //                $SectionFieldDTO->setType(new InputField('input_field'));
+            //
+            //                if($field === 'name')
+            //                {
+            //                    $SectionFieldDTO->setType(new InputField('contact_field'));
+            //                }
+            //
+            //                if($field === 'email')
+            //                {
+            //                    $SectionFieldDTO->setType(new InputField('account_email'));
+            //                    $SectionFieldDTO->setRequired(false);
+            //                }
+            //
+            //                if($field === 'phone')
+            //                {
+            //                    $SectionFieldDTO->setType(new InputField('phone_field'));
+            //                }
+            //
+            //
+            //                /** @var SectionFieldTransDTO $SectionFieldTrans */
+            //                foreach($SectionFieldDTO->getTranslate() as $SectionFieldTrans)
+            //                {
+            //                    $name = $this->translator->trans('wildberries.fbo.section.contact.field.'.$field.'.name', domain: 'profile.type', locale: $SectionFieldTrans->getLocal()->getLocalValue());
+            //                    $desc = $this->translator->trans('wildberries.fbo.section.contact.field.'.$field.'.desc', domain: 'profile.type', locale: $SectionFieldTrans->getLocal()->getLocalValue());
+            //
+            //                    $SectionFieldTrans->setName($name);
+            //                    $SectionFieldTrans->setDescription($desc);
+            //                }
+            //
+            //                $SectionDTO->addField($SectionFieldDTO);
+            //            }
 
-            $TypeProfileDTO->addSection($SectionDTO);
-
-            /* Добавляем поля для заполнения */
-
-            $fields = ['name', 'email', 'phone'];
-
-            foreach($fields as $sort => $field)
-            {
-                $SectionFieldDTO = new SectionFieldDTO();
-                $SectionFieldDTO->setSort($sort);
-                $SectionFieldDTO->setPublic(true);
-                $SectionFieldDTO->setRequired(true);
-
-                $SectionFieldDTO->setType(new InputField('input_field'));
-
-                if($field === 'name')
-                {
-                    $SectionFieldDTO->setType(new InputField('contact_field'));
-                }
-
-                if($field === 'email')
-                {
-                    $SectionFieldDTO->setType(new InputField('account_email'));
-                    $SectionFieldDTO->setRequired(false);
-                }
-
-                if($field === 'phone')
-                {
-                    $SectionFieldDTO->setType(new InputField('phone_field'));
-                }
-
-
-                /** @var SectionFieldTransDTO $SectionFieldTrans */
-                foreach($SectionFieldDTO->getTranslate() as $SectionFieldTrans)
-                {
-                    $name = $this->translator->trans('wildberries.fbo.section.contact.field.'.$field.'.name', domain: 'profile.type', locale: $SectionFieldTrans->getLocal()->getLocalValue());
-                    $desc = $this->translator->trans('wildberries.fbo.section.contact.field.'.$field.'.desc', domain: 'profile.type', locale: $SectionFieldTrans->getLocal()->getLocalValue());
-
-                    $SectionFieldTrans->setName($name);
-                    $SectionFieldTrans->setDescription($desc);
-                }
-
-                $SectionDTO->addField($SectionFieldDTO);
-            }
-
-
-            $TypeProfileDTO->addSection($SectionDTO);
+            //            $TypeProfileDTO->addSection($SectionDTO);
 
             $handle = $this->profileHandler->handle($TypeProfileDTO);
 

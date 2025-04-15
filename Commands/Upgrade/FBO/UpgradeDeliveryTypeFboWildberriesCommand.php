@@ -47,8 +47,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AsCommand(
-    name: 'baks:delivery:wildberries-dbs',
-    description: 'Добавляет собственную доставку клиенту Wildberries'
+    name: 'baks:delivery:wildberries-fbo',
+    description: 'Добавляет доставку FBO Wildberries'
 )]
 class UpgradeDeliveryTypeFboWildberriesCommand extends Command
 {

@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -70,7 +70,7 @@ class UpgradeProfileTypeDbsWildberriesCommand extends Command
         if(!$exists)
         {
             $io = new SymfonyStyle($input, $output);
-            $io->text('Добавляем тип профиля Wildberries DBS');
+            $io->text('Добавляем тип профиля DBS Wildberries');
 
             $TypeProfileDTO = new TypeProfileDTO();
             $TypeProfileDTO->setSort(TypeProfileDbsWildberries::priority());

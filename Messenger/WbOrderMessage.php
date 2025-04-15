@@ -1,17 +1,17 @@
 <?php
 /*
- *  Copyright 2023.  Baks.dev <admin@baks.dev>
- *
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
  *  in the Software without restriction, including without limitation the rights
  *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *  copies of the Software, and to permit persons to whom the Software is furnished
  *  to do so, subject to the following conditions:
- *
+ *  
  *  The above copyright notice and this permission notice shall be included in all
  *  copies or substantial portions of the Software.
- *
+ *  
  *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *  FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
@@ -34,24 +34,27 @@ final class WbOrderMessage
     /**
      * Идентификатор
      */
-    private OrderUid $id;
+    private $id;
 
     /**
      * Идентификатор события
      */
-    private WbOrdersEventUid $event;
+    private string $event;
 
     /**
      * Идентификатор предыдущего события
      */
-    private ?WbOrdersEventUid $last;
+    private string|null $last;
 
-
-    public function __construct(OrderUid $id, WbOrdersEventUid $event, ?WbOrdersEventUid $last = null)
+    public function __construct(
+        OrderUid|string $id,
+        WbOrdersEventUid|string $event,
+        WbOrdersEventUid|string|null $last = null
+    )
     {
-        $this->id = $id;
-        $this->event = $event;
-        $this->last = $last;
+        $this->id = (string) $id;
+        $this->event = (string) $event;
+        $this->last = $last ? (string) $last : null;
     }
 
 
@@ -60,7 +63,7 @@ final class WbOrderMessage
      */
     public function getId(): OrderUid
     {
-        return $this->id;
+        return new OrderUid($this->id);
     }
 
 
@@ -69,7 +72,7 @@ final class WbOrderMessage
      */
     public function getEvent(): WbOrdersEventUid
     {
-        return $this->event;
+        return new WbOrdersEventUid($this->event);
     }
 
 
@@ -78,6 +81,6 @@ final class WbOrderMessage
      */
     public function getLast(): ?WbOrdersEventUid
     {
-        return $this->last;
+        return $this->last ? new WbOrdersEventUid($this->last) : null;
     }
 }

@@ -42,8 +42,8 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AsCommand(
-    name: 'baks:payment:wildberries-dbs',
-    description: 'Добавляет способ оплаты DBS Wildberries'
+    name: 'baks:payment:wildberries-fbo',
+    description: 'Добавляет способ оплаты FBO Wildberries'
 )]
 class UpgradePaymentTypeFboWildberriesCommand extends Command
 {
@@ -67,7 +67,7 @@ class UpgradePaymentTypeFboWildberriesCommand extends Command
         if(!$exists)
         {
             $io = new SymfonyStyle($input, $output);
-            $io->text('Добавляем способ оплаты Wildberries');
+            $io->text('Добавляем способ оплаты FBO Wildberries');
 
             $PaymentDTO = new PaymentDTO($PaymentUid);
             $PaymentDTO->setType(new TypeProfileUid(TypeProfileFboWildberries::class));

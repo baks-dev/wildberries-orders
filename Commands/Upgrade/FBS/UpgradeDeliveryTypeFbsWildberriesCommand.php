@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -48,7 +48,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[AsCommand(
     name: 'baks:delivery:wildberries-fbs',
-    description: 'Добавляет курьерскую доставку FBS Wildberries'
+    description: 'Добавляет доставку FBS Wildberries'
 )]
 class UpgradeDeliveryTypeFbsWildberriesCommand extends Command
 {
@@ -72,7 +72,7 @@ class UpgradeDeliveryTypeFbsWildberriesCommand extends Command
         if(!$exists)
         {
             $io = new SymfonyStyle($input, $output);
-            $io->text('Добавляем курьерскую доставку Wildberries');
+            $io->text('Добавляем доставку FBS Wildberries');
 
             $DeliveryDTO = new DeliveryDTO($DeliveryUid);
 

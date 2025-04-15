@@ -112,7 +112,7 @@ final class CheckStatusWhenChangeOrderStatusDispatcher
         $this->messageDispatch->dispatch(
             $WildberriesOrderCompletedMessage,
             stamps: [new MessageDelay('1 day')],
-            transport: 'wildberries-orders-low',
+            transport: $OrderEvent->getOrderProfile().'-low',
         );
     }
 }
