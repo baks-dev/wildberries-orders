@@ -295,7 +295,10 @@ final class WildberriesOrderHandler extends AbstractHandler
          * Присваиваем активное событие доставки
          */
 
-        $DeliveryEvent = $this->currentDeliveryEvent->get($OrderDeliveryDTO->getDelivery());
-        $OrderDeliveryDTO->setEvent($DeliveryEvent?->getId());
+        $DeliveryEventUid = $this->currentDeliveryEvent
+            ->forDelivery($OrderDeliveryDTO->getDelivery())
+            ->getId();
+
+        $OrderDeliveryDTO->setEvent($DeliveryEventUid);
     }
 }

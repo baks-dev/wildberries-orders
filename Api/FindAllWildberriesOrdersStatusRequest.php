@@ -99,8 +99,13 @@ final class FindAllWildberriesOrdersStatusRequest extends Wildberries
             if($response->getStatusCode() !== 200)
             {
                 $this->logger->critical(
-                    'wildberries-orders: Ошибка при получении статусов сборочных заданий',
-                    [$orders, $content, self::class.':'.__LINE__]
+                    sprintf('wildberries-orders: Ошибка %s при получении статусов сборочных заданий', $response->getStatusCode()),
+                    [
+                        'orders' => $orders,
+                        'content' => $content,
+                        'profile' => (string) $this->profile,
+                        self::class.':'.__LINE__
+                    ]
                 );
 
                 continue;
