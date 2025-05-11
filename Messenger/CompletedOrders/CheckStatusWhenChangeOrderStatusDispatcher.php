@@ -83,7 +83,7 @@ final class CheckStatusWhenChangeOrderStatusDispatcher
         }
 
         /** Если тип заказа не FBS Wildberries «Доставка службой Wildberries» */
-        if($OrderEvent->isDeliveryTypeEquals(TypeDeliveryFbsWildberries::TYPE))
+        if(false === $OrderEvent->isDeliveryTypeEquals(TypeDeliveryFbsWildberries::TYPE))
         {
             return;
         }

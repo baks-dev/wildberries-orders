@@ -78,7 +78,6 @@ final class FindAllWildberriesOrdersStatusRequest extends Wildberries
             return false;
         }
 
-
         $chunk = array_chunk($this->orders, 1000);
 
         $result = [];
@@ -94,7 +93,15 @@ final class FindAllWildberriesOrdersStatusRequest extends Wildberries
                 ['json' => $data],
             );
 
+            /** Если попадаем на блокировку - включаем ожидание */
+            if($response->getStatusCode() === 429)
+            {
+                sleep(60);
+                continue;
+            }
+
             $content = $response->toArray(false);
+
 
             if($response->getStatusCode() !== 200)
             {
@@ -114,7 +121,6 @@ final class FindAllWildberriesOrdersStatusRequest extends Wildberries
             $result = array_merge($content['orders'], $result);
 
         }
-
 
         return $result;
     }
