@@ -192,8 +192,11 @@ class UpdateWildberriesOrdersCompletedCommand extends Command
                 continue;
             }
 
-            /** Делаем задержку от блока */
-            usleep(500000);
+            if(false === $async)
+            {
+                /** Делаем задержку от блока */
+                usleep(500000);
+            }
 
             /* Отправляем сообщение в шину профиля */
             $this->messageDispatch->dispatch(

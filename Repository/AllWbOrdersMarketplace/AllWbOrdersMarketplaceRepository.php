@@ -132,6 +132,8 @@ final class AllWbOrdersMarketplaceRepository implements AllWbOrdersMarketplaceIn
                 type: ArrayParameterType::STRING
             );
 
+        $dbal->orderBy('event.created');
+
         return $dbal->fetchAllHydrate(AllWbOrdersMarketplaceResult::class);
     }
 }
