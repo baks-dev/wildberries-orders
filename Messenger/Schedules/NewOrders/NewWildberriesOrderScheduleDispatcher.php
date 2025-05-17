@@ -32,6 +32,8 @@ use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersNewRequest;
 use BaksDev\Wildberries\Orders\Schedule\NewOrders\UpdateWildberriesOrdersNewSchedules;
 use BaksDev\Wildberries\Orders\UseCase\New\WildberriesOrderDTO;
 use BaksDev\Wildberries\Orders\UseCase\New\WildberriesOrderHandler;
+use BaksDev\Wildberries\Products\Api\Cards\FindAllWildberriesCardsRequest;
+use BaksDev\Wildberries\Products\Api\Cards\WildberriesCardDTO;
 use BaksDev\Wildberries\Products\Messenger\Cards\CardNew\WildberriesCardNewMassage;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Target;
@@ -43,6 +45,7 @@ final readonly class NewWildberriesOrderScheduleDispatcher
     public function __construct(
         #[Target('wildberriesOrdersLogger')] private LoggerInterface $logger,
         private FindAllWildberriesOrdersNewRequest $wildberriesOrdersNew,
+        private FindAllWildberriesCardsRequest $WildberriesCardsRequest,
         private DeduplicatorInterface $deduplicator,
         private WildberriesOrderHandler $WildberriesOrderHandler,
         private MessageDispatchInterface $messageDispatch
@@ -98,7 +101,7 @@ final readonly class NewWildberriesOrderScheduleDispatcher
             {
                 $this->logger->info(
                     sprintf('Новый заказ %s уже добавлен в систему', $WildberriesOrderDTO->getNumber()),
-                    [self::class.':'.__LINE__]
+                    [self::class.':'.__LINE__],
                 );
 
                 $Deduplicator->save();
@@ -109,7 +112,7 @@ final readonly class NewWildberriesOrderScheduleDispatcher
             {
                 $this->logger->critical(
                     sprintf('wildberries-orders: Ошибка при добавлении нового заказа %s', $WildberriesOrderDTO->getNumber()),
-                    [$handle, $message->getProfile(), self::class.':'.__LINE__]
+                    [$handle, $message->getProfile(), self::class.':'.__LINE__],
                 );
 
                 /**
@@ -121,23 +124,36 @@ final readonly class NewWildberriesOrderScheduleDispatcher
                 $article = explode(' ', current($article));
                 $article = current($article);
 
-                $WildberriesCardNewMassage = new WildberriesCardNewMassage(
-                    $message->getProfile(),
-                    $article
-                );
+                /** Получаем список карточек WB */
 
-                $this->messageDispatch
-                    ->dispatch(
-                        message: $WildberriesCardNewMassage,
-                        transport: (string) $message->getProfile()
+                $WildberriesCards = $this->WildberriesCardsRequest
+                    ->profile($message->getProfile())
+                    ->findAll();
+
+                /** @var WildberriesCardDTO $WildberriesCardDTO */
+                foreach($WildberriesCards as $WildberriesCardDTO)
+                {
+                    if(stripos($WildberriesCardDTO->getArticle(), $article) === false)
+                    {
+                        continue;
+                    }
+
+                    /** Передаем на обновление найденный артикул */
+                    $WildberriesCardNewMassage = new WildberriesCardNewMassage(
+                        profile: $message->getProfile(),
+                        article: $WildberriesCardDTO->getArticle(),
                     );
 
-                continue;
+                    $this->messageDispatch->dispatch(
+                        $WildberriesCardNewMassage,
+                        transport: (string) $message->getProfile(),
+                    );
+                }
             }
 
             $this->logger->info(
                 sprintf('Добавили новый заказ %s', $WildberriesOrderDTO->getNumber()),
-                [self::class.':'.__LINE__]
+                [self::class.':'.__LINE__],
             );
 
             $Deduplicator->save();
