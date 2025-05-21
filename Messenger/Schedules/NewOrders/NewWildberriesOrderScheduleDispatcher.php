@@ -105,6 +105,7 @@ final readonly class NewWildberriesOrderScheduleDispatcher
                 );
 
                 $Deduplicator->save();
+
                 continue;
             }
 
@@ -120,15 +121,15 @@ final readonly class NewWildberriesOrderScheduleDispatcher
                  */
 
                 $article = explode(':', $handle);
-                $article = explode('-', current($article));
-                $article = explode(' ', current($article));
+                //$article = explode('-', current($article));
+                //$article = explode(' ', current($article));
                 $article = current($article);
 
                 /** Получаем список карточек WB */
 
                 $WildberriesCards = $this->WildberriesCardsRequest
                     ->profile($message->getProfile())
-                    ->findAll();
+                    ->findAll($article);
 
                 /** @var WildberriesCardDTO $WildberriesCardDTO */
                 foreach($WildberriesCards as $WildberriesCardDTO)
