@@ -90,7 +90,7 @@ final class PostWildberriesSgtinRequest extends Wildberries
                 [self::class.':'.__LINE__]
             );
 
-            return true;
+            return false;
         }
 
         $data['sgtins'] = $this->sgtin;
