@@ -111,19 +111,17 @@ final readonly class NewWildberriesOrderScheduleDispatcher
 
             if(false === ($handle instanceof Order))
             {
-                $this->logger->critical(
-                    sprintf('wildberries-orders: Ошибка при добавлении нового заказа %s', $WildberriesOrderDTO->getNumber()),
-                    [$handle, $message->getProfile(), self::class.':'.__LINE__],
-                );
-
                 /**
                  * Пробуем обновить карточку по артикулу
                  */
 
                 $article = explode(':', $handle);
-                //$article = explode('-', current($article));
-                //$article = explode(' ', current($article));
                 $article = current($article);
+
+                $this->logger->critical(
+                    sprintf('wildberries-orders: Ошибка при добавлении нового заказа %s. Пробуем добавить карточку по артикулу %s', $WildberriesOrderDTO->getNumber(), $article),
+                    [$handle, $message->getProfile(), self::class.':'.__LINE__],
+                );
 
                 /** Получаем список карточек WB */
 
@@ -134,11 +132,6 @@ final readonly class NewWildberriesOrderScheduleDispatcher
                 /** @var WildberriesCardDTO $WildberriesCardDTO */
                 foreach($WildberriesCards as $WildberriesCardDTO)
                 {
-                    if(stripos($WildberriesCardDTO->getArticle(), $article) === false)
-                    {
-                        continue;
-                    }
-
                     /** Передаем на обновление найденный артикул */
                     $WildberriesCardNewMassage = new WildberriesCardNewMassage(
                         profile: $message->getProfile(),
