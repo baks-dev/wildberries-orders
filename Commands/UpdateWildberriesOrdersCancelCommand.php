@@ -141,7 +141,7 @@ class UpdateWildberriesOrdersCancelCommand extends Command
 
         foreach($profiles as $profile)
         {
-            if($profile->getAttr() === $questions[$key])
+            if($profile->getAttr() === $key)
             {
                 /* Присваиваем профиль пользователя */
                 $UserProfileUid = $profile;
