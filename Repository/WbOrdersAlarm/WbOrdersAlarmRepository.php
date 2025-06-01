@@ -84,7 +84,7 @@ final readonly class WbOrdersAlarmRepository implements WbOrdersAlarmInterface
             'orders_delivery',
             '
                 orders_delivery.usr = orders_user.id AND
-                orders_delivery.delivery_date < ( NOW() - interval \'24 HOUR\')
+                orders_delivery.delivery_date < NOW()
             '
         );
 

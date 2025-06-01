@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2024.  Baks.dev <admin@baks.dev>
+ *  Copyright 2025.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -30,23 +30,23 @@ use BaksDev\Products\Product\Type\Event\ProductEventUid;
 use BaksDev\Products\Product\Type\Id\ProductUid;
 
 
-final class UpdateStatisticMessage
+final readonly class UpdateStatisticMessage
 {
     /**
      * Идентификатор
      */
-    private readonly ProductUid $id;
+    private string $id;
 
     /**
      * Идентификатор события
      */
-    private readonly ProductEventUid $event;
+    private string $event;
 
 
     public function __construct(ProductUid $id, ProductEventUid $event)
     {
-        $this->id = $id;
-        $this->event = $event;
+        $this->id = (string) $id;
+        $this->event = (string) $event;
     }
 
 
@@ -55,7 +55,7 @@ final class UpdateStatisticMessage
      */
     public function getProduct(): ProductUid
     {
-        return $this->id;
+        return new ProductUid($this->id);
     }
 
 
@@ -64,7 +64,7 @@ final class UpdateStatisticMessage
      */
     public function getProductEvent(): ProductEventUid
     {
-        return $this->event;
+        return new ProductEventUid($this->event);
     }
 
 }
