@@ -119,7 +119,7 @@ final readonly class CancelWildberriesOrdersScheduleDispatcher
 
             if(false === $OrderUid)
             {
-                $this->logger->warning('wildberries-orders: Заказа %s для отмены не найдено', $cancel);
+                $this->logger->warning('Заказа %s для отмены не найдено', $cancel);
 
                 continue;
             }
@@ -130,7 +130,7 @@ final readonly class CancelWildberriesOrdersScheduleDispatcher
 
             if(false === ($OrderEvent instanceof OrderEvent))
             {
-                $this->logger->warning('wildberries-orders: События для отмены заказа  %s не найдено', $cancel);
+                $this->logger->warning('События для отмены заказа  %s не найдено', $cancel);
 
                 continue;
             }
@@ -159,13 +159,13 @@ final readonly class CancelWildberriesOrdersScheduleDispatcher
 
             if(false === ($Order instanceof Order))
             {
-                $this->logger->critical('wildberries-orders: Ошибка при отмене заказа %s', $cancel);
+                $this->logger->critical('Ошибка при отмене заказа %s', $cancel);
                 continue;
             }
 
             $Deduplicator->save();
 
-            $this->logger->info(sprintf('wildberries-orders: Заказ %s успешно отменен', $cancel));
+            $this->logger->info(sprintf('Заказ %s успешно отменен', $cancel));
         }
 
 
