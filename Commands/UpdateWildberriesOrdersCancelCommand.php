@@ -47,19 +47,12 @@ class UpdateWildberriesOrdersCancelCommand extends Command
 {
     private SymfonyStyle $io;
 
-    private AllProfileTokenInterface $allProfileToken;
-
-    private MessageDispatchInterface $messageDispatch;
-
     public function __construct(
-        AllProfileTokenInterface $allProfileToken,
-        MessageDispatchInterface $messageDispatch,
+        private readonly AllProfileTokenInterface $allProfileToken,
+        private readonly MessageDispatchInterface $messageDispatch,
     )
     {
         parent::__construct();
-
-        $this->allProfileToken = $allProfileToken;
-        $this->messageDispatch = $messageDispatch;
     }
 
 
@@ -101,7 +94,7 @@ class UpdateWildberriesOrdersCancelCommand extends Command
         $question = new ChoiceQuestion(
             'Профиль пользователя (Ctrl+C чтобы выйти)',
             $questions,
-            '0'
+            '0',
         );
 
         $key = $helper->ask($input, $output, $question);
@@ -169,7 +162,7 @@ class UpdateWildberriesOrdersCancelCommand extends Command
         /* Отправляем сообщение в шину профиля */
         $this->messageDispatch->dispatch(
             message: new CancelWildberriesOrdersScheduleMessage($profile)->disableDeduplicator(),
-            transport: $async === true ? (string) $profile : null
+            transport: $async === true ? (string) $profile : null,
         );
     }
 
