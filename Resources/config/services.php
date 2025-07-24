@@ -43,4 +43,18 @@ return static function(ContainerConfigurator $configurator) {
             $PATH.'**'.DIRECTORY_SEPARATOR.'*Test.php',
         ]);
 
+    $services->load(
+        $NAMESPACE.'Type\DeliveryType\\',
+        $PATH.implode(DIRECTORY_SEPARATOR, ['Type', 'DeliveryType']),
+    );
+
+    $services->load(
+        $NAMESPACE.'Type\ProfileType\\',
+        $PATH.implode(DIRECTORY_SEPARATOR, ['Type', 'ProfileType']),
+    );
+
+    $services->load(
+        $NAMESPACE.'Type\PaymentType\\',
+        $PATH.implode(DIRECTORY_SEPARATOR, ['Type', 'PaymentType']),
+    );
 };
