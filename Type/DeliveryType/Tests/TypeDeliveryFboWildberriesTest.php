@@ -29,14 +29,11 @@ use BaksDev\Core\Doctrine\DBALQueryBuilder;
 use BaksDev\Delivery\Type\Id\DeliveryUid;
 use BaksDev\Wildberries\Orders\Type\DeliveryType\TypeDeliveryFboWildberries;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
-
-/**
- * @group wildberries-orders
- * @group wildberries-orders-type-delivery
- */
+#[Group('wildberries-orders')]
 #[When(env: 'test')]
 class TypeDeliveryFboWildberriesTest extends KernelTestCase
 {

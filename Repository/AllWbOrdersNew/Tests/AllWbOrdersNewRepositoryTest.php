@@ -28,13 +28,11 @@ namespace BaksDev\Wildberries\Orders\Repository\AllWbOrdersNew\Tests;
 use BaksDev\Core\Doctrine\DBALQueryBuilder;
 use BaksDev\Wildberries\Orders\Repository\AllWbOrdersNew\AllWbOrdersNewInterface;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
-
-/**
- * @group wildberries-orders
- */
+#[Group('wildberries-orders')]
 #[When(env: 'test')]
 class AllWbOrdersNewRepositoryTest extends KernelTestCase
 {

@@ -30,13 +30,11 @@ use BaksDev\Products\Product\Type\Event\ProductEventUid;
 use BaksDev\Wildberries\Orders\Repository\WbOrdersAnalog\WbOrdersAnalogInterface;
 use BaksDev\Wildberries\Orders\Repository\WbOrdersAnalog\WbOrdersAnalogRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
-
-/**
- * @group wildberries-orders
- */
+#[Group('wildberries-orders')]
 #[When(env: 'test')]
 class WbOrdersAnalogRepositoryTest extends KernelTestCase
 {

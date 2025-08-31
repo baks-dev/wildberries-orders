@@ -28,13 +28,11 @@ namespace BaksDev\Wildberries\Orders\Repository\WbOrdersAlarm\Tests;
 use BaksDev\Products\Product\Type\Event\ProductEventUid;
 use BaksDev\Wildberries\Orders\Repository\WbOrdersAlarm\WbOrdersAlarmInterface;
 use BaksDev\Wildberries\Orders\Repository\WbOrdersAlarm\WbOrdersAlarmRepository;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
-
-/**
- * @group wildberries-orders
- */
+#[Group('wildberries-orders')]
 #[When(env: 'test')]
 class WbOrdersAlarmRepositoryTest extends KernelTestCase
 {

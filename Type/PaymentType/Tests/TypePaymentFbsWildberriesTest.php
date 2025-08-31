@@ -28,14 +28,11 @@ namespace BaksDev\Wildberries\Orders\Type\PaymentType\Tests;
 
 use BaksDev\Payment\Type\Id\PaymentUid;
 use BaksDev\Wildberries\Orders\Type\PaymentType\TypePaymentFbsWildberries;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
-
-/**
- * @group wildberries-orders
- * @group wildberries-orders-type-payment
- */
+#[Group('wildberries-orders')]
 #[When(env: 'test')]
 class TypePaymentFbsWildberriesTest extends KernelTestCase
 {

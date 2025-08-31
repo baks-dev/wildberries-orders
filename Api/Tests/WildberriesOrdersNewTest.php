@@ -34,13 +34,11 @@ use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersNewRequest;
 use BaksDev\Wildberries\Orders\UseCase\New\WildberriesOrderDTO;
 use BaksDev\Wildberries\Orders\UseCase\New\WildberriesOrderHandler;
 use BaksDev\Wildberries\Type\Authorization\WbAuthorizationToken;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
-
-/**
- * @group wildberries-orders
- */
+#[Group('wildberries-orders')]
 #[When(env: 'test')]
 class WildberriesOrdersNewTest extends KernelTestCase
 {

@@ -49,10 +49,6 @@ use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\DependencyInjection\Attribute\When;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-/**
- * @group yandex-market-orders
- * @group yandex-market-orders-new
- */
 #[When(env: 'test')]
 class WildberriesOrderDBSTest extends KernelTestCase
 {

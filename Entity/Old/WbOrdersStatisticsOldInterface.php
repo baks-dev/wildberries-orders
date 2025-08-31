@@ -21,32 +21,19 @@
  *  THE SOFTWARE.
  */
 
-declare(strict_types=1);
+namespace BaksDev\Wildberries\Orders\Entity\Old;
 
-namespace BaksDev\Wildberries\Orders\Type\DeliveryType\Tests;
+use BaksDev\Products\Product\Type\Invariable\ProductInvariableUid;
 
-use BaksDev\Core\Doctrine\DBALQueryBuilder;
-use BaksDev\Delivery\Type\Id\DeliveryUid;
-use BaksDev\Wildberries\Orders\Type\DeliveryType\TypeDeliveryDbsWildberries;
-use Doctrine\ORM\EntityManagerInterface;
-use PHPUnit\Framework\Attributes\Group;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use Symfony\Component\DependencyInjection\Attribute\When;
-
-#[Group('wildberries-orders')]
-#[When(env: 'test')]
-class TypeDeliveryDbsWildberriesTest extends KernelTestCase
+interface WbOrdersStatisticsOldInterface
 {
-    public function testUseCase(): void
-    {
-        $DeliveryUid = new DeliveryUid(TypeDeliveryDbsWildberries::TYPE);
-        self::assertTrue($DeliveryUid->equals(new DeliveryUid(TypeDeliveryDbsWildberries::TYPE)));
+    public function getInvariable(): ProductInvariableUid;
 
-        self::assertTrue($DeliveryUid->equals(TypeDeliveryDbsWildberries::class));
-        self::assertTrue($DeliveryUid->equals(TypeDeliveryDbsWildberries::TYPE));
+    /**
+     * Значение свойства
+     *
+     * @see WbOrdersStatisticsOld
+     */
+    public function getValue(): ?int;
 
-        self::assertTrue($DeliveryUid->equals(new DeliveryUid(TypeDeliveryDbsWildberries::class)));
-        self::assertTrue($DeliveryUid->equals(new DeliveryUid(TypeDeliveryDbsWildberries::TYPE)));
-
-    }
 }

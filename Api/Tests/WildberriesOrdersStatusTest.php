@@ -31,13 +31,11 @@ use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Users\Profile\UserProfile\UseCase\User\NewEdit\Tests\UserNewUserProfileHandleTest;
 use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersStatusRequest;
 use BaksDev\Wildberries\Type\Authorization\WbAuthorizationToken;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
-
-/**
- * @group wildberries-orders
- */
+#[Group('wildberries-orders')]
 #[When(env: 'test')]
 class WildberriesOrdersStatusTest extends KernelTestCase
 {

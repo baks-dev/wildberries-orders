@@ -27,12 +27,11 @@ namespace BaksDev\Wildberries\Orders\Type\ProfileType\Tests;
 
 use BaksDev\Users\Profile\TypeProfile\Type\Id\TypeProfileUid;
 use BaksDev\Wildberries\Orders\Type\ProfileType\TypeProfileFbsWildberries;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\DependencyInjection\Attribute\When;
 
-/**
- * @group wildberries-orders
- * @group wildberries-orders-type-profile
- */
+#[Group('wildberries-orders')]
 #[When(env: 'test')]
 class TypeProfileFbsWildberriesTest extends KernelTestCase
 {

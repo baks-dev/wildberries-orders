@@ -26,13 +26,11 @@ declare(strict_types=1);
 namespace BaksDev\Wildberries\Orders\Api\WildberriesOrdersSticker\Tests;
 
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
+use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
-/**
- * @group wildberries
- * @group wildberries-api
- */
+#[Group('wildberries-orders')]
 #[When(env: 'test')]
 final class WildberriesOrdersStickerTest extends KernelTestCase
 {
