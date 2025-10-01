@@ -2,7 +2,7 @@
 
 
     {# Обложка #}
-    {% set image_path = '/assets/img/blank.svg' %}
+    {% set image_path = '/assets/'~version~'/img/blank.svg' %}
 
     {% if card.product_image_ext is defined and card.product_image_ext is not null %}
         {% set img_host =  card.product_image_cdn == true  ? CDN_HOST : '' %}
