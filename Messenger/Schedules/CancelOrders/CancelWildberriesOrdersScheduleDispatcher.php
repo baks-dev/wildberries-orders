@@ -71,7 +71,7 @@ final readonly class CancelWildberriesOrdersScheduleDispatcher
         $DeduplicatorExecuted->save();
 
         /**
-         * Получаем все новые заказы Wildberries
+         * Получаем все заказы Wildberries
          */
 
         $orders = $this->AllWbOrdersNewInterface
@@ -151,9 +151,8 @@ final readonly class CancelWildberriesOrdersScheduleDispatcher
 
             $OrderCanceledDTO = new CanceledOrderDTO();
             $OrderEvent->getDto($OrderCanceledDTO);
-            $OrderCanceledDTO
-                ->setProfile($message->getProfile())
-                ->setComment('Отмена пользователем');
+            $OrderCanceledDTO->setComment('Отмена пользователем');
+
 
             $Order = $this->OrderStatusHandler->handle($OrderCanceledDTO);
 
