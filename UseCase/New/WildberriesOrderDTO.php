@@ -277,7 +277,6 @@ final class WildberriesOrderDTO implements OrderEventInterface
         return $this->comment;
     }
 
-
     /**
      * Invariable
      */
@@ -285,19 +284,4 @@ final class WildberriesOrderDTO implements OrderEventInterface
     {
         return $this->invariable;
     }
-
-    /**
-     * Profile
-     */
-    public function getProfile(): ?UserProfileUid
-    {
-        return $this->profile;
-    }
-
-    public function resetProfile(?UserProfileUid $profile = null): self
-    {
-        $this->profile = $profile;
-        return $this;
-    }
-
 }
