@@ -34,14 +34,14 @@ final class WbOrdersAnalogDTO implements WbOrdersStatisticsAnalogInterface
 {
     /** Идентификатор */
     #[Assert\Uuid]
-    private string $invariable;
+    private ProductInvariableUid $invariable;
 
     public function __construct(
         ProductInvariableUid $invariable,
         private readonly int $value,
     )
     {
-        $this->invariable = (string) $invariable;
+        $this->invariable = $invariable;
     }
 
     /**
@@ -51,7 +51,7 @@ final class WbOrdersAnalogDTO implements WbOrdersStatisticsAnalogInterface
      */
     public function getInvariable(): ProductInvariableUid
     {
-        return new ProductInvariableUid($this->invariable);
+        return $this->invariable;
     }
 
     public function getValue(): ?int

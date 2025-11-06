@@ -37,10 +37,17 @@ final class WbOrdersAnalogHandler extends AbstractHandler
         $this->setCommand($command);
 
         $WbOrdersStatisticsAnalog = $this
-            ->getRepository(WbOrdersStatisticsAnalog::class)->find($command->getInvariable())
-            ?: new WbOrdersStatisticsAnalog();
+            ->getRepository(WbOrdersStatisticsAnalog::class)->find($command->getInvariable());
+
+
+        if (false === $WbOrdersStatisticsAnalog instanceof WbOrdersStatisticsAnalog) {
+            $WbOrdersStatisticsAnalog = new WbOrdersStatisticsAnalog($command->getInvariable());
+
+            $this->persist($WbOrdersStatisticsAnalog);
+        }
 
         $WbOrdersStatisticsAnalog->setEntity($command);
+
 
         /** Валидация всех объектов */
         if($this->validatorCollection->isInvalid())
