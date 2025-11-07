@@ -53,6 +53,10 @@ class WbOrdersStatisticsAlarm extends EntityState
     #[ORM\Column(type: Types::SMALLINT, options: ['default' => 0])]
     private int $value = 0;
 
+    public function __construct(ProductInvariableUid $invariable)
+    {
+        $this->invariable = $invariable;
+    }
 
     public function __toString(): string
     {
@@ -83,4 +87,5 @@ class WbOrdersStatisticsAlarm extends EntityState
 
         throw new InvalidArgumentException(sprintf('Class %s interface error', $dto::class));
     }
+
 }

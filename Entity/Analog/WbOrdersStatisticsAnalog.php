@@ -55,6 +55,11 @@ class WbOrdersStatisticsAnalog extends EntityState
     #[ORM\Column(type: Types::SMALLINT, options: ['default' => 0])]
     private int $value = 0;
 
+    public function __construct(ProductInvariableUid $invariable)
+    {
+        $this->invariable = $invariable;
+    }
+
     public function __toString(): string
     {
         return (string) $this->invariable;
@@ -91,4 +96,5 @@ class WbOrdersStatisticsAnalog extends EntityState
 
         throw new InvalidArgumentException(sprintf('Class %s interface error', $dto::class));
     }
+
 }

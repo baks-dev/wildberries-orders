@@ -37,10 +37,19 @@ final class WbOrdersAlarmHandler extends AbstractHandler
         $this->setCommand($command);
 
         $WbOrdersStatisticsAlarm = $this
-            ->getRepository(WbOrdersStatisticsAlarm::class)->find($command->getInvariable())
-            ?: new WbOrdersStatisticsAlarm();
+            ->getRepository(WbOrdersStatisticsAlarm::class)->find($command->getInvariable());
+
+
+        if (false ===  $WbOrdersStatisticsAlarm instanceof WbOrdersStatisticsAlarm) {
+            $WbOrdersStatisticsAlarm = new WbOrdersStatisticsAlarm($command->getInvariable());
+            
+            $this->persist($WbOrdersStatisticsAlarm);
+
+        }
+
 
         $WbOrdersStatisticsAlarm->setEntity($command);
+
 
         /** Валидация всех объектов */
         if($this->validatorCollection->isInvalid())
@@ -51,6 +60,7 @@ final class WbOrdersAlarmHandler extends AbstractHandler
         $this->flush();
 
         $this->messageDispatch->addClearCacheOther('wildberries-orders');
+
 
         return $WbOrdersStatisticsAlarm;
     }
