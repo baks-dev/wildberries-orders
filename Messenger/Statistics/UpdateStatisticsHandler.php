@@ -53,13 +53,18 @@ final readonly class UpdateStatisticsHandler
             return;
         }
 
-        /** @var OrderProductResultDTO $OrderProductResultDTO */
         foreach($products as $OrderProductResultDTO)
         {
             /* Отправляем сообщение в шину для обновления статистики */
             $this->messageDispatch->dispatch(
-                message: new UpdateStatisticMessage($OrderProductResultDTO->getProduct(), $OrderProductResultDTO->getProductEvent(), $OrderProductResultDTO->getProductInvariable()),
-                transport: 'async'
+                message: new UpdateStatisticMessage(
+                    $OrderProductResultDTO->getProductEvent(),
+                    $OrderProductResultDTO->getProductOffer(),
+                    $OrderProductResultDTO->getProductVariation(),
+                    $OrderProductResultDTO->getProductModification(),
+                    $OrderProductResultDTO->getProductInvariable(),
+                ),
+                transport: 'async',
             );
         }
     }

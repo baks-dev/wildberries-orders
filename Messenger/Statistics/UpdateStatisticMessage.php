@@ -29,41 +29,45 @@ use BaksDev\Orders\Order\Type\Id\OrderUid;
 use BaksDev\Products\Product\Type\Event\ProductEventUid;
 use BaksDev\Products\Product\Type\Id\ProductUid;
 use BaksDev\Products\Product\Type\Invariable\ProductInvariableUid;
+use BaksDev\Products\Product\Type\Offers\Id\ProductOfferUid;
+use BaksDev\Products\Product\Type\Offers\Variation\Id\ProductVariationUid;
+use BaksDev\Products\Product\Type\Offers\Variation\Modification\Id\ProductModificationUid;
 
 
 final readonly class UpdateStatisticMessage
 {
     /**
-     * Идентификатор
-     */
-    private string $id;
-
-    /**
-     * Идентификатор события
+     * Идентификатор события продукта
      */
     private string $event;
+
+    private string $offer;
+
+    private string $variation;
+
+    private string $modification;
+
 
     /**
      * Идентификатор invariable
      */
     private string $invariable;
 
-    public function __construct(ProductUid $id, ProductEventUid $event, ProductInvariableUid $invariable)
+
+    public function __construct(
+        ProductEventUid $event,
+        ProductOfferUid $offer,
+        ProductVariationUid $variation,
+        ProductModificationUid $modification,
+        ProductInvariableUid $invariable
+    )
     {
-        $this->id = (string) $id;
         $this->event = (string) $event;
+        $this->offer = (string) $offer;
+        $this->variation = (string) $variation;
+        $this->modification = (string) $modification;
         $this->invariable = (string) $invariable;
     }
-
-
-    /**
-     * Идентификатор
-     */
-    public function getProduct(): ProductUid
-    {
-        return new ProductUid($this->id);
-    }
-
 
     /**
      * Идентификатор события
@@ -73,6 +77,21 @@ final readonly class UpdateStatisticMessage
         return new ProductEventUid($this->event);
     }
 
+    public function getProductOffer(): ProductOfferUid|false
+    {
+        return $this->offer ? new ProductOfferUid($this->offer) : false;
+    }
+
+    public function getProductVariation(): ProductVariationUid|false
+    {
+        return $this->variation ? new ProductVariationUid($this->variation) : false;
+    }
+
+    public function getProductModification(): ProductModificationUid|false
+    {
+        return $this->modification ? new ProductModificationUid($this->modification) : false;
+    }
+
     /**
      * Идентификатор invariable
      */
@@ -80,5 +99,6 @@ final readonly class UpdateStatisticMessage
     {
         return new ProductInvariableUid($this->invariable);
     }
+
 
 }

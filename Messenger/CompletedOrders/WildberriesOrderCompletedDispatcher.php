@@ -128,7 +128,7 @@ final readonly class WildberriesOrderCompletedDispatcher
             /**  Делаем повторную проверку позже */
 
             $this->logger->warning(
-                sprintf('Заказ %s еще не выполнен! Делаем проверку позже', $message->getIdentifier())
+                sprintf('Заказ %s еще не выполнен! Делаем проверку позже', $message->getIdentifier()),
             );
 
             $this->messageDispatch->dispatch(
@@ -174,8 +174,8 @@ final readonly class WildberriesOrderCompletedDispatcher
                             sprintf('wildberries-orders: Ошибка %s при изменении статуса сырьевого честного знака на Done «Выполнен»', $MaterialSignHandle),
                             [
                                 var_export($message, true),
-                                self::class.':'.__LINE__
-                            ]
+                                self::class.':'.__LINE__,
+                            ],
                         );
 
                         continue;
@@ -222,8 +222,8 @@ final readonly class WildberriesOrderCompletedDispatcher
                             sprintf('wildberries-orders: Ошибка %s при изменении статуса продуктового честного знака на Done «Выполнен»', $ProductSignHandle),
                             [
                                 var_export($message, true),
-                                self::class.':'.__LINE__
-                            ]
+                                self::class.':'.__LINE__,
+                            ],
                         );
 
                         continue;
@@ -249,7 +249,7 @@ final readonly class WildberriesOrderCompletedDispatcher
         {
             $this->logger->critical(
                 sprintf('wildberries-orders: Ошибка %s при изменении статуса заказа на Completed «Выполнен»', $Order),
-                [$message, self::class.':'.__LINE__]
+                [$message, self::class.':'.__LINE__],
             );
 
             return;
