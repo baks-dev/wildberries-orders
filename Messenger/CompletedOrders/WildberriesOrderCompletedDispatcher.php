@@ -78,17 +78,17 @@ final readonly class WildberriesOrderCompletedDispatcher
 
     public function __invoke(WildberriesOrderCompletedMessage $message): void
     {
-        $Deduplicator = $this->deduplicator
-            ->namespace('wildberries-orders')
-            ->deduplication([$message->getIdentifier(), UpdateWildberriesOrdersCompleted::class]);
-
-        /** Пропускаем, если заказ был добавлен в очередь на проверку через консоль */
-        if($message->isDeduplication() && $Deduplicator->isExecuted())
-        {
-            return;
-        }
-
-        $Deduplicator->isExecuted() ?: $Deduplicator->save();
+        //        $Deduplicator = $this->deduplicator
+        //            ->namespace('wildberries-orders')
+        //            ->deduplication([$message->getIdentifier(), UpdateWildberriesOrdersCompleted::class]);
+        //
+        //        /** Пропускаем, если заказ был добавлен в очередь на проверку через консоль */
+        //        if($message->isDeduplication() && $Deduplicator->isExecuted())
+        //        {
+        //            return;
+        //        }
+        //
+        //        $Deduplicator->isExecuted() ?: $Deduplicator->save();
 
         $OrderEvent = $this->CurrentOrderEvent
             ->forOrder($message->getOrder())
