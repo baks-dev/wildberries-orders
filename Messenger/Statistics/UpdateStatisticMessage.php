@@ -41,11 +41,11 @@ final readonly class UpdateStatisticMessage
      */
     private string $event;
 
-    private string $offer;
+    private string|false $offer;
 
-    private string $variation;
+    private string|false $variation;
 
-    private string $modification;
+    private string|false $modification;
 
 
     /**
@@ -55,18 +55,20 @@ final readonly class UpdateStatisticMessage
 
 
     public function __construct(
+        ProductInvariableUid $invariable,
         ProductEventUid $event,
-        ProductOfferUid $offer,
-        ProductVariationUid $variation,
-        ProductModificationUid $modification,
-        ProductInvariableUid $invariable
+        ProductOfferUid|null|false $offer,
+        ProductVariationUid|null|false $variation,
+        ProductModificationUid|null|false $modification,
     )
     {
         $this->event = (string) $event;
-        $this->offer = (string) $offer;
-        $this->variation = (string) $variation;
-        $this->modification = (string) $modification;
         $this->invariable = (string) $invariable;
+
+        $this->offer = $offer instanceof ProductOfferUid ? (string) $offer : false;
+        $this->variation = $variation instanceof ProductVariationUid ? (string) $variation : false;
+        $this->modification = $modification instanceof ProductModificationUid ? (string) $modification : false;
+
     }
 
     /**

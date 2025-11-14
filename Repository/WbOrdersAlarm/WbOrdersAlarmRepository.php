@@ -55,7 +55,7 @@ final class WbOrdersAlarmRepository implements WbOrdersAlarmInterface
 
     private ProductModificationUid|false $modification = false;
 
-    public function __construct(private DBALQueryBuilder $DBALQueryBuilder) {}
+    public function __construct(private readonly DBALQueryBuilder $DBALQueryBuilder) {}
 
     public function forProductEvent(ProductEvent|ProductEventUid|string $product): self
     {
@@ -158,11 +158,11 @@ final class WbOrdersAlarmRepository implements WbOrdersAlarmInterface
 
         $dbal->select('COUNT(*)');
 
-        $dbal->from(Order::class, 'ord');
+        $dbal->from(Order::class, 'orders');
 
         $dbal
             ->join(
-                'ord',
+                'orders',
                 OrderEvent::class,
                 'event',
                 '
@@ -178,11 +178,11 @@ final class WbOrdersAlarmRepository implements WbOrdersAlarmInterface
 
         $dbal
             ->join(
-                'ord',
+                'orders',
                 OrderProduct::class,
                 'product',
                 '
-                    product.event = ord.event AND 
+                    product.event = orders.event AND 
                     product.product = :product AND 
                     product.offer '.(false === ($this->offer instanceof ProductOfferUid) ? ' IS NULL' : ' = :offer').' AND
                     product.variation '.(false === ($this->variation instanceof ProductVariationUid) ? ' IS NULL' : ' = :variation').' AND

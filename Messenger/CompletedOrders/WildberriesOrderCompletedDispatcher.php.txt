@@ -80,7 +80,7 @@ final readonly class WildberriesOrderCompletedDispatcher
     {
         $Deduplicator = $this->deduplicator
             ->namespace('wildberries-orders')
-            ->deduplication([$message->getIdentifier(), UpdateWildberriesOrdersCompletedCommand::class]);
+            ->deduplication([$message->getIdentifier(), UpdateWildberriesOrdersCompleted::class]);
 
         /** Пропускаем, если заказ был добавлен в очередь на проверку через консоль */
         if($message->isDeduplication() && $Deduplicator->isExecuted())

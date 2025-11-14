@@ -31,8 +31,11 @@ use BaksDev\Orders\Order\Repository\OrderProducts\OrderProductResultDTO;
 use BaksDev\Orders\Order\Repository\OrderProducts\OrderProductsInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+/**
+ * При обновлении заказа - обновляем статистику по продукции в заказе
+ */
 #[AsMessageHandler(priority: -100)]
-final readonly class UpdateStatisticsHandler
+final readonly class UpdateStatisticsByChangeOrderHandler
 {
     public function __construct(
         private MessageDispatchInterface $messageDispatch,
@@ -58,11 +61,11 @@ final readonly class UpdateStatisticsHandler
             /* Отправляем сообщение в шину для обновления статистики */
             $this->messageDispatch->dispatch(
                 message: new UpdateStatisticMessage(
-                    $OrderProductResultDTO->getProductEvent(),
-                    $OrderProductResultDTO->getProductOffer(),
-                    $OrderProductResultDTO->getProductVariation(),
-                    $OrderProductResultDTO->getProductModification(),
-                    $OrderProductResultDTO->getProductInvariable(),
+                    invariable: $OrderProductResultDTO->getProductInvariable(),
+                    event: $OrderProductResultDTO->getProductEvent(),
+                    offer: $OrderProductResultDTO->getProductOffer(),
+                    variation: $OrderProductResultDTO->getProductVariation(),
+                    modification: $OrderProductResultDTO->getProductModification(),
                 ),
                 transport: 'async',
             );
