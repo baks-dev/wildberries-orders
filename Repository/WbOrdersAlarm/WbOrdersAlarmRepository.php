@@ -75,7 +75,7 @@ final class WbOrdersAlarmRepository implements WbOrdersAlarmInterface
         return $this;
     }
 
-    public function forOffer(ProductOffer|ProductOfferUid|string $offer): self
+    public function forOffer(ProductOffer|ProductOfferUid|string|null|false $offer): self
     {
         if(empty($offer))
         {
