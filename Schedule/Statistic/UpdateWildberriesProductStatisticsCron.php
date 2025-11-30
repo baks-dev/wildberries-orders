@@ -53,7 +53,7 @@ use Symfony\Component\Scheduler\Attribute\AsCronTask;
 final readonly class UpdateWildberriesProductStatisticsCron
 {
     public function __construct(
-        #[Target('ozonProductsLogger')] private LoggerInterface $logger,
+        #[Target('wildberriesOrdersLogger')] private LoggerInterface $logger,
         private MessageDispatchInterface $messageDispatch,
         private AllProductsIdentifierInterface $AllProductsIdentifierRepository,
     ) {}
