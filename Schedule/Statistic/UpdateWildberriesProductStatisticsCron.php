@@ -25,17 +25,9 @@ declare(strict_types=1);
 
 namespace BaksDev\Wildberries\Orders\Schedule\Statistic;
 
-use BaksDev\Core\Messenger\MessageDelay;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
-use BaksDev\Ozon\Products\Messenger\Card\OzonProductsCardMessage;
-use BaksDev\Ozon\Products\Messenger\Price\OzonProductsPriceMessage;
-use BaksDev\Ozon\Products\Messenger\Stocks\OzonProductsStocksUpdateDispatcher;
-use BaksDev\Ozon\Repository\AllProfileToken\AllProfileOzonTokenInterface;
 use BaksDev\Products\Product\Repository\AllProductsIdentifier\AllProductsIdentifierInterface;
 use BaksDev\Wildberries\Orders\Messenger\Statistics\UpdateStatisticMessage;
-use BaksDev\Yandex\Market\Products\Messenger\Card\YaMarketProductsCardMessage;
-use BaksDev\Yandex\Market\Products\Messenger\YaMarketProductsPriceUpdate\YaMarketProductsPriceMessage;
-use BaksDev\Yandex\Market\Repository\AllProfileToken\AllProfileYaMarketTokenInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Scheduler\Attribute\AsCronTask;
