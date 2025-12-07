@@ -27,7 +27,7 @@ namespace BaksDev\Wildberries\Orders\Commands;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Wildberries\Orders\Messenger\Schedules\CancelOrders\CancelWildberriesOrdersScheduleMessage;
-use BaksDev\Wildberries\Repository\AllProfileToken\AllProfileTokenInterface;
+use BaksDev\Wildberries\Repository\AllProfileToken\AllProfileWildberriesTokenInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -48,7 +48,7 @@ class UpdateWildberriesOrdersCancelCommand extends Command
     private SymfonyStyle $io;
 
     public function __construct(
-        private readonly AllProfileTokenInterface $allProfileToken,
+        private readonly AllProfileWildberriesTokenInterface $allProfileToken,
         private readonly MessageDispatchInterface $messageDispatch,
     )
     {

@@ -27,18 +27,18 @@ namespace BaksDev\Wildberries\Orders\Schedule\NewOrders;
 
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Wildberries\Orders\Messenger\Schedules\NewOrders\NewWildberriesOrdersScheduleMessage;
-use BaksDev\Wildberries\Repository\AllProfileToken\AllProfileTokenInterface;
+use BaksDev\Wildberries\Repository\AllProfileToken\AllProfileWildberriesTokenInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
 final class UpdateWildberriesOrdersNewSchedulesHandler
 {
-    private AllProfileTokenInterface $allProfileToken;
+    private AllProfileWildberriesTokenInterface $allProfileToken;
 
     private MessageDispatchInterface $messageDispatch;
 
     public function __construct(
-        AllProfileTokenInterface $allProfileToken,
+        AllProfileWildberriesTokenInterface $allProfileToken,
         MessageDispatchInterface $messageDispatch,
     )
     {
