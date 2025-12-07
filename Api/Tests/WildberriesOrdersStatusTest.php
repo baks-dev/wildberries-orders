@@ -43,9 +43,14 @@ class WildberriesOrdersStatusTest extends KernelTestCase
 
     public static function setUpBeforeClass(): void
     {
+        /** @see .env.test */
         self::$Authorization = new WbAuthorizationToken(
-            new UserProfileUid($_SERVER['TEST_WILDBERRIES_PROFILE']),
-            $_SERVER['TEST_WILDBERRIES_TOKEN']
+            profile: new UserProfileUid($_SERVER['TEST_WILDBERRIES_PROFILE']),
+            token: $_SERVER['TEST_WILDBERRIES_TOKEN'],
+            warehouse: $_SERVER['TEST_WILDBERRIES_WAREHOUSE'] ?? null,
+            percent: $_SERVER['TEST_WILDBERRIES_PERCENT'] ?? "0",
+            card: $_SERVER['TEST_WILDBERRIES_CARD'] === "true" ?? false,
+            stock: $_SERVER['TEST_WILDBERRIES_STOCK'] === "true" ?? false,
         );
     }
 
