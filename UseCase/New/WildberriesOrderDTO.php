@@ -31,6 +31,7 @@ use BaksDev\Orders\Order\Type\Event\OrderEventUid;
 use BaksDev\Orders\Order\Type\Status\OrderStatus;
 use BaksDev\Orders\Order\Type\Status\OrderStatus\Collection\OrderStatusNew;
 use BaksDev\Orders\Order\Type\Status\OrderStatus\OrderStatusInterface;
+use BaksDev\Ozon\Type\Id\OzonTokenUid;
 use BaksDev\Payment\Type\Id\PaymentUid;
 use BaksDev\Reference\Currency\Type\Currency;
 use BaksDev\Reference\Money\Type\Money;
@@ -42,6 +43,7 @@ use BaksDev\Wildberries\Orders\Type\PaymentType\TypePaymentDbsWildberries;
 use BaksDev\Wildberries\Orders\Type\PaymentType\TypePaymentFbsWildberries;
 use BaksDev\Wildberries\Orders\Type\ProfileType\TypeProfileDbsWildberries;
 use BaksDev\Wildberries\Orders\Type\ProfileType\TypeProfileFbsWildberries;
+use BaksDev\Wildberries\Type\id\WbTokenUid;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -78,15 +80,18 @@ final class WildberriesOrderDTO implements OrderEventInterface
     /** Комментарий к заказу */
     private ?string $comment = null;
 
-    public function __construct(array $order, UserProfileUid $profile)
+    public function __construct(array $order, UserProfileUid $profile, WbTokenUid|false $identifier = false)
     {
-
 
         /** Постоянная величина */
         $NewOrderInvariable = new Invariable\NewOrderInvariable();
-        $NewOrderInvariable->setCreated(new DateTimeImmutable($order['createdAt'] ?: 'now'));
-        $NewOrderInvariable->setProfile($profile);
-        $NewOrderInvariable->setNumber('W-'.$order['id']); // помечаем заказ префиксом W
+
+        $NewOrderInvariable
+            ->setCreated(new DateTimeImmutable($order['createdAt'] ?: 'now'))
+            ->setProfile($profile) // идентификатор профиля склада
+            ->setToken($identifier) // идентификатор токена
+            ->setNumber('W-'.$order['id']); // помечаем заказ префиксом W
+
         $this->invariable = $NewOrderInvariable;
 
         /** @deprecated переносится в Invariable */
@@ -231,6 +236,7 @@ final class WildberriesOrderDTO implements OrderEventInterface
 
     /**
      * Коллекция продукции в заказе
+     *
      * @return ArrayCollection<Products\NewOrderProductDTO>
      */
 

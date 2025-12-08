@@ -29,6 +29,7 @@ use BaksDev\Orders\Order\Entity\Invariable\OrderInvariableInterface;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Users\User\Type\Id\UserUid;
 use DateTimeImmutable;
+use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /** @see OrderInvariableDTO */
@@ -61,6 +62,12 @@ final class NewOrderInvariable implements OrderInvariableInterface
     #[Assert\NotBlank]
     #[Assert\Uuid]
     private ?UserProfileUid $profile = null;
+
+
+    /**
+     * ID токена маркетплейса
+     */
+    private Uuid|null $token = null;
 
 
     public function __construct()
@@ -121,6 +128,26 @@ final class NewOrderInvariable implements OrderInvariableInterface
     public function setNumber(?string $number): self
     {
         $this->number = $number;
+        return $this;
+    }
+
+    public function getToken(): ?Uuid
+    {
+        return $this->token;
+    }
+
+    public function setToken(mixed $token): self
+    {
+        if(empty($token))
+        {
+            $this->token = null;
+            return $this;
+        }
+
+        $token = (string) $token;
+
+        $this->token = empty($token) ? null : new Uuid($token);
+
         return $this;
     }
 

@@ -23,47 +23,48 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Wildberries\Orders\Api;
+namespace BaksDev\Wildberries\Orders\Api\Dbs;
 
 use BaksDev\Wildberries\Api\Wildberries;
-use BaksDev\Wildberries\Orders\UseCase\New\WildberriesOrderDTO;
-use Generator;
 
-final class FindAllWildberriesOrdersNewRequest extends Wildberries
+/** Перевести на сборку */
+final class UpdateWildberriesOrdersPackageRequest extends Wildberries
 {
     /**
-     * Получить список новых сборочных заданий.
-     * Возвращает список всех новых сборочных заданий у продавца на данный момент.
+     * Перевести на сборку
      *
-     * @see https://dev.wildberries.ru/openapi/orders-fbs/#tag/Sborochnye-zadaniya/paths/~1api~1v3~1orders~1new/get
+     * @see https://dev.wildberries.ru/openapi/orders-dbs/#tag/Sborochnye-zadaniya-DBS/paths/~1api~1v3~1dbs~1orders~1{orderId}~1confirm/patch
      */
-    public function findAll(): Generator|false
+    public function update(int|string $order): bool
     {
-        $response = $this->marketplace()->TokenHttpClient()->request(
-            'GET',
-            '/api/v3/orders/new',
-        );
-
-        $content = $response->toArray(false);
-
-        if($response->getStatusCode() !== 200)
+        if($this->isExecuteEnvironment() === false)
         {
+            $this->logger->critical('Запрос может быть выполнен только в PROD окружении', [self::class.':'.__LINE__]);
+            return true;
+        }
+
+        $order = str_replace('W-', '', (string) $order);
+
+        $response = $this
+            ->marketplace()
+            ->TokenHttpClient()
+            ->request(
+                'PATH',
+                sprintf('/api/v3/dbs/orders/%s/confirm', $order),
+            );
+
+        if($response->getStatusCode() !== 204)
+        {
+            $content = $response->toArray(false);
+
             $this->logger->critical(
                 'wildberries-orders: Ошибка при получении новых заказов',
-                [$content, self::class.':'.__LINE__]
+                [$content, self::class.':'.__LINE__],
             );
 
             return false;
         }
 
-        if(empty($content['orders']))
-        {
-            return false;
-        }
-
-        foreach($content['orders'] as $order)
-        {
-            yield new WildberriesOrderDTO($order, $this->getProfile());
-        }
+        return true;
     }
 }

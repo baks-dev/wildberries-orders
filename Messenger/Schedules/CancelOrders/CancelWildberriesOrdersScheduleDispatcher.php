@@ -35,6 +35,7 @@ use BaksDev\Orders\Order\UseCase\Admin\Status\OrderStatusHandler;
 use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersStatusRequest;
 use BaksDev\Wildberries\Orders\Repository\AllWbOrdersNew\AllWbOrdersNewInterface;
 use BaksDev\Wildberries\Orders\Schedule\UpdateOrdersStatus\UpdateWildberriesOrdersCancelSchedules;
+use BaksDev\Wildberries\Repository\AllWbTokensByProfile\AllWbTokensByProfileInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -49,7 +50,8 @@ final readonly class CancelWildberriesOrdersScheduleDispatcher
         private CurrentOrderEventInterface $CurrentOrderEvent,
         private CentrifugoPublishInterface $CentrifugoPublish,
         private OrderStatusHandler $OrderStatusHandler,
-        private DeduplicatorInterface $deduplicator
+        private DeduplicatorInterface $deduplicator,
+        private AllWbTokensByProfileInterface $AllWbTokensByProfileRepository,
     ) {}
 
     /**
@@ -58,38 +60,66 @@ final readonly class CancelWildberriesOrdersScheduleDispatcher
     public function __invoke(CancelWildberriesOrdersScheduleMessage $message): void
     {
 
-        $DeduplicatorExecuted = $this->deduplicator
-            ->namespace('wildberries-orders')
-            ->expiresAfter(UpdateWildberriesOrdersCancelSchedules::INTERVAL)
-            ->deduplication([$message->getProfile(), self::class]);
+        /** Получаем все токены профиля */
 
-        if($message->isDeduplicator() && $DeduplicatorExecuted->isExecuted())
+        $tokensByProfile = $this->AllWbTokensByProfileRepository
+            ->forProfile($message->getProfile())
+            ->findAll();
+
+        if(false === $tokensByProfile || false === $tokensByProfile->valid())
         {
             return;
         }
 
-        $DeduplicatorExecuted->save();
+        foreach($tokensByProfile as $WbTokenUid)
+        {
+            /**
+             * Ограничиваем периодичность запросов
+             */
+            $DeduplicatorExecuted = $this->deduplicator
+                ->namespace('wildberries-orders')
+                ->expiresAfter(UpdateWildberriesOrdersCancelSchedules::INTERVAL)
+                ->deduplication([$WbTokenUid, self::class]);
 
-        /**
-         * Получаем все заказы Wildberries
-         */
+            if($message->isDeduplicator() && $DeduplicatorExecuted->isExecuted())
+            {
+                continue;
+            }
 
-        $orders = $this->AllWbOrdersNewInterface
-            ->forProfile($message->getProfile())
-            ->findAll();
+            /** Добавляем дедубликатор обновления (удалям в конце данного процесса) */
+            $DeduplicatorExecuted->save();
 
-        $orders = iterator_to_array($orders);
 
-        $this->FindAllWildberriesOrdersStatusRequest
-            ->profile($message->getProfile());
+            /**
+             * Получаем все заказы Wildberries
+             */
 
-        /** Добавляем в объект Request идентификатор заказа Wildberries для получения его статуса */
-        array_map(function($OrderUid) {
+            $orders = $this->AllWbOrdersNewInterface
+                ->forProfile($message->getProfile())
+                ->findAll();
+
+            $orders = iterator_to_array($orders);
+
             $this->FindAllWildberriesOrdersStatusRequest
-                ->addOrder($OrderUid->getAttr());
-        }, iterator_to_array($orders));
+                ->profile($message->getProfile());
 
-        $cancels = $this->FindAllWildberriesOrdersStatusRequest->findOrderCancel();
+            /** Добавляем в объект Request идентификатор заказа Wildberries для получения его статуса */
+            array_map(function($OrderUid) {
+                $this->FindAllWildberriesOrdersStatusRequest
+                    ->addOrder($OrderUid->getAttr());
+            }, iterator_to_array($orders));
+
+            $cancels = $this->FindAllWildberriesOrdersStatusRequest->findOrderCancel();
+
+
+        }
+
+
+
+
+
+
+
 
         if(false === $cancels)
         {

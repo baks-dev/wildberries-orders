@@ -28,60 +28,96 @@ namespace BaksDev\Wildberries\Orders\Messenger\Schedules\NewOrders;
 use BaksDev\Core\Deduplicator\DeduplicatorInterface;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Orders\Order\Entity\Order;
-use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersNewRequest;
+use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersNewDbsRequest;
 use BaksDev\Wildberries\Orders\Schedule\NewOrders\UpdateWildberriesOrdersNewSchedules;
 use BaksDev\Wildberries\Orders\UseCase\New\WildberriesOrderDTO;
 use BaksDev\Wildberries\Orders\UseCase\New\WildberriesOrderHandler;
 use BaksDev\Wildberries\Products\Api\Cards\FindAllWildberriesCardsRequest;
 use BaksDev\Wildberries\Products\Api\Cards\WildberriesCardDTO;
 use BaksDev\Wildberries\Products\Messenger\Cards\CardNew\WildberriesCardNewMassage;
+use BaksDev\Wildberries\Repository\AllWbTokensByProfile\AllWbTokensByProfileInterface;
+use BaksDev\Wildberries\Type\id\WbTokenUid;
+use Generator;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+/** Получает список новых сборочных заданий DBS */
 #[AsMessageHandler]
-final readonly class NewWildberriesOrderScheduleDispatcher
+final readonly class NewWildberriesOrderDbsScheduleDispatcher
 {
     public function __construct(
         #[Target('wildberriesOrdersLogger')] private LoggerInterface $logger,
-        private FindAllWildberriesOrdersNewRequest $wildberriesOrdersNew,
+        private FindAllWildberriesOrdersNewDbsRequest $wildberriesOrdersNew,
         private FindAllWildberriesCardsRequest $WildberriesCardsRequest,
         private DeduplicatorInterface $deduplicator,
         private WildberriesOrderHandler $WildberriesOrderHandler,
-        private MessageDispatchInterface $messageDispatch
+        private MessageDispatchInterface $messageDispatch,
+        private AllWbTokensByProfileInterface $AllWbTokensByProfileRepository,
+
+
     ) {}
 
     public function __invoke(NewWildberriesOrdersScheduleMessage $message): void
     {
-        $DeduplicatorExecuted = $this->deduplicator
-            ->namespace('wildberries-orders')
-            ->expiresAfter(UpdateWildberriesOrdersNewSchedules::INTERVAL)
-            ->deduplication([$message->getProfile(), self::class]);
+        /** Получаем все токены профиля */
 
-        if($message->isDeduplicator() && $DeduplicatorExecuted->isExecuted())
-        {
-            return;
-        }
-
-        $DeduplicatorExecuted->save();
-
-        /**
-         * Получаем список НОВЫХ сборочных заданий по основному идентификатору компании
-         */
-
-        $orders = $this->wildberriesOrdersNew
-            ->profile($message->getProfile())
+        $tokensByProfile = $this->AllWbTokensByProfileRepository
+            ->forProfile($message->getProfile())
             ->findAll();
 
-
-        if(false === $orders || false === $orders->valid())
+        if(false === $tokensByProfile || false === $tokensByProfile->valid())
         {
             return;
         }
 
-        /** Добавляем новые заказы Wildberries */
+        foreach($tokensByProfile as $WbTokenUid)
+        {
+            /**
+             * Ограничиваем периодичность запросов
+             */
+
+            $Deduplicator = $this->deduplicator
+                ->namespace('yandex-market-orders')
+                ->expiresAfter(UpdateWildberriesOrdersNewSchedules::INTERVAL)
+                ->deduplication([self::class, (string) $WbTokenUid]);
+
+            if($Deduplicator->isExecuted())
+            {
+                continue;
+            }
+
+            /** Добавляем дедубликатор обновления (удалям в конце данного процесса) */
+            $Deduplicator->save();
+
+            /**
+             * Получаем список НОВЫХ сборочных заданий
+             */
+
+            $orders = $this->wildberriesOrdersNew
+                ->forTokenIdentifier($WbTokenUid)
+                ->findAll();
+
+            if(false === $orders || false === $orders->valid())
+            {
+                $Deduplicator->delete();
+                continue;
+            }
+
+            $this->ordersCreate($orders, $message);
 
 
+            /** Удаляем дедубликатор обновления */
+            $Deduplicator->delete();
+
+        }
+    }
+
+    /**
+     * Добавляем новые заказы Wildberries
+     */
+    private function ordersCreate(Generator $orders, NewWildberriesOrdersScheduleMessage $message): void
+    {
         /** @var WildberriesOrderDTO $WildberriesOrderDTO */
         foreach($orders as $WildberriesOrderDTO)
         {
@@ -95,9 +131,9 @@ final readonly class NewWildberriesOrderScheduleDispatcher
                 continue;
             }
 
-            $handle = $this->WildberriesOrderHandler->handle($WildberriesOrderDTO);
+            $Order = $this->WildberriesOrderHandler->handle($WildberriesOrderDTO);
 
-            if($handle === true)
+            if($Order === true)
             {
                 $this->logger->info(
                     sprintf('Новый заказ %s уже добавлен в систему', $WildberriesOrderDTO->getNumber()),
@@ -109,18 +145,18 @@ final readonly class NewWildberriesOrderScheduleDispatcher
                 continue;
             }
 
-            if(false === ($handle instanceof Order))
+            if(false === ($Order instanceof Order))
             {
                 /**
                  * Пробуем обновить карточку по артикулу
                  */
 
-                $article = explode(':', $handle);
+                $article = explode(':', $Order);
                 $article = current($article);
 
                 $this->logger->critical(
                     sprintf('wildberries-orders: Ошибка при добавлении нового заказа %s. Пробуем добавить карточку по артикулу %s', $WildberriesOrderDTO->getNumber(), $article),
-                    [$handle, $message->getProfile(), self::class.':'.__LINE__],
+                    [$Order, $message->getProfile(), self::class.':'.__LINE__],
                 );
 
                 /** Получаем список карточек WB */
@@ -129,7 +165,6 @@ final readonly class NewWildberriesOrderScheduleDispatcher
                     ->profile($message->getProfile())
                     ->findAll($article);
 
-                /** @var WildberriesCardDTO $WildberriesCardDTO */
                 foreach($WildberriesCards as $WildberriesCardDTO)
                 {
                     /** Передаем на обновление найденный артикул */

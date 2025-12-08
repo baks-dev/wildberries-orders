@@ -30,7 +30,7 @@ use BaksDev\Orders\Order\UseCase\Admin\Edit\Tests\OrderNewTest;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Users\Profile\UserProfile\UseCase\Admin\NewEdit\Tests\NewUserProfileHandlerTest;
 use BaksDev\Users\Profile\UserProfile\UseCase\User\NewEdit\Tests\UserNewUserProfileHandleTest;
-use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersNewRequest;
+use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersNewFbsRequest;
 use BaksDev\Wildberries\Orders\UseCase\New\WildberriesOrderDTO;
 use BaksDev\Wildberries\Orders\UseCase\New\WildberriesOrderHandler;
 use BaksDev\Wildberries\Type\Authorization\WbAuthorizationToken;
@@ -63,8 +63,8 @@ class WildberriesOrdersNewTest extends KernelTestCase
         UserNewUserProfileHandleTest::setUpBeforeClass();
         NewUserProfileHandlerTest::setUpBeforeClass();
 
-        /** @var FindAllWildberriesOrdersNewRequest $WildberriesOrdersNewRequest */
-        $WildberriesOrdersNewRequest = self::getContainer()->get(FindAllWildberriesOrdersNewRequest::class);
+        /** @var FindAllWildberriesOrdersNewFbsRequest $WildberriesOrdersNewRequest */
+        $WildberriesOrdersNewRequest = self::getContainer()->get(FindAllWildberriesOrdersNewFbsRequest::class);
         $WildberriesOrdersNewRequest->TokenHttpClient(self::$Authorization);
 
         /** @var WildberriesOrderHandler $WildberriesOrderHandler */
