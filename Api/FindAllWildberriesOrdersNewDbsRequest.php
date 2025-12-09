@@ -41,6 +41,11 @@ final class FindAllWildberriesOrdersNewDbsRequest extends Wildberries
      */
     public function findAll(): Generator|false
     {
+        if(false === $this->isStock())
+        {
+            return false;
+        }
+
         $response = $this->marketplace()->TokenHttpClient()->request(
             'GET',
             '/api/v3/dbs/orders/new',
