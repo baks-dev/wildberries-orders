@@ -30,6 +30,8 @@ use BaksDev\Core\Messenger\MessageDelay;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Orders\Order\Entity\Event\OrderEvent;
 use BaksDev\Orders\Order\Repository\CurrentOrderEvent\CurrentOrderEventInterface;
+use BaksDev\Orders\Order\Type\Status\OrderStatus\Collection\OrderStatusCanceled;
+use BaksDev\Orders\Order\Type\Status\OrderStatus\Collection\OrderStatusPackage;
 use BaksDev\Wildberries\Orders\Api\Dbs\UpdateWildberriesOrdersPackageRequest;
 use BaksDev\Wildberries\Type\id\WbTokenUid;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
@@ -52,6 +54,11 @@ final readonly class WildberriesOrdersPackageDispatcher
             ->find();
 
         if(false === ($OrderEvent instanceof OrderEvent))
+        {
+            return;
+        }
+
+        if(false === $OrderEvent->isStatusEquals(OrderStatusPackage::class))
         {
             return;
         }

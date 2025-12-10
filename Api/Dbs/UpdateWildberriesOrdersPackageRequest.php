@@ -58,8 +58,8 @@ final class UpdateWildberriesOrdersPackageRequest extends Wildberries
             $content = $response->toArray(false);
 
             $this->logger->critical(
-                'wildberries-orders: Ошибка при получении новых заказов',
-                [$content, self::class.':'.__LINE__],
+                sprintf('wildberries-orders: Ошибка при отправке заказа %s на упаковку', $order),
+                [$content, self::class.':'.__LINE__, $this->getTokenIdentifier()],
             );
 
             return false;
