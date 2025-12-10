@@ -84,7 +84,7 @@ final class FindAllWildberriesOrdersNewDbsRequest extends Wildberries
                     ->TokenHttpClient()
                     ->request(
                         method: 'PATCH',
-                        url: sprintf('/api/v3/dbs/orders/%s/confirm', $order),
+                        url: sprintf('/api/v3/dbs/orders/%s/confirm', $order['id']),
                     );
 
                 /** Пробуем добавить заказ позже */
