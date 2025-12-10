@@ -59,7 +59,7 @@ final readonly class OrderByDeliveryDispatcher
             return;
         }
 
-        if($OrderEvent->isStatusEquals(OrderStatusExtradition::class))
+        if(false === $OrderEvent->isStatusEquals(OrderStatusExtradition::class))
         {
             return;
         }

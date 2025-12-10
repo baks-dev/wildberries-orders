@@ -30,7 +30,7 @@ use BaksDev\Orders\Order\UseCase\Admin\Edit\Tests\OrderNewTest;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Users\Profile\UserProfile\UseCase\Admin\NewEdit\Tests\NewUserProfileHandlerTest;
 use BaksDev\Users\Profile\UserProfile\UseCase\User\NewEdit\Tests\UserNewUserProfileHandleTest;
-use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersNewFbsRequest;
+use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersNewDbsRequest;
 use BaksDev\Wildberries\Orders\UseCase\New\WildberriesOrderDTO;
 use BaksDev\Wildberries\Orders\UseCase\New\WildberriesOrderHandler;
 use BaksDev\Wildberries\Type\Authorization\WbAuthorizationToken;
@@ -40,7 +40,7 @@ use Symfony\Component\DependencyInjection\Attribute\When;
 
 #[Group('wildberries-orders')]
 #[When(env: 'test')]
-class WildberriesOrdersNewTest extends KernelTestCase
+class WildberriesOrdersNewBdsTest extends KernelTestCase
 {
     private static WbAuthorizationToken $Authorization;
 
@@ -63,14 +63,15 @@ class WildberriesOrdersNewTest extends KernelTestCase
         UserNewUserProfileHandleTest::setUpBeforeClass();
         NewUserProfileHandlerTest::setUpBeforeClass();
 
-        /** @var FindAllWildberriesOrdersNewFbsRequest $WildberriesOrdersNewRequest */
-        $WildberriesOrdersNewRequest = self::getContainer()->get(FindAllWildberriesOrdersNewFbsRequest::class);
-        $WildberriesOrdersNewRequest->TokenHttpClient(self::$Authorization);
+        /** @var FindAllWildberriesOrdersNewDbsRequest $FindAllWildberriesOrdersNewDbsRequest */
+        $FindAllWildberriesOrdersNewDbsRequest = self::getContainer()->get(FindAllWildberriesOrdersNewDbsRequest::class);
+        $FindAllWildberriesOrdersNewDbsRequest->TokenHttpClient(self::$Authorization);
 
         /** @var WildberriesOrderHandler $WildberriesOrderHandler */
         $WildberriesOrderHandler = self::getContainer()->get(WildberriesOrderHandler::class);
 
-        $data = $WildberriesOrdersNewRequest->findAll();
+        $data = $FindAllWildberriesOrdersNewDbsRequest->findAll();
+
 
         /** Если нет заказов */
         if(false === $data || false === $data->valid())
@@ -90,7 +91,7 @@ class WildberriesOrdersNewTest extends KernelTestCase
                 break;
             }
 
-            self::assertInstanceOf(Order::class, $handle);
+            self::assertInstanceOf(Order::class, $handle, message: sprintf('Ошибка %s при добавлении заказа', $handle));
 
             break;
         }

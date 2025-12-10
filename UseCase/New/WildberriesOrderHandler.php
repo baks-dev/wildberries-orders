@@ -33,6 +33,8 @@ use BaksDev\Core\Type\Gps\GpsLatitude;
 use BaksDev\Core\Type\Gps\GpsLongitude;
 use BaksDev\Core\Validator\ValidatorCollectionInterface;
 use BaksDev\Delivery\Repository\CurrentDeliveryEvent\CurrentDeliveryEventInterface;
+use BaksDev\Field\Pack\Contact\Type\ContactField;
+use BaksDev\Field\Pack\Phone\Type\PhoneField;
 use BaksDev\Files\Resources\Upload\File\FileUploadInterface;
 use BaksDev\Files\Resources\Upload\Image\ImageUploadInterface;
 use BaksDev\Orders\Order\Entity\Event\OrderEvent;
@@ -41,13 +43,18 @@ use BaksDev\Orders\Order\Messenger\OrderMessage;
 use BaksDev\Orders\Order\Repository\ExistsOrderNumber\ExistsOrderNumberInterface;
 use BaksDev\Orders\Order\Repository\FieldByDeliveryChoice\FieldByDeliveryChoiceInterface;
 use BaksDev\Orders\Order\Type\Status\OrderStatus\Collection\OrderStatusNew;
+use BaksDev\Products\Product\Repository\CurrentProductByArticle\CurrentProductByBarcodeResult;
 use BaksDev\Products\Product\Repository\CurrentProductByArticle\ProductConstByBarcodeInterface;
 use BaksDev\Users\Address\Services\GeocodeAddressParser;
 use BaksDev\Users\Profile\UserProfile\Entity\UserProfile;
+use BaksDev\Users\Profile\UserProfile\Repository\FieldValueForm\FieldValueFormDTO;
+use BaksDev\Users\Profile\UserProfile\Repository\FieldValueForm\FieldValueFormInterface;
 use BaksDev\Users\Profile\UserProfile\Repository\UserByUserProfile\UserByUserProfileInterface;
 use BaksDev\Users\Profile\UserProfile\Repository\UserProfileGps\UserProfileGpsInterface;
 use BaksDev\Users\Profile\UserProfile\UseCase\User\NewEdit\UserProfileHandler;
+use BaksDev\Wildberries\Orders\Api\Dbs\ClientInfo\ClientWildberriesOrdersDTO;
 use BaksDev\Wildberries\Orders\UseCase\New\User\Delivery\Field\OrderDeliveryFieldDTO;
+use BaksDev\Wildberries\Orders\UseCase\New\User\UserProfile\Value\ValueDTO;
 use Doctrine\ORM\EntityManagerInterface;
 
 final class WildberriesOrderHandler extends AbstractHandler
@@ -61,7 +68,7 @@ final class WildberriesOrderHandler extends AbstractHandler
         private readonly ExistsOrderNumberInterface $existsOrderNumber,
         private readonly UserByUserProfileInterface $userByUserProfile,
         private readonly PickupByGeolocationInterface $pickupByGeolocation,
-
+        private readonly FieldValueFormInterface $fieldValue,
         private readonly UserProfileGpsInterface $userProfileGps,
 
         EntityManagerInterface $entityManager,
@@ -107,6 +114,7 @@ final class WildberriesOrderHandler extends AbstractHandler
 
         /**
          * Получаем события продукции
+         *
          * @var Products\NewOrderProductDTO $product
          */
         foreach($command->getProduct() as $product)
@@ -116,7 +124,7 @@ final class WildberriesOrderHandler extends AbstractHandler
             /** Если по штрихкоду не найден - пробуем найти по артикулу */
             //$ProductData ?: $ProductData = $this->ProductConstByArticle->find($product->getArticle());
 
-            if(!$ProductData)
+            if(false === ($ProductData instanceof CurrentProductByBarcodeResult))
             {
                 $error = sprintf('%s: Артикул товара не найден (%s)', $product->getArticle(), $product->getBarcode());
                 //throw new InvalidArgumentException($error);
@@ -132,7 +140,7 @@ final class WildberriesOrderHandler extends AbstractHandler
 
 
         /** Присваиваем информацию о покупателе (При доставке DBS) */
-        // $this->fillProfile($command);
+        $this->fillProfile($command);
 
         /** Присваиваем информацию о доставке */
         $this->fillDelivery($command);
@@ -185,11 +193,85 @@ final class WildberriesOrderHandler extends AbstractHandler
         /* Отправляем сообщение в шину */
         $this->messageDispatch->dispatch(
             message: new OrderMessage($this->main->getId(), $this->main->getEvent(), $command->getEvent()),
-            transport: 'orders-order'
+            transport: 'orders-order',
         );
 
 
         return $this->main;
+    }
+
+
+    public function fillProfile(WildberriesOrderDTO $command): void
+    {
+        if(false === ($command->getClient() instanceof ClientWildberriesOrdersDTO))
+        {
+            return;
+        }
+
+        /** Профиль пользователя  */
+        $UserProfileDTO = $command->getUsr()->getUserProfile();
+
+        if(null === $UserProfileDTO)
+        {
+            return;
+        }
+
+        /** Идентификатор типа профиля  */
+        $TypeProfileUid = $UserProfileDTO?->getType();
+
+        if(null === $TypeProfileUid)
+        {
+            return;
+        }
+
+        /**
+         * Определяем свойства клиента при доставке DBS
+         */
+        $ClientWildberriesOrdersDTO = $command->getClient();
+        $profileFields = $this->fieldValue->get($TypeProfileUid);
+
+        /** @var FieldValueFormDTO $profileField */
+        foreach($profileFields as $profileField)
+        {
+            if($profileField->getType()->getType() === ContactField::TYPE) // contact_field
+            {
+                if(empty($ClientWildberriesOrdersDTO->getContactName()))
+                {
+                    continue;
+                }
+
+                $UserProfileValueDTO = new ValueDTO();
+                $UserProfileValueDTO->setField($profileField->getField());
+                $UserProfileValueDTO->setValue($ClientWildberriesOrdersDTO->getContactName());
+                $UserProfileDTO->addValue($UserProfileValueDTO);
+
+                continue;
+            }
+
+            if($profileField->getType()->getType() === PhoneField::TYPE) //  'phone_field'
+            {
+                if(empty($ClientWildberriesOrdersDTO->getPhone()))
+                {
+                    continue;
+                }
+
+                $phone = PhoneField::formater($ClientWildberriesOrdersDTO->getPhone());
+
+                $UserProfileValueDTO = new ValueDTO();
+                $UserProfileValueDTO->setField($profileField->getField());
+                $UserProfileValueDTO->setValue($phone);
+                $UserProfileDTO->addValue($UserProfileValueDTO);
+
+                continue;
+            }
+
+        }
+
+        /** В комментарий добавляем добавочные номера */
+        if($ClientWildberriesOrdersDTO->getPhoneReserve())
+        {
+            $command->addComment('Доп.тел: '.$ClientWildberriesOrdersDTO->getPhoneReserve());
+        }
     }
 
 
@@ -234,6 +316,16 @@ final class WildberriesOrderHandler extends AbstractHandler
             $OrderDeliveryDTO->setLongitude(new GpsLongitude($GeocodeAddress['longitude']));
         }
 
+        /**
+         * Присваиваем активное событие доставки
+         */
+
+        $DeliveryEventUid = $this->currentDeliveryEvent
+            ->forDelivery($OrderDeliveryDTO->getDelivery())
+            ->getId();
+
+        $OrderDeliveryDTO->setEvent($DeliveryEventUid);
+
 
         /**
          * Определяем свойства доставки и присваиваем адрес
@@ -241,12 +333,17 @@ final class WildberriesOrderHandler extends AbstractHandler
 
         $fields = $this->deliveryFields->fetchDeliveryFields($OrderDeliveryDTO->getDelivery());
 
+        if(empty($fields))
+        {
+            return;
+        }
+
 
         /**
          * Указываем адрес доставки
          */
 
-        $address_field = array_filter($fields, function($v) {
+        $address_field = array_filter($fields, static function($v) {
             /** @var InputField $InputField */
             return $v->getType()->getType() === 'address_field';
         });
@@ -265,7 +362,7 @@ final class WildberriesOrderHandler extends AbstractHandler
          * При самовывозе указываем ПВЗ
          */
 
-        $contacts_region = array_filter($fields, function($v) {
+        $contacts_region = array_filter($fields, static function($v) {
             /** @var InputField $InputField */
             return $v->getType()->getType() === 'contacts_region_type';
         });
@@ -291,14 +388,5 @@ final class WildberriesOrderHandler extends AbstractHandler
             $OrderDeliveryDTO->addField($OrderDeliveryFieldDTO);
         }
 
-        /**
-         * Присваиваем активное событие доставки
-         */
-
-        $DeliveryEventUid = $this->currentDeliveryEvent
-            ->forDelivery($OrderDeliveryDTO->getDelivery())
-            ->getId();
-
-        $OrderDeliveryDTO->setEvent($DeliveryEventUid);
     }
 }

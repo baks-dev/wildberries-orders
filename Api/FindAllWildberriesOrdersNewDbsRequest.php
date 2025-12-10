@@ -51,7 +51,6 @@ final class FindAllWildberriesOrdersNewDbsRequest extends Wildberries
             '/api/v3/dbs/orders/new',
         );
 
-
         $content = $response->toArray(false);
 
         if($response->getStatusCode() !== 200)
@@ -71,6 +70,30 @@ final class FindAllWildberriesOrdersNewDbsRequest extends Wildberries
 
         foreach($content['orders'] as $order)
         {
+            /** Пропускаем, если заказ на другой склад */
+            if((string) $order['warehouseId'] !== $this->getWarehouse())
+            {
+                continue;
+            }
+
+            /** Сразу отправляем заказ на сборку для получения информации о клиенте */
+            if($this->isExecuteEnvironment() !== false)
+            {
+                $response = $this
+                    ->marketplace()
+                    ->TokenHttpClient()
+                    ->request(
+                        method: 'PATCH',
+                        url: sprintf('/api/v3/dbs/orders/%s/confirm', $order),
+                    );
+
+                /** Пробуем добавить заказ позже */
+                if($response->getStatusCode() !== 204)
+                {
+                    continue;
+                }
+            }
+
             yield new WildberriesOrderDTO($order, $this->getProfile(), $this->getTokenIdentifier());
         }
     }

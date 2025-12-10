@@ -64,9 +64,9 @@ final class UpdateWildberriesOrdersCompleteRequest extends Wildberries
             ->marketplace()
             ->TokenHttpClient()
             ->request(
-                'PATH',
-                sprintf('/api/v3/dbs/orders/%s/receive', $order),
-                ['json' => ['code' => 'OK']],
+                method: 'PATCH',
+                url: sprintf('/api/v3/dbs/orders/%s/receive', $order),
+                options: ['json' => ['code' => 'OK']],
             );
 
         if($response->getStatusCode() !== 204)

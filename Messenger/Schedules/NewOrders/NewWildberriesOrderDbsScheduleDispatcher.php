@@ -28,8 +28,11 @@ namespace BaksDev\Wildberries\Orders\Messenger\Schedules\NewOrders;
 use BaksDev\Core\Deduplicator\DeduplicatorInterface;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Orders\Order\Entity\Order;
+use BaksDev\Wildberries\Orders\Api\Dbs\ClientInfo\ClientWildberriesOrdersDTO;
+use BaksDev\Wildberries\Orders\Api\Dbs\ClientInfo\FindClientWildberriesOrdersRequest;
 use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersNewDbsRequest;
 use BaksDev\Wildberries\Orders\Schedule\NewOrders\UpdateWildberriesOrdersNewSchedules;
+use BaksDev\Wildberries\Orders\Type\DeliveryType\TypeDeliveryDbsWildberries;
 use BaksDev\Wildberries\Orders\UseCase\New\WildberriesOrderDTO;
 use BaksDev\Wildberries\Orders\UseCase\New\WildberriesOrderHandler;
 use BaksDev\Wildberries\Products\Api\Cards\FindAllWildberriesCardsRequest;
@@ -54,6 +57,7 @@ final readonly class NewWildberriesOrderDbsScheduleDispatcher
         private WildberriesOrderHandler $WildberriesOrderHandler,
         private MessageDispatchInterface $messageDispatch,
         private AllWbTokensByProfileInterface $AllWbTokensByProfileRepository,
+        private FindClientWildberriesOrdersRequest $FindClientWildberriesOrdersRequest,
 
 
     ) {}
@@ -104,7 +108,7 @@ final readonly class NewWildberriesOrderDbsScheduleDispatcher
                 continue;
             }
 
-            $this->ordersCreate($orders, $message);
+            $this->ordersCreate($orders, $message, $WbTokenUid);
 
 
             /** Удаляем дедубликатор обновления */
@@ -116,7 +120,11 @@ final readonly class NewWildberriesOrderDbsScheduleDispatcher
     /**
      * Добавляем новые заказы Wildberries
      */
-    private function ordersCreate(Generator $orders, NewWildberriesOrdersScheduleMessage $message): void
+    private function ordersCreate(
+        Generator $orders,
+        NewWildberriesOrdersScheduleMessage $message,
+        WbTokenUid $WbTokenUid
+    ): void
     {
         /** @var WildberriesOrderDTO $WildberriesOrderDTO */
         foreach($orders as $WildberriesOrderDTO)
@@ -129,6 +137,22 @@ final readonly class NewWildberriesOrderDbsScheduleDispatcher
             if($message->isDeduplicator() && $Deduplicator->isExecuted())
             {
                 continue;
+            }
+
+            if(true === $WildberriesOrderDTO->getUsr()->getDelivery()->getDelivery()?->getTypeDelivery()->equals(TypeDeliveryDbsWildberries::TYPE))
+            {
+                /** Делаем задержку для получения информации о клиенте в 3 сек */
+                sleep(3);
+
+                /** Получаем информацию о клиенте */
+                $ClientWildberriesOrdersDTO = $this->FindClientWildberriesOrdersRequest
+                    ->forTokenIdentifier($WbTokenUid)
+                    ->find($WildberriesOrderDTO->getInvariable()->getNumber());
+
+                if($ClientWildberriesOrdersDTO instanceof ClientWildberriesOrdersDTO)
+                {
+                    $WildberriesOrderDTO->setClientInfo($ClientWildberriesOrdersDTO);
+                }
             }
 
             $Order = $this->WildberriesOrderHandler->handle($WildberriesOrderDTO);
@@ -145,40 +169,6 @@ final readonly class NewWildberriesOrderDbsScheduleDispatcher
                 continue;
             }
 
-            if(false === ($Order instanceof Order))
-            {
-                /**
-                 * Пробуем обновить карточку по артикулу
-                 */
-
-                $article = explode(':', $Order);
-                $article = current($article);
-
-                $this->logger->critical(
-                    sprintf('wildberries-orders: Ошибка при добавлении нового заказа %s. Пробуем добавить карточку по артикулу %s', $WildberriesOrderDTO->getNumber(), $article),
-                    [$Order, $message->getProfile(), self::class.':'.__LINE__],
-                );
-
-                /** Получаем список карточек WB */
-
-                $WildberriesCards = $this->WildberriesCardsRequest
-                    ->profile($message->getProfile())
-                    ->findAll($article);
-
-                foreach($WildberriesCards as $WildberriesCardDTO)
-                {
-                    /** Передаем на обновление найденный артикул */
-                    $WildberriesCardNewMassage = new WildberriesCardNewMassage(
-                        profile: $message->getProfile(),
-                        article: $WildberriesCardDTO->getArticle(),
-                    );
-
-                    $this->messageDispatch->dispatch(
-                        $WildberriesCardNewMassage,
-                        transport: (string) $message->getProfile(),
-                    );
-                }
-            }
 
             $this->logger->info(
                 sprintf('Добавили новый заказ %s', $WildberriesOrderDTO->getNumber()),

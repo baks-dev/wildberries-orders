@@ -59,7 +59,7 @@ final readonly class OrderByPackageDispatcher
             return;
         }
 
-        if($OrderEvent->isStatusEquals(OrderStatusPackage::class))
+        if(false === $OrderEvent->isStatusEquals(OrderStatusPackage::class))
         {
             return;
         }

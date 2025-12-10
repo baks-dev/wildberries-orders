@@ -25,6 +25,8 @@ declare(strict_types=1);
 
 namespace BaksDev\Wildberries\Orders\UseCase\New;
 
+use BaksDev\Core\Type\Gps\GpsLatitude;
+use BaksDev\Core\Type\Gps\GpsLongitude;
 use BaksDev\Delivery\Type\Id\DeliveryUid;
 use BaksDev\Orders\Order\Entity\Event\OrderEventInterface;
 use BaksDev\Orders\Order\Type\Event\OrderEventUid;
@@ -37,6 +39,7 @@ use BaksDev\Reference\Currency\Type\Currency;
 use BaksDev\Reference\Money\Type\Money;
 use BaksDev\Users\Profile\TypeProfile\Type\Id\TypeProfileUid;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
+use BaksDev\Wildberries\Orders\Api\Dbs\ClientInfo\ClientWildberriesOrdersDTO;
 use BaksDev\Wildberries\Orders\Type\DeliveryType\TypeDeliveryDbsWildberries;
 use BaksDev\Wildberries\Orders\Type\DeliveryType\TypeDeliveryFbsWildberries;
 use BaksDev\Wildberries\Orders\Type\PaymentType\TypePaymentDbsWildberries;
@@ -80,8 +83,12 @@ final class WildberriesOrderDTO implements OrderEventInterface
     /** Комментарий к заказу */
     private ?string $comment = null;
 
+    private ClientWildberriesOrdersDTO|false $client;
+
     public function __construct(array $order, UserProfileUid $profile, WbTokenUid|false $identifier = false)
     {
+        $this->client = false;
+
 
         /** Постоянная величина */
         $NewOrderInvariable = new Invariable\NewOrderInvariable();
@@ -151,24 +158,50 @@ final class WildberriesOrderDTO implements OrderEventInterface
         $deliveryDate = match ($order['deliveryType'])
         {
             'fbs' => $NewOrderInvariable->getCreated()->modify('+1 day'),
-            'dbs', 'edbs', 'wbgo' => new DateTimeImmutable($order['ddate'] ?: 'now'),
+            'dbs' => new DateTimeImmutable('now'),
+            'edbs', 'wbgo' => new DateTimeImmutable($order['ddate'] ?? 'now'),
             default => $NewOrderInvariable->getCreated(),
         };
 
         $OrderDeliveryDTO->setDeliveryDate($deliveryDate);
 
         /** Адрес доставки */
-        false === isset($order['address']) ?: $deliveryAddress[] = $order['address'];
-        false === isset($order['offices']) ?: $deliveryAddress[] = implode(', ', str_replace('_', ' ', $order['offices']));
+        // false === isset($order['address']) ?: $deliveryAddress[] = $order['address'];
+        // false === isset($order['offices']) ?: $deliveryAddress[] = implode(', ', str_replace('_', ' ', $order['offices']));
 
-        $OrderDeliveryDTO->setAddress(implode(', ', $deliveryAddress));
+        //        if(false === empty($deliveryAddress))
+        //        {
+        //            $OrderDeliveryDTO->setAddress(implode(', ', $deliveryAddress));
+        //        }
 
+        /**
+         * Координаты доставки
+         */
+
+        if(isset($order['address']['latitude']))
+        {
+            $OrderDeliveryDTO->setLatitude(new GpsLatitude($order['address']['latitude']));
+        }
+
+        if(isset($order['address']['longitude']))
+        {
+            $OrderDeliveryDTO->setLongitude(new GpsLongitude($order['address']['longitude']));
+        }
+
+        /** Указываем адрес доставки  */
+        if(isset($order['address']['fullAddress']))
+        {
+            $OrderDeliveryDTO->setAddress($order['address']['fullAddress']);
+        }
 
         /**
          * Комментарий покупателя
          */
 
         $deliveryComment[] = null;
+
+        /** Добавляем комментарий при наличии */
+        empty($order['comment']) ?: $deliveryComment[] = $order['comment'];
 
         /** Признак заказа, сделанного на нулевой остаток товара. */
         $order['isZeroOrder'] === false ?: $deliveryComment[] = 'Заказ сделан на товар с остатком равным нулю. Заказ можно отменить без штрафа за отмену';
@@ -283,11 +316,33 @@ final class WildberriesOrderDTO implements OrderEventInterface
         return $this->comment;
     }
 
+    public function addComment(?string $comment): self
+    {
+        if($comment)
+        {
+            $this->comment .= ($this->comment ? ', ' : '').$comment;
+        }
+
+        return $this;
+    }
+
+
     /**
      * Invariable
      */
     public function getInvariable(): Invariable\NewOrderInvariable
     {
         return $this->invariable;
+    }
+
+    public function setClientInfo(ClientWildberriesOrdersDTO $ClientWildberriesOrdersDTO): self
+    {
+        $this->client = $ClientWildberriesOrdersDTO;
+        return $this;
+    }
+
+    public function getClient(): false|ClientWildberriesOrdersDTO
+    {
+        return $this->client;
     }
 }
