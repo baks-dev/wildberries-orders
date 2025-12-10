@@ -59,6 +59,8 @@ final readonly class CancelWildberriesOrdersScheduleDispatcher
      */
     public function __invoke(CancelWildberriesOrdersScheduleMessage $message): void
     {
+        /* TODO: реализовать отмену заказов !!! */
+        return;
 
         /** Получаем все токены профиля */
 
@@ -101,6 +103,7 @@ final readonly class CancelWildberriesOrdersScheduleDispatcher
             $orders = iterator_to_array($orders);
 
             $this->FindAllWildberriesOrdersStatusRequest
+                ->forTokenIdentifier($WbTokenUid)
                 ->profile($message->getProfile());
 
             /** Добавляем в объект Request идентификатор заказа Wildberries для получения его статуса */
@@ -113,12 +116,6 @@ final readonly class CancelWildberriesOrdersScheduleDispatcher
 
 
         }
-
-
-
-
-
-
 
 
         if(false === $cancels)
