@@ -188,17 +188,32 @@ final class WildberriesOrderDTO implements OrderEventInterface
             $OrderDeliveryDTO->setLongitude(new GpsLongitude($order['address']['longitude']));
         }
 
+        $deliveryComment[] = null;
+
         /** Указываем адрес доставки  */
         if(isset($order['address']['fullAddress']))
         {
-            $OrderDeliveryDTO->setAddress($order['address']['fullAddress']);
+            // пробуем определить в адресе домофон и этаж
+            $explodeAddress = explode(',', $order['address']['fullAddress']);
+
+            $address[] = null;
+
+            foreach($explodeAddress as $val)
+            {
+                $val = trim($val);
+
+                /** этаж и домофон добавляем в комментарий */
+                if(str_contains($val, 'дмф') || str_contains($val, 'этаж'))
+                {
+                    $deliveryComment[] = $val;
+                    continue;
+                }
+
+                $address[] = $val;
+            }
+
+            $OrderDeliveryDTO->setAddress(implode(', ', $address));
         }
-
-        /**
-         * Комментарий покупателя
-         */
-
-        $deliveryComment[] = null;
 
         /** Добавляем комментарий при наличии */
         empty($order['comment']) ?: $deliveryComment[] = $order['comment'];

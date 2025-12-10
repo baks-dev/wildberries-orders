@@ -33,7 +33,7 @@ final class UpdateWildberriesOrdersPackageRequest extends Wildberries
     /**
      * Перевести на сборку
      *
-     * @see https://dev.wildberries.ru/openapi/orders-dbs/#tag/Sborochnye-zadaniya-DBS/paths/~1api~1v3~1dbs~1orders~1{orderId}~1confirm/patch
+     * @see https://dev.wildberries.ru/openapi/orders-dbs#tag/Sborochnye-zadaniya-DBS/paths/~1api~1v3~1dbs~1orders~1%7BorderId%7D~1confirm/patch
      */
     public function update(int|string $order): bool
     {
