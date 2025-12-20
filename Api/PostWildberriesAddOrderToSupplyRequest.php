@@ -71,7 +71,7 @@ final class PostWildberriesAddOrderToSupplyRequest extends Wildberries
     /**
      * Добавляет к поставке заказ и переводит в статус 1 ("В сборке").
      *
-     * @see https://dev.wildberries.ru/openapi/orders-fbs/#tag/Postavki-FBS/paths/~1api~1v3~1supplies~1{supplyId}~1orders~1{orderId}/patch
+     * @see https://dev.wildberries.ru/openapi/orders-fbs#tag/Postavki-FBS/paths/~1api~1marketplace~1v3~1supplies~1%7BsupplyId%7D~1orders/patch
      */
     public function add(): bool
     {
@@ -85,27 +85,33 @@ final class PostWildberriesAddOrderToSupplyRequest extends Wildberries
         if(false === $this->supply)
         {
             throw new InvalidArgumentException(
-                'Не указан идентификатор поставки через вызов метода withSupply: ->withSupply("WB-GI-1234567")'
+                'Не указан идентификатор поставки через вызов метода withSupply: ->withSupply("WB-GI-1234567")',
             );
         }
 
         if(false === $this->order)
         {
             throw new InvalidArgumentException(
-                'Не указан cписок идентификаторов сборочных заданий через вызов метода addOrder: ->withOrder(5632423)'
+                'Не указан cписок идентификаторов сборочных заданий через вызов метода addOrder: ->withOrder(5632423)',
             );
         }
 
+        //        $response = $this->marketplace()->TokenHttpClient()->request(
+        //            'PATCH',
+        //            '/api/v3/supplies/'.$this->supply.'/orders/'.$this->order,
+        //        );
+
         $response = $this->marketplace()->TokenHttpClient()->request(
             'PATCH',
-            '/api/v3/supplies/'.$this->supply.'/orders/'.$this->order,
+            sprintf('/api/marketplace/v3/supplies/%s/orders', $this->supply),
+            ['json' => ['orders' => [(int) $this->order]]],
         );
 
         if($response->getStatusCode() !== 204)
         {
             $this->logger->critical(
                 sprintf('wildberries-orders: Ошибка при добавлении заказа %s к поставке %s', $this->order, $this->supply),
-                [$response->toArray(false), self::class.':'.__LINE__]
+                [$response->toArray(false), self::class.':'.__LINE__],
             );
 
             return false;
