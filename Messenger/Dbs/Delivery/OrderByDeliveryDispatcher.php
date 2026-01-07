@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -26,12 +26,15 @@ declare(strict_types=1);
 namespace BaksDev\Wildberries\Orders\Messenger\Dbs\Delivery;
 
 
+use BaksDev\Core\Deduplicator\DeduplicatorInterface;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Orders\Order\Entity\Event\OrderEvent;
 use BaksDev\Orders\Order\Messenger\OrderMessage;
 use BaksDev\Orders\Order\Repository\CurrentOrderEvent\CurrentOrderEventInterface;
 use BaksDev\Orders\Order\Type\Status\OrderStatus\Collection\OrderStatusExtradition;
 use BaksDev\Wildberries\Orders\Type\DeliveryType\TypeDeliveryDbsWildberries;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 /** Метод создает сообщение на обновление статуса заказа в маркетплейсе нa Delivery «Доставляется»  */
@@ -39,23 +42,44 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 final readonly class OrderByDeliveryDispatcher
 {
     public function __construct(
+        #[Target('wildberriesOrdersLogger')] private LoggerInterface $Logger,
         private CurrentOrderEventInterface $CurrentOrderEventRepository,
         private MessageDispatchInterface $messageDispatch,
+        private DeduplicatorInterface $deduplicator,
     ) {}
 
     public function __invoke(OrderMessage $message): void
     {
+        /** Дедубликатор по идентификатору заказа */
+        $Deduplicator = $this->deduplicator
+            ->namespace('orders-order')
+            ->deduplication([
+                (string) $message->getId(),
+                self::class,
+            ]);
+
+        if($Deduplicator->isExecuted() === true)
+        {
+            return;
+        }
+
         $OrderEvent = $this->CurrentOrderEventRepository
             ->forOrder($message->getId())
             ->find();
 
         if(false === ($OrderEvent instanceof OrderEvent))
         {
+            $this->Logger->critical(
+                message: 'ozon-orders: Не найдено событие OrderEvent',
+                context: [self::class.':'.__LINE__, var_export($message, true)],
+            );
+
             return;
         }
 
         if(false === $OrderEvent->isDeliveryTypeEquals(TypeDeliveryDbsWildberries::TYPE))
         {
+            $Deduplicator->save();
             return;
         }
 

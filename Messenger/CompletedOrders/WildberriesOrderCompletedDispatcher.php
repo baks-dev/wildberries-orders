@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -78,17 +78,19 @@ final readonly class WildberriesOrderCompletedDispatcher
 
     public function __invoke(WildberriesOrderCompletedMessage $message): void
     {
-        //        $Deduplicator = $this->deduplicator
-        //            ->namespace('wildberries-orders')
-        //            ->deduplication([$message->getIdentifier(), UpdateWildberriesOrdersCompleted::class]);
-        //
-        //        /** Пропускаем, если заказ был добавлен в очередь на проверку через консоль */
-        //        if($message->isDeduplication() && $Deduplicator->isExecuted())
-        //        {
-        //            return;
-        //        }
-        //
-        //        $Deduplicator->isExecuted() ?: $Deduplicator->save();
+        /** Дедубликатор по идентификатору заказа */
+        $Deduplicator = $this->deduplicator
+            ->namespace('orders-order')
+            ->deduplication([
+                (string) $message->getOrder(),
+                self::class,
+            ]);
+
+        if($Deduplicator->isExecuted() === true)
+        {
+            return;
+        }
+
 
         $OrderEvent = $this->CurrentOrderEvent
             ->forOrder($message->getOrder())
@@ -101,6 +103,7 @@ final readonly class WildberriesOrderCompletedDispatcher
 
         if(false === $OrderEvent->isDeliveryTypeEquals(TypeDeliveryFbsWildberries::TYPE))
         {
+            $Deduplicator->save();
             return;
         }
 

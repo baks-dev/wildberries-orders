@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Wildberries\Orders\Messenger\Dbs\Package;
 
 
+use BaksDev\Core\Deduplicator\DeduplicatorInterface;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Orders\Order\Entity\Event\OrderEvent;
 use BaksDev\Orders\Order\Messenger\OrderMessage;
@@ -41,10 +42,24 @@ final readonly class OrderByPackageDispatcher
     public function __construct(
         private CurrentOrderEventInterface $CurrentOrderEventRepository,
         private MessageDispatchInterface $messageDispatch,
+        private DeduplicatorInterface $deduplicator,
     ) {}
 
     public function __invoke(OrderMessage $message): void
     {
+        /** Дедубликатор по идентификатору заказа */
+        $Deduplicator = $this->deduplicator
+            ->namespace('orders-order')
+            ->deduplication([
+                (string) $message->getId(),
+                self::class,
+            ]);
+
+        if($Deduplicator->isExecuted() === true)
+        {
+            return;
+        }
+
         $OrderEvent = $this->CurrentOrderEventRepository
             ->forOrder($message->getId())
             ->find();
@@ -56,6 +71,7 @@ final readonly class OrderByPackageDispatcher
 
         if(false === $OrderEvent->isDeliveryTypeEquals(TypeDeliveryDbsWildberries::TYPE))
         {
+            $Deduplicator->save();
             return;
         }
 
