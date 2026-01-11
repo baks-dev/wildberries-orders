@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@ use BaksDev\Orders\Order\Repository\OrderProducts\OrderProductsInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 /**
- * При обновлении заказа - обновляем статистику по продукции в заказе
+ * При обновлении заказа - обновляем статистику Wildberries по продукции в заказе
  */
 #[AsMessageHandler(priority: -100)]
 final readonly class UpdateStatisticsByChangeOrderHandler

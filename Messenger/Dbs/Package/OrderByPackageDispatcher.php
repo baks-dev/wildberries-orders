@@ -35,7 +35,7 @@ use BaksDev\Orders\Order\Type\Status\OrderStatus\Collection\OrderStatusPackage;
 use BaksDev\Wildberries\Orders\Type\DeliveryType\TypeDeliveryDbsWildberries;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-/** Метод создает сообщение на обновление статуса заказа в маркетплейсе нa Package «На сборке»  */
+/** Метод создает сообщение на обновление статуса заказа в Wildberries нa Package «На сборке» */
 #[AsMessageHandler(priority: 0)]
 final readonly class OrderByPackageDispatcher
 {

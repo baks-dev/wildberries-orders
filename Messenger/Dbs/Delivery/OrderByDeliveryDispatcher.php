@@ -37,7 +37,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-/** Метод создает сообщение на обновление статуса заказа в маркетплейсе нa Delivery «Доставляется»  */
+/** Метод создает сообщение на обновление статуса заказа Wildberries нa Delivery «Доставляется»  */
 #[AsMessageHandler(priority: 0)]
 final readonly class OrderByDeliveryDispatcher
 {
