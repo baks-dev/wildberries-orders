@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -30,8 +30,8 @@ use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Orders\Order\Entity\Order;
 use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersNewFbsRequest;
 use BaksDev\Wildberries\Orders\Schedule\NewOrders\UpdateWildberriesOrdersNewSchedules;
-use BaksDev\Wildberries\Orders\UseCase\New\WildberriesOrderDTO;
-use BaksDev\Wildberries\Orders\UseCase\New\WildberriesOrderHandler;
+use BaksDev\Wildberries\Orders\UseCase\New\WildberriesNewOrderDTO;
+use BaksDev\Wildberries\Orders\UseCase\New\WildberriesNewOrderHandler;
 use BaksDev\Wildberries\Products\Api\Cards\FindAllWildberriesCardsRequest;
 use BaksDev\Wildberries\Products\Api\Cards\WildberriesCardDTO;
 use BaksDev\Wildberries\Products\Messenger\Cards\CardNew\WildberriesCardNewMassage;
@@ -50,7 +50,7 @@ final readonly class NewWildberriesOrderFbsScheduleDispatcher
         private FindAllWildberriesOrdersNewFbsRequest $wildberriesOrdersNew,
         private FindAllWildberriesCardsRequest $WildberriesCardsRequest,
         private DeduplicatorInterface $deduplicator,
-        private WildberriesOrderHandler $WildberriesOrderHandler,
+        private WildberriesNewOrderHandler $WildberriesOrderHandler,
         private MessageDispatchInterface $messageDispatch,
         private AllWbTokensByProfileInterface $AllWbTokensByProfileRepository,
 
@@ -106,7 +106,7 @@ final readonly class NewWildberriesOrderFbsScheduleDispatcher
             /**
              * Добавляем новые заказы Wildberries
              */
-            /** @var WildberriesOrderDTO $WildberriesOrderDTO */
+            /** @var WildberriesNewOrderDTO $WildberriesOrderDTO */
             foreach($orders as $WildberriesOrderDTO)
             {
                 $Deduplicator = $this->deduplicator

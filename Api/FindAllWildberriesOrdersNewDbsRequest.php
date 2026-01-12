@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Wildberries\Orders\Api;
 
 use BaksDev\Wildberries\Api\Wildberries;
-use BaksDev\Wildberries\Orders\UseCase\New\WildberriesOrderDTO;
+use BaksDev\Wildberries\Orders\UseCase\New\WildberriesNewOrderDTO;
 use Generator;
 
 final class FindAllWildberriesOrdersNewDbsRequest extends Wildberries
@@ -37,7 +37,7 @@ final class FindAllWildberriesOrdersNewDbsRequest extends Wildberries
      *
      * @see https://dev.wildberries.ru/openapi/orders-dbs#tag/Sborochnye-zadaniya-DBS/paths/~1api~1v3~1dbs~1orders~1new/get
      *
-     * @return Generator<WildberriesOrderDTO>|false
+     * @return Generator<WildberriesNewOrderDTO>|false
      */
     public function findAll(): Generator|false
     {
@@ -94,7 +94,7 @@ final class FindAllWildberriesOrdersNewDbsRequest extends Wildberries
                 }
             }
 
-            yield new WildberriesOrderDTO($order, $this->getProfile(), $this->getTokenIdentifier());
+            yield new WildberriesNewOrderDTO($order, $this->getProfile(), $this->getTokenIdentifier());
         }
     }
 }

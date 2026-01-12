@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -53,11 +53,12 @@ use BaksDev\Users\Profile\UserProfile\Repository\UserByUserProfile\UserByUserPro
 use BaksDev\Users\Profile\UserProfile\Repository\UserProfileGps\UserProfileGpsInterface;
 use BaksDev\Users\Profile\UserProfile\UseCase\User\NewEdit\UserProfileHandler;
 use BaksDev\Wildberries\Orders\Api\Dbs\ClientInfo\ClientWildberriesOrdersDTO;
+use BaksDev\Wildberries\Orders\UseCase\New\Products\Items\WildberriesOrderProductItemDTO;
 use BaksDev\Wildberries\Orders\UseCase\New\User\Delivery\Field\OrderDeliveryFieldDTO;
 use BaksDev\Wildberries\Orders\UseCase\New\User\UserProfile\Value\ValueDTO;
 use Doctrine\ORM\EntityManagerInterface;
 
-final class WildberriesOrderHandler extends AbstractHandler
+final class WildberriesNewOrderHandler extends AbstractHandler
 {
     public function __construct(
         private readonly UserProfileHandler $profileHandler,
@@ -81,7 +82,7 @@ final class WildberriesOrderHandler extends AbstractHandler
         parent::__construct($entityManager, $messageDispatch, $validatorCollection, $imageUpload, $fileUpload);
     }
 
-    public function handle(WildberriesOrderDTO $command): Order|string|bool
+    public function handle(WildberriesNewOrderDTO $command): Order|string|bool
     {
         if(false === $command->getStatusEquals(OrderStatusNew::class))
         {
@@ -115,7 +116,7 @@ final class WildberriesOrderHandler extends AbstractHandler
         /**
          * Получаем события продукции
          *
-         * @var Products\NewOrderProductDTO $product
+         * @var Products\WildberriesOrderProductDTO $product
          */
         foreach($command->getProduct() as $product)
         {
@@ -136,6 +137,28 @@ final class WildberriesOrderHandler extends AbstractHandler
                 ->setOffer($ProductData->getOffer())
                 ->setVariation($ProductData->getVariation())
                 ->setModification($ProductData->getModification());
+        }
+
+
+        /**
+         * Создаем единицу продукта по количеству продукта в заказе
+         */
+        foreach($command->getProduct() as $WildberriesOrderProductDTO)
+        {
+            for($i = 0; $i < $WildberriesOrderProductDTO->getPrice()->getTotal(); $i++)
+            {
+                $item = new WildberriesOrderProductItemDTO();
+
+                /**
+                 * Присваиваем цену из продукта в заказе
+                 */
+                $item
+                    ->getPrice()
+                    ->setPrice($product->getPrice()->getPrice())
+                    ->setCurrency($product->getPrice()->getCurrency());
+
+                $product->addItem($item);
+            }
         }
 
 
@@ -201,7 +224,7 @@ final class WildberriesOrderHandler extends AbstractHandler
     }
 
 
-    public function fillProfile(WildberriesOrderDTO $command): void
+    public function fillProfile(WildberriesNewOrderDTO $command): void
     {
         if(false === ($command->getClient() instanceof ClientWildberriesOrdersDTO))
         {
@@ -275,7 +298,7 @@ final class WildberriesOrderHandler extends AbstractHandler
     }
 
 
-    public function fillDelivery(WildberriesOrderDTO $command): void
+    public function fillDelivery(WildberriesNewOrderDTO $command): void
     {
         /* Идентификатор свойства адреса доставки */
         $OrderDeliveryDTO = $command->getUsr()->getDelivery();

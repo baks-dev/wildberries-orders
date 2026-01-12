@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -35,8 +35,8 @@ use BaksDev\Wildberries\Orders\Api\Dbs\DeliveryDateTime\WildberriesOrdersDbsDeli
 use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersNewDbsRequest;
 use BaksDev\Wildberries\Orders\Schedule\NewOrders\UpdateWildberriesOrdersNewSchedules;
 use BaksDev\Wildberries\Orders\Type\DeliveryType\TypeDeliveryDbsWildberries;
-use BaksDev\Wildberries\Orders\UseCase\New\WildberriesOrderDTO;
-use BaksDev\Wildberries\Orders\UseCase\New\WildberriesOrderHandler;
+use BaksDev\Wildberries\Orders\UseCase\New\WildberriesNewOrderDTO;
+use BaksDev\Wildberries\Orders\UseCase\New\WildberriesNewOrderHandler;
 use BaksDev\Wildberries\Products\Api\Cards\FindAllWildberriesCardsRequest;
 use BaksDev\Wildberries\Products\Api\Cards\WildberriesCardDTO;
 use BaksDev\Wildberries\Products\Messenger\Cards\CardNew\WildberriesCardNewMassage;
@@ -55,7 +55,7 @@ final readonly class NewWildberriesOrderDbsScheduleDispatcher
         #[Target('wildberriesOrdersLogger')] private LoggerInterface $logger,
         private FindAllWildberriesOrdersNewDbsRequest $wildberriesOrdersNew,
         private DeduplicatorInterface $deduplicator,
-        private WildberriesOrderHandler $WildberriesOrderHandler,
+        private WildberriesNewOrderHandler $WildberriesOrderHandler,
         private AllWbTokensByProfileInterface $AllWbTokensByProfileRepository,
         private FindClientWildberriesOrdersRequest $FindClientWildberriesOrdersRequest,
         private GetWildberriesOrdersDbsDeliveryDateTimeRequest $GetWildberriesOrdersDbsDeliveryDateTimeRequest
@@ -127,7 +127,7 @@ final readonly class NewWildberriesOrderDbsScheduleDispatcher
         WbTokenUid $WbTokenUid
     ): void
     {
-        /** @var WildberriesOrderDTO $WildberriesOrderDTO */
+        /** @var WildberriesNewOrderDTO $WildberriesOrderDTO */
         foreach($orders as $WildberriesOrderDTO)
         {
             $Deduplicator = $this->deduplicator

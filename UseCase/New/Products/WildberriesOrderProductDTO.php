@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -31,10 +31,12 @@ use BaksDev\Products\Product\Type\Event\ProductEventUid;
 use BaksDev\Products\Product\Type\Offers\Id\ProductOfferUid;
 use BaksDev\Products\Product\Type\Offers\Variation\Id\ProductVariationUid;
 use BaksDev\Products\Product\Type\Offers\Variation\Modification\Id\ProductModificationUid;
+use BaksDev\Wildberries\Orders\UseCase\New\Products\Items\WildberriesOrderProductItemDTO;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /** @see OrderProduct */
-final class NewOrderProductDTO implements OrderProductInterface
+final class WildberriesOrderProductDTO implements OrderProductInterface
 {
     /** Артикул продукта */
     #[Assert\NotBlank]
@@ -66,11 +68,20 @@ final class NewOrderProductDTO implements OrderProductInterface
     #[Assert\Valid]
     private Price\NewOrderPriceDTO $price;
 
+    /**
+     * Коллекция единиц товара
+     *
+     * @var ArrayCollection<WildberriesOrderProductItemDTO> $item
+     */
+    #[Assert\Valid]
+    private ArrayCollection $item;
+
     public function __construct(string $article, string $barcode)
     {
         $this->article = $article;
         $this->barcode = $barcode;
         $this->price = new Price\NewOrderPriceDTO();
+        $this->item = new ArrayCollection();
 
     }
 
@@ -173,4 +184,34 @@ final class NewOrderProductDTO implements OrderProductInterface
     {
         $this->price = $price;
     }
+
+
+    /**
+     * Коллекция разделенных отправлений одного заказа
+     *
+     * @return ArrayCollection<WildberriesOrderProductItemDTO>
+     */
+    public function getItem(): ArrayCollection
+    {
+        return $this->item;
+    }
+
+    public function addItem(WildberriesOrderProductItemDTO $item): void
+    {
+        $exist = $this->item->exists(function(int $k, WildberriesOrderProductItemDTO $value) use ($item) {
+            /** @var WildberriesOrderProductItemDTO $item */
+            return $value->getConst()->equals($item->getConst());
+        });
+
+        if(false === $exist)
+        {
+            $this->item->add($item);
+        }
+    }
+
+    public function removeItem(WildberriesOrderProductItemDTO $item): void
+    {
+        $this->item->removeElement($item);
+    }
+
 }

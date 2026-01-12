@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,7 @@ namespace BaksDev\Wildberries\Orders\Api\Dbs\DeliveryDateTime\Tests;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Wildberries\Orders\Api\Dbs\DeliveryDateTime\GetWildberriesOrdersDbsDeliveryDateTimeRequest;
 use BaksDev\Wildberries\Orders\Api\Dbs\DeliveryDateTime\WildberriesOrdersDbsDeliveryDateTimeDTO;
-use BaksDev\Wildberries\Orders\UseCase\New\WildberriesOrderHandler;
+use BaksDev\Wildberries\Orders\UseCase\New\WildberriesNewOrderHandler;
 use BaksDev\Wildberries\Type\Authorization\WbAuthorizationToken;
 use PHPUnit\Framework\Attributes\Group;
 use ReflectionClass;
@@ -63,7 +63,7 @@ class GetWildberriesOrdersDbsDeliveryDateTimeRequestTest extends KernelTestCase
         $GetWildberriesOrdersDbsDeliveryDateTimeRequest = self::getContainer()->get(GetWildberriesOrdersDbsDeliveryDateTimeRequest::class);
         $GetWildberriesOrdersDbsDeliveryDateTimeRequest->TokenHttpClient(self::$Authorization);
 
-        /** @var WildberriesOrderHandler $WildberriesOrderHandler */
+        /** @var WildberriesNewOrderHandler $WildberriesOrderHandler */
 
         $WildberriesOrdersDbsDeliveryDateTimeDTO = $GetWildberriesOrdersDbsDeliveryDateTimeRequest
             ->find('W-4367157483');

@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -46,13 +46,14 @@ use BaksDev\Wildberries\Orders\Type\PaymentType\TypePaymentDbsWildberries;
 use BaksDev\Wildberries\Orders\Type\PaymentType\TypePaymentFbsWildberries;
 use BaksDev\Wildberries\Orders\Type\ProfileType\TypeProfileDbsWildberries;
 use BaksDev\Wildberries\Orders\Type\ProfileType\TypeProfileFbsWildberries;
+use BaksDev\Wildberries\Orders\UseCase\New\Products\WildberriesOrderProductDTO;
 use BaksDev\Wildberries\Type\id\WbTokenUid;
 use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /** @see OrderEvent */
-final class WildberriesOrderDTO implements OrderEventInterface
+final class WildberriesNewOrderDTO implements OrderEventInterface
 {
     /** Идентификатор события */
     #[Assert\Uuid]
@@ -226,7 +227,7 @@ final class WildberriesOrderDTO implements OrderEventInterface
 
         /** Продукция */
 
-        $NewOrderProductDTO = new Products\NewOrderProductDTO($order['article'], current($order['skus']));
+        $NewOrderProductDTO = new WildberriesOrderProductDTO($order['article'], current($order['skus']));
 
         $NewOrderPriceDTO = $NewOrderProductDTO->getPrice();
 
@@ -285,7 +286,7 @@ final class WildberriesOrderDTO implements OrderEventInterface
     /**
      * Коллекция продукции в заказе
      *
-     * @return ArrayCollection<Products\NewOrderProductDTO>
+     * @return ArrayCollection<Products\WildberriesOrderProductDTO>
      */
 
     public function getProduct(): ArrayCollection
@@ -298,9 +299,9 @@ final class WildberriesOrderDTO implements OrderEventInterface
         $this->product = $product;
     }
 
-    public function addProduct(Products\NewOrderProductDTO $product): void
+    public function addProduct(Products\WildberriesOrderProductDTO $product): void
     {
-        $filter = $this->product->filter(function(Products\NewOrderProductDTO $element) use ($product) {
+        $filter = $this->product->filter(function(Products\WildberriesOrderProductDTO $element) use ($product) {
             return $element->getArticle() === $product->getArticle();
         });
 
@@ -310,7 +311,7 @@ final class WildberriesOrderDTO implements OrderEventInterface
         }
     }
 
-    public function removeProduct(Products\NewOrderProductDTO $product): void
+    public function removeProduct(Products\WildberriesOrderProductDTO $product): void
     {
         $this->product->removeElement($product);
     }

@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -31,8 +31,8 @@ use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Users\Profile\UserProfile\UseCase\Admin\NewEdit\Tests\NewUserProfileHandlerTest;
 use BaksDev\Users\Profile\UserProfile\UseCase\User\NewEdit\Tests\UserNewUserProfileHandleTest;
 use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersNewFbsRequest;
-use BaksDev\Wildberries\Orders\UseCase\New\WildberriesOrderDTO;
-use BaksDev\Wildberries\Orders\UseCase\New\WildberriesOrderHandler;
+use BaksDev\Wildberries\Orders\UseCase\New\WildberriesNewOrderDTO;
+use BaksDev\Wildberries\Orders\UseCase\New\WildberriesNewOrderHandler;
 use BaksDev\Wildberries\Type\Authorization\WbAuthorizationToken;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -67,8 +67,8 @@ class WildberriesOrdersNewFbsTest extends KernelTestCase
         $WildberriesOrdersNewRequest = self::getContainer()->get(FindAllWildberriesOrdersNewFbsRequest::class);
         $WildberriesOrdersNewRequest->TokenHttpClient(self::$Authorization);
 
-        /** @var WildberriesOrderHandler $WildberriesOrderHandler */
-        $WildberriesOrderHandler = self::getContainer()->get(WildberriesOrderHandler::class);
+        /** @var WildberriesNewOrderHandler $WildberriesOrderHandler */
+        $WildberriesOrderHandler = self::getContainer()->get(WildberriesNewOrderHandler::class);
 
         $data = $WildberriesOrdersNewRequest->findAll();
 
@@ -81,7 +81,7 @@ class WildberriesOrdersNewFbsTest extends KernelTestCase
 
         foreach($data as $order)
         {
-            self::assertInstanceOf(WildberriesOrderDTO::class, $order);
+            self::assertInstanceOf(WildberriesNewOrderDTO::class, $order);
 
             $handle = $WildberriesOrderHandler->handle($order);
 
