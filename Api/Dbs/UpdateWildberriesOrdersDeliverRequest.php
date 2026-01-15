@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -43,6 +43,11 @@ final class UpdateWildberriesOrdersDeliverRequest extends Wildberries
             return true;
         }
 
+        if(false === $this->isOrders())
+        {
+            return true;
+        }
+
         $order = str_replace('W-', '', (string) $order);
 
         $response = $this
@@ -55,12 +60,25 @@ final class UpdateWildberriesOrdersDeliverRequest extends Wildberries
 
         if($response->getStatusCode() !== 204)
         {
+            if($response->getStatusCode() === 429)
+            {
+                sleep(1);
+            }
+
             $content = $response->toArray(false);
 
             $this->logger->critical(
-                'wildberries-orders: Ошибка при получении новых заказов',
+                sprintf(
+                    'wildberries-orders: Ошибка %s при перемещении заказа %s в доставку',
+                    $response->getStatusCode(), $order,
+                ),
                 [$content, self::class.':'.__LINE__],
             );
+
+            if($content['code'] === 'StatusMismatch' && $response->getStatusCode() === 409)
+            {
+                return true;
+            }
 
             return false;
         }

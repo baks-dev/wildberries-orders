@@ -41,7 +41,7 @@ final class FindAllWildberriesOrdersNewDbsRequest extends Wildberries
      */
     public function findAll(): Generator|false
     {
-        if(false === $this->isStock())
+        if(false === $this->isOrders())
         {
             return false;
         }

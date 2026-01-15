@@ -216,6 +216,12 @@ final class WildberriesNewOrderDTO implements OrderEventInterface
             $OrderDeliveryDTO->setAddress(implode(', ', $address));
         }
 
+        else if(isset($order['offices']))
+        {
+            $OrderDeliveryDTO->setAddress(implode(', ', str_replace('_', ' ', $order['offices'])));
+
+        }
+
         /** Добавляем комментарий при наличии */
         empty($order['comment']) ?: $deliveryComment[] = $order['comment'];
 
