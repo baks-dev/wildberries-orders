@@ -83,11 +83,6 @@ final class PostWildberriesSgtinRequest extends Wildberries
             return true;
         }
 
-        if(false === $this->isOrders())
-        {
-            return true;
-        }
-
         if(empty($this->sgtin))
         {
             $this->logger->warning(

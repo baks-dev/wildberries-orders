@@ -82,11 +82,6 @@ final class PostWildberriesAddOrderToSupplyRequest extends Wildberries
             return true;
         }
 
-        if(false === $this->isOrders())
-        {
-            return true;
-        }
-
         if(false === $this->supply)
         {
             throw new InvalidArgumentException(
@@ -100,11 +95,6 @@ final class PostWildberriesAddOrderToSupplyRequest extends Wildberries
                 'Не указан cписок идентификаторов сборочных заданий через вызов метода addOrder: ->withOrder(5632423)',
             );
         }
-
-        //        $response = $this->marketplace()->TokenHttpClient()->request(
-        //            'PATCH',
-        //            '/api/v3/supplies/'.$this->supply.'/orders/'.$this->order,
-        //        );
 
         $response = $this->marketplace()->TokenHttpClient()->request(
             'PATCH',
