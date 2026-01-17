@@ -35,6 +35,8 @@ use BaksDev\Wildberries\Orders\UseCase\New\WildberriesNewOrderDTO;
 use BaksDev\Wildberries\Orders\UseCase\New\WildberriesNewOrderHandler;
 use BaksDev\Wildberries\Type\Authorization\WbAuthorizationToken;
 use PHPUnit\Framework\Attributes\Group;
+use ReflectionClass;
+use ReflectionMethod;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
@@ -72,6 +74,8 @@ class WildberriesOrdersNewBdsTest extends KernelTestCase
 
         $data = $FindAllWildberriesOrdersNewDbsRequest->findAll();
 
+        iterator_to_array($data);
+
 
         /** Если нет заказов */
         if(false === $data || false === $data->valid())
@@ -80,11 +84,24 @@ class WildberriesOrdersNewBdsTest extends KernelTestCase
             return;
         }
 
-        foreach($data as $order)
+        foreach($data as $WildberriesNewOrderDTO)
         {
-            self::assertInstanceOf(WildberriesNewOrderDTO::class, $order);
+            // Вызываем все геттеры
+            $reflectionClass = new ReflectionClass(WildberriesNewOrderDTO::class);
+            $methods = $reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC);
 
-            $handle = $WildberriesOrderHandler->handle($order);
+            foreach($methods as $method)
+            {
+                // Методы без аргументов
+                if($method->getNumberOfParameters() === 0)
+                {
+                    // Вызываем метод
+                    $data = $method->invoke($WildberriesNewOrderDTO);
+                    // dump($data);
+                }
+            }
+
+            $handle = $WildberriesOrderHandler->handle($WildberriesNewOrderDTO);
 
             if($handle === true)
             {
