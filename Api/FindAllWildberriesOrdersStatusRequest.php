@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -34,6 +34,12 @@ final class FindAllWildberriesOrdersStatusRequest extends Wildberries
      */
     private array $orders = [];
 
+    public function clearOrders(): self
+    {
+        $this->orders = [];
+
+        return $this;
+    }
 
     /**
      * Добавить в список идентификатор сборочного задания
@@ -111,8 +117,8 @@ final class FindAllWildberriesOrdersStatusRequest extends Wildberries
                         'orders' => $orders,
                         'content' => $content,
                         'profile' => (string) $this->profile,
-                        self::class.':'.__LINE__
-                    ]
+                        self::class.':'.__LINE__,
+                    ],
                 );
 
                 continue;

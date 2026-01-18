@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -59,9 +59,6 @@ final readonly class CancelWildberriesOrdersScheduleDispatcher
      */
     public function __invoke(CancelWildberriesOrdersScheduleMessage $message): void
     {
-        /* TODO: реализовать отмену заказов !!! */
-        return;
-
         /** Получаем все токены профиля */
 
         $tokensByProfile = $this->AllWbTokensByProfileRepository
@@ -91,7 +88,6 @@ final readonly class CancelWildberriesOrdersScheduleDispatcher
             /** Добавляем дедубликатор обновления (удалям в конце данного процесса) */
             $DeduplicatorExecuted->save();
 
-
             /**
              * Получаем все заказы Wildberries
              */
@@ -102,98 +98,100 @@ final readonly class CancelWildberriesOrdersScheduleDispatcher
 
             $orders = iterator_to_array($orders);
 
+            /** Присваиваем токен авторизации */
             $this->FindAllWildberriesOrdersStatusRequest
                 ->forTokenIdentifier($WbTokenUid)
-                ->profile($message->getProfile());
+                ->profile($message->getProfile())
+                ->clearOrders();
 
             /** Добавляем в объект Request идентификатор заказа Wildberries для получения его статуса */
             array_map(function($OrderUid) {
-                $this->FindAllWildberriesOrdersStatusRequest
-                    ->addOrder($OrderUid->getAttr());
+                $this->FindAllWildberriesOrdersStatusRequest->addOrder($OrderUid->getAttr());
             }, iterator_to_array($orders));
 
+            /** Получаем список отмен */
             $cancels = $this->FindAllWildberriesOrdersStatusRequest->findOrderCancel();
 
-
-        }
-
-
-        if(false === $cancels)
-        {
-            return;
-        }
-
-        foreach($cancels as $cancel)
-        {
-            $Deduplicator = $this->deduplicator
-                ->expiresAfter('30 days')
-                ->deduplication([$cancel, self::class]);
-
-            if($Deduplicator->isExecuted())
+            if(false === $cancels)
             {
-                return;
-            }
-
-            /**
-             * Отменяем заказы
-             */
-
-            $filter = array_filter($orders, static function($OrderUid) use ($cancel) {
-                return $OrderUid->getAttr() === $cancel;
-            });
-
-            $OrderUid = current($filter);
-
-            if(false === $OrderUid)
-            {
-                $this->logger->warning('Заказа %s для отмены не найдено', $cancel);
-
                 continue;
             }
 
-            $OrderEvent = $this->CurrentOrderEvent
-                ->forOrder($OrderUid)
-                ->find();
-
-            if(false === ($OrderEvent instanceof OrderEvent))
+            foreach($cancels as $cancel)
             {
-                $this->logger->warning('События для отмены заказа  %s не найдено', $cancel);
+                $Deduplicator = $this->deduplicator
+                    ->expiresAfter('30 days')
+                    ->deduplication([$cancel, self::class]);
 
-                continue;
+                if($Deduplicator->isExecuted())
+                {
+                    continue;
+                }
+
+                /**
+                 * Отменяем заказы
+                 */
+
+                $filter = array_filter($orders, static function($OrderUid) use ($cancel) {
+                    return $OrderUid->getAttr() === $cancel;
+                });
+
+                $OrderUid = current($filter);
+
+                if(false === $OrderUid)
+                {
+                    $this->logger->warning('Заказа %s для отмены не найдено', $cancel);
+
+                    continue;
+                }
+
+                $OrderEvent = $this->CurrentOrderEvent
+                    ->forOrder($OrderUid)
+                    ->find();
+
+                if(false === ($OrderEvent instanceof OrderEvent))
+                {
+                    $this->logger->warning('События для отмены заказа  %s не найдено', $cancel);
+
+                    continue;
+                }
+
+                /**
+                 * Отправляем сокет для скрытия
+                 */
+
+                $this->CentrifugoPublish
+                    ->addData(['identifier' => (string) $OrderUid])
+                    ->addData(['profile' => false])
+                    ->send('remove');
+
+                $this->CentrifugoPublish
+                    ->addData(['profile' => false]) // Скрывает у всех
+                    ->addData(['order' => (string) $OrderUid])
+                    ->send('orders');
+
+
+                /**
+                 * Отменяем заказ
+                 */
+
+                $OrderCanceledDTO = new CanceledOrderDTO();
+                $OrderEvent->getDto($OrderCanceledDTO);
+                $OrderCanceledDTO->setComment('Отмена пользователем Wildberries');
+
+
+                $Order = $this->OrderStatusHandler->handle($OrderCanceledDTO);
+
+                if(false === ($Order instanceof Order))
+                {
+                    $this->logger->critical('Ошибка при отмене заказа %s', $cancel);
+                    continue;
+                }
+
+                $Deduplicator->save();
+
+                $this->logger->info(sprintf('Заказ %s успешно отменен', $cancel));
             }
-
-            /**
-             * Отправляем сокет для скрытия
-             */
-
-            $this->CentrifugoPublish
-                ->addData(['identifier' => (string) $OrderUid])
-                ->addData(['profile' => false])
-                ->send('remove');
-
-
-            /**
-             * Отменяем заказ
-             */
-
-            $OrderCanceledDTO = new CanceledOrderDTO();
-            $OrderEvent->getDto($OrderCanceledDTO);
-            $OrderCanceledDTO->setComment('Отмена пользователем');
-
-
-            $Order = $this->OrderStatusHandler->handle($OrderCanceledDTO);
-
-            if(false === ($Order instanceof Order))
-            {
-                $this->logger->critical('Ошибка при отмене заказа %s', $cancel);
-                continue;
-            }
-
-            $Deduplicator->save();
-
-            $this->logger->info(sprintf('Заказ %s успешно отменен', $cancel));
         }
-
-
     }
 }
