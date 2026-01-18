@@ -48,7 +48,7 @@ use BaksDev\Products\Sign\Repository\CurrentEvent\ProductSignCurrentEventInterfa
 use BaksDev\Products\Sign\Repository\ProductSignByOrder\ProductSignByOrderInterface;
 use BaksDev\Products\Sign\UseCase\Admin\Status\ProductSignDoneDTO;
 use BaksDev\Products\Sign\UseCase\Admin\Status\ProductSignStatusHandler;
-use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersStatusRequest;
+use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersStatusFbsRequest;
 use BaksDev\Wildberries\Orders\Commands\UpdateWildberriesOrdersCompletedCommand;
 use BaksDev\Wildberries\Orders\Type\DeliveryType\TypeDeliveryFbsWildberries;
 use Psr\Log\LoggerInterface;
@@ -60,7 +60,7 @@ final readonly class WildberriesOrderCompletedDispatcher
 {
     public function __construct(
         #[Target('wildberriesOrdersLogger')] private LoggerInterface $logger,
-        private FindAllWildberriesOrdersStatusRequest $FindAllWildberriesOrdersStatusRequest,
+        private FindAllWildberriesOrdersStatusFbsRequest $FindAllWildberriesOrdersStatusRequest,
         private MessageDispatchInterface $messageDispatch,
         private CurrentOrderEventInterface $CurrentOrderEvent,
         private OrderStatusHandler $OrderStatusHandler,

@@ -27,7 +27,7 @@ namespace BaksDev\Wildberries\Orders\Api;
 
 use BaksDev\Wildberries\Api\Wildberries;
 
-final class FindAllWildberriesOrdersStatusRequest extends Wildberries
+final class FindAllWildberriesOrdersStatusDbsRequest extends Wildberries
 {
     /**
      * Список идентификаторов сборочных заданий
@@ -74,7 +74,7 @@ final class FindAllWildberriesOrdersStatusRequest extends Wildberries
      * canceled_by_client - отмена сборочного задания покупателем
      *
      *
-     * @see https://dev.wildberries.ru/openapi/orders-fbs/#tag/Sborochnye-zadaniya/paths/~1api~1v3~1orders~1status/post
+     * @see https://dev.wildberries.ru/openapi/orders-dbs#tag/Sborochnye-zadaniya-DBS/paths/~1api~1marketplace~1v3~1dbs~1orders~1status~1info/post
      *
      */
     private function request(): array|false
@@ -93,11 +93,12 @@ final class FindAllWildberriesOrdersStatusRequest extends Wildberries
         {
             $data = ["orders" => $orders];
 
-            $response = $this->marketplace()->TokenHttpClient()->request(
-                'POST',
-                '/api/v3/orders/status',
-                ['json' => $data],
-            );
+            $response = $this->marketplace()->TokenHttpClient()
+                ->request(
+                    'POST',
+                    '/api/marketplace/v3/dbs/orders/status/info',
+                    ['json' => $data],
+                );
 
             /** Если попадаем на блокировку - включаем ожидание */
             if($response->getStatusCode() === 429)
@@ -142,7 +143,12 @@ final class FindAllWildberriesOrdersStatusRequest extends Wildberries
         }
 
         $orders = array_filter($request, static function($item) {
-            return in_array($item['wbStatus'], ['declined_by_client', 'canceled']);
+            return in_array($item['wbStatus'], [
+                'canceled', // отмена сборочного задания
+                'canceled_by_client', // покупатель отменил заказ при получении
+                'declined_by_client', // покупатель отменил заказ в первый чаc
+                'canceled_by_missed_call', // отмена по причине недозвона
+            ]);
         });
 
         return empty($orders) ? false :

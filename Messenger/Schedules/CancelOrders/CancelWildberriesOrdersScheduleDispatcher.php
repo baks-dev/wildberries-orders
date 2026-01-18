@@ -32,7 +32,7 @@ use BaksDev\Orders\Order\Entity\Order;
 use BaksDev\Orders\Order\Repository\CurrentOrderEvent\CurrentOrderEventInterface;
 use BaksDev\Orders\Order\UseCase\Admin\Canceled\CanceledOrderDTO;
 use BaksDev\Orders\Order\UseCase\Admin\Status\OrderStatusHandler;
-use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersStatusRequest;
+use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersStatusFbsRequest;
 use BaksDev\Wildberries\Orders\Repository\AllWbOrdersNew\AllWbOrdersNewInterface;
 use BaksDev\Wildberries\Orders\Schedule\UpdateOrdersStatus\UpdateWildberriesOrdersCancelSchedules;
 use BaksDev\Wildberries\Repository\AllWbTokensByProfile\AllWbTokensByProfileInterface;
@@ -46,7 +46,7 @@ final readonly class CancelWildberriesOrdersScheduleDispatcher
     public function __construct(
         #[Target('wildberriesOrdersLogger')] private LoggerInterface $logger,
         private AllWbOrdersNewInterface $AllWbOrdersNewInterface,
-        private FindAllWildberriesOrdersStatusRequest $FindAllWildberriesOrdersStatusRequest,
+        private FindAllWildberriesOrdersStatusFbsRequest $FindAllWildberriesOrdersStatusFbsRequest,
         private CurrentOrderEventInterface $CurrentOrderEvent,
         private CentrifugoPublishInterface $CentrifugoPublish,
         private OrderStatusHandler $OrderStatusHandler,
@@ -99,18 +99,17 @@ final readonly class CancelWildberriesOrdersScheduleDispatcher
             $orders = iterator_to_array($orders);
 
             /** Присваиваем токен авторизации */
-            $this->FindAllWildberriesOrdersStatusRequest
+            $this->FindAllWildberriesOrdersStatusFbsRequest
                 ->forTokenIdentifier($WbTokenUid)
-                ->profile($message->getProfile())
-                ->clearOrders();
+                ->clearOrders(); // сбрасываем массив идентификаторов
 
             /** Добавляем в объект Request идентификатор заказа Wildberries для получения его статуса */
             array_map(function($OrderUid) {
-                $this->FindAllWildberriesOrdersStatusRequest->addOrder($OrderUid->getAttr());
+                $this->FindAllWildberriesOrdersStatusFbsRequest->addOrder($OrderUid->getAttr());
             }, iterator_to_array($orders));
 
             /** Получаем список отмен */
-            $cancels = $this->FindAllWildberriesOrdersStatusRequest->findOrderCancel();
+            $cancels = $this->FindAllWildberriesOrdersStatusFbsRequest->findOrderCancel();
 
             if(false === $cancels)
             {

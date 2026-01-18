@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@ use BaksDev\Orders\Order\Entity\Order;
 use BaksDev\Orders\Order\UseCase\Admin\Edit\Tests\OrderNewTest;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Users\Profile\UserProfile\UseCase\User\NewEdit\Tests\UserNewUserProfileHandleTest;
-use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersStatusRequest;
+use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersStatusFbsRequest;
 use BaksDev\Wildberries\Type\Authorization\WbAuthorizationToken;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -56,8 +56,8 @@ class WildberriesOrdersStatusTest extends KernelTestCase
 
     public function testUseCase(): void
     {
-        /** @var FindAllWildberriesOrdersStatusRequest $FindAllWildberriesOrdersStatusRequest */
-        $FindAllWildberriesOrdersStatusRequest = self::getContainer()->get(FindAllWildberriesOrdersStatusRequest::class);
+        /** @var FindAllWildberriesOrdersStatusFbsRequest $FindAllWildberriesOrdersStatusRequest */
+        $FindAllWildberriesOrdersStatusRequest = self::getContainer()->get(FindAllWildberriesOrdersStatusFbsRequest::class);
         $FindAllWildberriesOrdersStatusRequest->TokenHttpClient(self::$Authorization);
 
         $data = $FindAllWildberriesOrdersStatusRequest
