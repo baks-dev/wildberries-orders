@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -82,13 +82,13 @@ final class GetWildberriesOrdersStickerRequest extends Wildberries
         if(false === $this->order)
         {
             throw new InvalidArgumentException(
-                'Не указан идентификатор сборочного задания через вызов метода addOrder: ->forOrder(5632423)'
+                'Не указан идентификатор сборочного задания через вызов метода addOrder: ->forOrder(5632423)',
             );
         }
 
 
         $cache = $this->getCacheInit('wildberries-orders');
-        $key = md5($this->getProfile().$this->order.$this->type.$this->width.$this->height.self::class);
+        $key = md5($this->getTokenIdentifier().$this->order.$this->type.$this->width.$this->height.self::class);
         //$cache->deleteItem($key);
 
         $file = $cache->get($key, function(ItemInterface $item): string|false {
@@ -109,7 +109,7 @@ final class GetWildberriesOrdersStickerRequest extends Wildberries
             {
                 $this->logger->critical(
                     sprintf('wildberries-orders: Ошибка при получении стикера заказа %s', $this->order),
-                    [$content, self::class.':'.__LINE__]
+                    [$content, self::class.':'.__LINE__],
                 );
 
                 return false;
@@ -133,7 +133,7 @@ final class GetWildberriesOrdersStickerRequest extends Wildberries
 
             usleep(100);
 
-            return str_replace(array('width="400"', 'height="300"'), array('width="180"', ''), $file);
+            return str_replace(['width="400"', 'height="300"'], ['width="180"', ''], $file);
         });
 
         return $file;
