@@ -33,6 +33,7 @@ use BaksDev\Payment\UseCase\Admin\NewEdit\PaymentDTO;
 use BaksDev\Payment\UseCase\Admin\NewEdit\PaymentHandler;
 use BaksDev\Payment\UseCase\Admin\NewEdit\Trans\PaymentTransDTO;
 use BaksDev\Users\Profile\TypeProfile\Type\Id\TypeProfileUid;
+use BaksDev\Wildberries\Orders\Type\PaymentType\TypePaymentPickupWildberries;
 use BaksDev\Wildberries\Orders\Type\ProfileType\TypeProfilePickupWildberries;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -59,7 +60,7 @@ class UpgradePaymentTypePickupWildberriesCommand extends Command
     /** Добавляет способ оплаты Wildberries при самовывозе  */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $PaymentUid = new PaymentUid(TypeProfilePickupWildberries::class);
+        $PaymentUid = new PaymentUid(TypePaymentPickupWildberries::class);
 
         /** Проверяем наличие способа оплаты Wildberries */
         $exists = $this->existTypePayment->isExists($PaymentUid);
