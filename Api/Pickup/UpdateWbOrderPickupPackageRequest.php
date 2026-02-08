@@ -23,24 +23,18 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Wildberries\Orders\Api\Dbs;
+namespace BaksDev\Wildberries\Orders\Api\Pickup;
 
 use BaksDev\Wildberries\Api\Wildberries;
 
 /** Перевести на сборку */
-final class UpdateWildberriesOrdersCancelRequest extends Wildberries
+final class UpdateWbOrderPickupPackageRequest extends Wildberries
 {
-    private string|false $code;
-
-    public function code(string $code): void
-    {
-        $this->code = $code;
-    }
-
     /**
-     * Сообщить, что покупатель отказался от заказа
+     * Перевести на сборку
+     * Сообщить, что сборочное задание готово к выдаче
      *
-     * @see https://dev.wildberries.ru/openapi/orders-dbs/#tag/Sborochnye-zadaniya-DBS/paths/~1api~1v3~1dbs~1orders~1{orderId}~1reject/patch
+     * @see https://dev.wildberries.ru/docs/openapi/in-store-pickup#tag/Sborochnye-zadaniya-Samovyvoz/paths/~1api~1v3~1click-collect~1orders~1%7BorderId%7D~1prepare/patch
      */
     public function update(int|string $order): bool
     {
@@ -55,12 +49,6 @@ final class UpdateWildberriesOrdersCancelRequest extends Wildberries
             return true;
         }
 
-        if(empty($this->code))
-        {
-            $this->logger->critical('wildberries-orders: Не указан код подтверждения');
-            return false;
-        }
-
         $order = str_replace('W-', '', (string) $order);
 
         $response = $this
@@ -68,8 +56,7 @@ final class UpdateWildberriesOrdersCancelRequest extends Wildberries
             ->TokenHttpClient()
             ->request(
                 method: 'PATCH',
-                url: sprintf('/api/v3/dbs/orders/%s/reject', $order),
-                options: ['json' => ['code' => 'OK']],
+                url: sprintf('/api/v3/click-collect/orders/%s/prepare', $order),
             );
 
         if($response->getStatusCode() !== 204)
@@ -77,8 +64,8 @@ final class UpdateWildberriesOrdersCancelRequest extends Wildberries
             $content = $response->toArray(false);
 
             $this->logger->critical(
-                'wildberries-orders: Ошибка при получении новых заказов',
-                [$content, self::class.':'.__LINE__],
+                sprintf('wildberries-orders: Ошибка при отправке заказа %s на «Готово к выдаче»', $order),
+                [$content, self::class.':'.__LINE__, $this->getTokenIdentifier()],
             );
 
             return false;
@@ -86,5 +73,4 @@ final class UpdateWildberriesOrdersCancelRequest extends Wildberries
 
         return true;
     }
-
 }

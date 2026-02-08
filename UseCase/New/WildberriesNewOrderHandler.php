@@ -52,7 +52,7 @@ use BaksDev\Users\Profile\UserProfile\Repository\FieldValueForm\FieldValueFormIn
 use BaksDev\Users\Profile\UserProfile\Repository\UserByUserProfile\UserByUserProfileInterface;
 use BaksDev\Users\Profile\UserProfile\Repository\UserProfileGps\UserProfileGpsInterface;
 use BaksDev\Users\Profile\UserProfile\UseCase\User\NewEdit\UserProfileHandler;
-use BaksDev\Wildberries\Orders\Api\Dbs\ClientInfo\ClientWildberriesOrdersDTO;
+use BaksDev\Wildberries\Orders\Api\ClientInfo\ClientWildberriesOrdersDTO;
 use BaksDev\Wildberries\Orders\UseCase\New\Products\Items\WildberriesOrderProductItemDTO;
 use BaksDev\Wildberries\Orders\UseCase\New\User\Delivery\Field\OrderDeliveryFieldDTO;
 use BaksDev\Wildberries\Orders\UseCase\New\User\UserProfile\Value\ValueDTO;

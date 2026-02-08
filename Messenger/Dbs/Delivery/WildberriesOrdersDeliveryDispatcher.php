@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,7 @@ use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Orders\Order\Entity\Event\OrderEvent;
 use BaksDev\Orders\Order\Repository\CurrentOrderEvent\CurrentOrderEventInterface;
 use BaksDev\Orders\Order\Type\Status\OrderStatus\Collection\OrderStatusExtradition;
-use BaksDev\Wildberries\Orders\Api\Dbs\UpdateWildberriesOrdersDeliverRequest;
+use BaksDev\Wildberries\Orders\Api\Dbs\UpdateWbOrderDbsDeliverRequest;
 use BaksDev\Wildberries\Type\id\WbTokenUid;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -40,7 +40,7 @@ final readonly class WildberriesOrdersDeliveryDispatcher
 {
     public function __construct(
         private CurrentOrderEventInterface $CurrentOrderEventRepository,
-        private UpdateWildberriesOrdersDeliverRequest $UpdateWildberriesOrdersDeliverRequest,
+        private UpdateWbOrderDbsDeliverRequest $UpdateWildberriesOrdersDeliverRequest,
         private MessageDispatchInterface $messageDispatch,
     ) {}
 

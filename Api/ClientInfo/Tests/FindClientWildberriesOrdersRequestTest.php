@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -27,8 +27,8 @@ namespace BaksDev\Wildberries\Orders\Api\Dbs\ClientInfo\Tests;
 
 use BaksDev\Core\Doctrine\DBALQueryBuilder;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
-use BaksDev\Wildberries\Orders\Api\Dbs\ClientInfo\ClientWildberriesOrdersDTO;
-use BaksDev\Wildberries\Orders\Api\Dbs\ClientInfo\FindClientWildberriesOrdersRequest;
+use BaksDev\Wildberries\Orders\Api\ClientInfo\ClientWildberriesOrdersDTO;
+use BaksDev\Wildberries\Orders\Api\ClientInfo\FindClientWildberriesOrderDbsRequest;
 use BaksDev\Wildberries\Type\Authorization\WbAuthorizationToken;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DependsOnClass;
@@ -64,8 +64,8 @@ class FindClientWildberriesOrdersRequestTest extends KernelTestCase
 
         self::assertTrue(true);
 
-        /** @var FindClientWildberriesOrdersRequest $FindClientWildberriesOrdersRequest */
-        $FindClientWildberriesOrdersRequest = self::getContainer()->get(FindClientWildberriesOrdersRequest::class);
+        /** @var FindClientWildberriesOrderDbsRequest $FindClientWildberriesOrdersRequest */
+        $FindClientWildberriesOrdersRequest = self::getContainer()->get(FindClientWildberriesOrderDbsRequest::class);
         $FindClientWildberriesOrdersRequest->TokenHttpClient(self::$Authorization);
 
         $ClientWildberriesOrdersDTO = $FindClientWildberriesOrdersRequest

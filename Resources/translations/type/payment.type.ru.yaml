@@ -11,3 +11,7 @@ wildberries:
     name: 'DBS: Wildberries'
     desc: 'Оплата DBS Wildberries'
 
+  pickup:
+    name: 'WB: Самовывоз'
+    desc: 'Оплата Wildberries при самовывозу'
+

@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -23,56 +23,67 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Wildberries\Orders\Api\Dbs\ClientInfo;
+namespace BaksDev\Wildberries\Orders\Api\Dbs;
 
 use BaksDev\Wildberries\Api\Wildberries;
-use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 
-/** Перевести на сборку */
-#[Autoconfigure(public: true)]
-final class FindClientWildberriesOrdersRequest extends Wildberries
+/** Перевести в доставку */
+final class UpdateWbOrderDbsDeliverRequest extends Wildberries
 {
     /**
-     * Информация о покупателе
+     * Перевести заказ в доставку
      *
-     * @see https://dev.wildberries.ru/openapi/orders-dbs/#tag/Sborochnye-zadaniya-DBS/paths/~1api~1v3~1dbs~1orders~1client/post
+     * @see https://dev.wildberries.ru/openapi/orders-dbs/#tag/Sborochnye-zadaniya-DBS/paths/~1api~1v3~1dbs~1orders~1{orderId}~1deliver/patch
      */
-    public function find(int|string $order): ClientWildberriesOrdersDTO|false
+    public function update(int|string $order): bool
     {
+        if($this->isExecuteEnvironment() === false)
+        {
+            $this->logger->critical('Запрос может быть выполнен только в PROD окружении', [self::class.':'.__LINE__]);
+            return true;
+        }
+
+        if(false === $this->isOrders())
+        {
+            return true;
+        }
+
         $order = str_replace('W-', '', (string) $order);
 
         $response = $this
             ->marketplace()
             ->TokenHttpClient()
             ->request(
-                method: 'POST',
-                url: '/api/v3/dbs/orders/client',
-                options: ['json' => ['orders' => [(int) $order]]],
+                method: 'PATCH',
+                url: sprintf('/api/v3/dbs/orders/%s/deliver', $order),
             );
 
-        $content = $response->toArray(false);
-
-        if($response->getStatusCode() !== 200)
+        if($response->getStatusCode() !== 204)
         {
+            if($response->getStatusCode() === 429)
+            {
+                sleep(1);
+            }
+
+            $content = $response->toArray(false);
+
             $this->logger->critical(
-                'wildberries-orders: Ошибка при получении информации о клиенте',
+                sprintf(
+                    'wildberries-orders: Ошибка %s при перемещении заказа %s в доставку',
+                    $response->getStatusCode(), $order,
+                ),
                 [$content, self::class.':'.__LINE__],
             );
+
+            if($content['code'] === 'StatusMismatch' && $response->getStatusCode() === 409)
+            {
+                return true;
+            }
 
             return false;
         }
 
-        if(empty($content['orders']))
-        {
-            $this->logger->critical(
-                'wildberries-orders: Ошибка при получении информации о клиенте',
-                [$content, self::class.':'.__LINE__],
-            );
-
-            return false;
-        }
-
-        return new ClientWildberriesOrdersDTO(...current($content['orders']));
+        return true;
     }
 
 }

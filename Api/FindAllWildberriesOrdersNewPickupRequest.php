@@ -29,13 +29,13 @@ use BaksDev\Wildberries\Api\Wildberries;
 use BaksDev\Wildberries\Orders\UseCase\New\WildberriesNewOrderDTO;
 use Generator;
 
-final class FindAllWildberriesOrdersNewDbsRequest extends Wildberries
+final class FindAllWildberriesOrdersNewPickupRequest extends Wildberries
 {
     /**
      * Получить список новых сборочных заданий.
-     * Возвращает список всех новых сборочных заданий у продавца на данный момент.
+     * Метод возвращает список всех новых сборочных заданий, которые есть у продавца на момент запроса.
      *
-     * @see https://dev.wildberries.ru/openapi/orders-dbs#tag/Sborochnye-zadaniya-DBS/paths/~1api~1v3~1dbs~1orders~1new/get
+     * @see https://dev.wildberries.ru/docs/openapi/in-store-pickup#tag/Sborochnye-zadaniya-Samovyvoz/paths/~1api~1v3~1click-collect~1orders~1new/get
      *
      * @return Generator<WildberriesNewOrderDTO>|false
      */
@@ -48,7 +48,7 @@ final class FindAllWildberriesOrdersNewDbsRequest extends Wildberries
 
         $response = $this->marketplace()->TokenHttpClient()->request(
             'GET',
-            '/api/v3/dbs/orders/new',
+            '/api/v3/click-collect/orders/new',
         );
 
         $content = $response->toArray(false);
@@ -84,7 +84,7 @@ final class FindAllWildberriesOrdersNewDbsRequest extends Wildberries
                     ->TokenHttpClient()
                     ->request(
                         method: 'PATCH',
-                        url: sprintf('/api/v3/dbs/orders/%s/confirm', $order['id']),
+                        url: sprintf('/api/v3/click-collect/orders/%s/confirm', $order['id']),
                     );
 
                 /** Пробуем добавить заказ позже */

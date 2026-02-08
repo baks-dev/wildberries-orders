@@ -23,70 +23,56 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Wildberries\Orders\Api\Dbs;
+namespace BaksDev\Wildberries\Orders\Api\ClientInfo;
 
 use BaksDev\Wildberries\Api\Wildberries;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 
-/** Сообщить, что заказ принят покупателем */
-final class UpdateWildberriesOrdersCompleteRequest extends Wildberries
+/** Перевести на сборку */
+#[Autoconfigure(public: true)]
+final class FindClientWildberriesOrderDbsRequest extends Wildberries
 {
-
-    private string|false $code;
-
-    public function code(string $code): void
-    {
-        $this->code = $code;
-    }
-
     /**
-     * Сообщить, что заказ принят покупателем
-     * Необходимо подтверждать проверочным кодом
+     * Информация о покупателе
      *
-     * @see https://dev.wildberries.ru/openapi/orders-dbs/#tag/Sborochnye-zadaniya-DBS/paths/~1api~1v3~1dbs~1orders~1{orderId}~1receive/patch
+     * @see https://dev.wildberries.ru/openapi/orders-dbs/#tag/Sborochnye-zadaniya-DBS/paths/~1api~1v3~1dbs~1orders~1client/post
      */
-    public function update(int|string $order): bool
+    public function find(int|string $order): ClientWildberriesOrdersDTO|false
     {
-        if($this->isExecuteEnvironment() === false)
-        {
-            $this->logger->critical('Запрос может быть выполнен только в PROD окружении', [self::class.':'.__LINE__]);
-            return true;
-        }
-
-        if(false === $this->isOrders())
-        {
-            return true;
-        }
-
-        if(empty($this->code))
-        {
-            $this->logger->critical('wildberries-orders: Не указан код подтверждения');
-            return false;
-        }
-
         $order = str_replace('W-', '', (string) $order);
 
         $response = $this
             ->marketplace()
             ->TokenHttpClient()
             ->request(
-                method: 'PATCH',
-                url: sprintf('/api/v3/dbs/orders/%s/receive', $order),
-                options: ['json' => ['code' => 'OK']],
+                method: 'POST',
+                url: '/api/v3/dbs/orders/client',
+                options: ['json' => ['orders' => [(int) $order]]],
             );
 
-        if($response->getStatusCode() !== 204)
-        {
-            $content = $response->toArray(false);
+        $content = $response->toArray(false);
 
+        if($response->getStatusCode() !== 200)
+        {
             $this->logger->critical(
-                'wildberries-orders: Ошибка при получении новых заказов',
+                'wildberries-orders: Ошибка при получении информации о клиенте',
                 [$content, self::class.':'.__LINE__],
             );
 
             return false;
         }
 
-        return true;
+        if(empty($content['orders']))
+        {
+            $this->logger->critical(
+                'wildberries-orders: Ошибка при получении информации о клиенте',
+                [$content, self::class.':'.__LINE__],
+            );
+
+            return false;
+        }
+
+        return new ClientWildberriesOrdersDTO(current($content['orders']));
     }
 
 }

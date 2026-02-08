@@ -27,13 +27,13 @@ namespace BaksDev\Wildberries\Orders\Api\Dbs;
 
 use BaksDev\Wildberries\Api\Wildberries;
 
-/** Перевести в доставку */
-final class UpdateWildberriesOrdersDeliverRequest extends Wildberries
+/** Перевести на сборку */
+final class UpdateWbOrderDbsPackageRequest extends Wildberries
 {
     /**
-     * Перевести заказ в доставку
+     * Перевести на сборку
      *
-     * @see https://dev.wildberries.ru/openapi/orders-dbs/#tag/Sborochnye-zadaniya-DBS/paths/~1api~1v3~1dbs~1orders~1{orderId}~1deliver/patch
+     * @see https://dev.wildberries.ru/openapi/orders-dbs#tag/Sborochnye-zadaniya-DBS/paths/~1api~1v3~1dbs~1orders~1%7BorderId%7D~1confirm/patch
      */
     public function update(int|string $order): bool
     {
@@ -55,35 +55,21 @@ final class UpdateWildberriesOrdersDeliverRequest extends Wildberries
             ->TokenHttpClient()
             ->request(
                 method: 'PATCH',
-                url: sprintf('/api/v3/dbs/orders/%s/deliver', $order),
+                url: sprintf('/api/v3/dbs/orders/%s/confirm', $order),
             );
 
         if($response->getStatusCode() !== 204)
         {
-            if($response->getStatusCode() === 429)
-            {
-                sleep(1);
-            }
-
             $content = $response->toArray(false);
 
             $this->logger->critical(
-                sprintf(
-                    'wildberries-orders: Ошибка %s при перемещении заказа %s в доставку',
-                    $response->getStatusCode(), $order,
-                ),
-                [$content, self::class.':'.__LINE__],
+                sprintf('wildberries-orders: Ошибка при отправке заказа %s на упаковку', $order),
+                [$content, self::class.':'.__LINE__, $this->getTokenIdentifier()],
             );
-
-            if($content['code'] === 'StatusMismatch' && $response->getStatusCode() === 409)
-            {
-                return true;
-            }
 
             return false;
         }
 
         return true;
     }
-
 }

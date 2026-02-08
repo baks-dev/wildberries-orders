@@ -27,6 +27,7 @@ namespace BaksDev\Wildberries\Orders\UseCase\New;
 
 use BaksDev\Core\Type\Gps\GpsLatitude;
 use BaksDev\Core\Type\Gps\GpsLongitude;
+use BaksDev\Delivery\Type\Id\Choice\TypeDeliveryPickup;
 use BaksDev\Delivery\Type\Id\DeliveryUid;
 use BaksDev\Orders\Order\Entity\Event\OrderEventInterface;
 use BaksDev\Orders\Order\Type\Event\OrderEventUid;
@@ -34,18 +35,21 @@ use BaksDev\Orders\Order\Type\Status\OrderStatus;
 use BaksDev\Orders\Order\Type\Status\OrderStatus\Collection\OrderStatusNew;
 use BaksDev\Orders\Order\Type\Status\OrderStatus\OrderStatusInterface;
 use BaksDev\Ozon\Type\Id\OzonTokenUid;
+use BaksDev\Payment\Type\Id\Choice\TypePaymentCache;
 use BaksDev\Payment\Type\Id\PaymentUid;
 use BaksDev\Reference\Currency\Type\Currency;
 use BaksDev\Reference\Money\Type\Money;
 use BaksDev\Users\Profile\TypeProfile\Type\Id\TypeProfileUid;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
-use BaksDev\Wildberries\Orders\Api\Dbs\ClientInfo\ClientWildberriesOrdersDTO;
+use BaksDev\Wildberries\Orders\Api\ClientInfo\ClientWildberriesOrdersDTO;
 use BaksDev\Wildberries\Orders\Type\DeliveryType\TypeDeliveryDbsWildberries;
 use BaksDev\Wildberries\Orders\Type\DeliveryType\TypeDeliveryFbsWildberries;
 use BaksDev\Wildberries\Orders\Type\PaymentType\TypePaymentDbsWildberries;
 use BaksDev\Wildberries\Orders\Type\PaymentType\TypePaymentFbsWildberries;
+use BaksDev\Wildberries\Orders\Type\PaymentType\TypePaymentPickupWildberries;
 use BaksDev\Wildberries\Orders\Type\ProfileType\TypeProfileDbsWildberries;
 use BaksDev\Wildberries\Orders\Type\ProfileType\TypeProfileFbsWildberries;
+use BaksDev\Wildberries\Orders\Type\ProfileType\TypeProfilePickupWildberries;
 use BaksDev\Wildberries\Orders\UseCase\New\Products\WildberriesOrderProductDTO;
 use BaksDev\Wildberries\Type\id\WbTokenUid;
 use DateTimeImmutable;
@@ -118,78 +122,108 @@ final class WildberriesNewOrderDTO implements OrderEventInterface
         $OrderProfileDTO = $this->usr->getUserProfile();
 
 
-        // Доставка Wildberries (FBS)
-        if($order['deliveryType'] === 'fbs')
+        if(false === isset($order['deliveryType']))
         {
-            /** Тип профиля FBS Wildberries */
-            $Profile = new TypeProfileUid(TypeProfileFbsWildberries::class);
+            /** Склад самовывоза */
+
+            /** Тип профиля заказа Pickup Wildberries */
+            $Profile = new TypeProfileUid(TypeProfilePickupWildberries::class);
             $OrderProfileDTO?->setType($Profile);
 
-            /** Способ доставки Wildberries (FBS Wildberries) */
-            $Delivery = new DeliveryUid(TypeDeliveryFbsWildberries::class);
+            /** Способ доставки - Самовывоз */
+            $Delivery = new DeliveryUid(TypeDeliveryPickup::class);
             $OrderDeliveryDTO->setDelivery($Delivery);
 
-            /** Способ оплаты FBS Wildberries */
-            $Payment = new PaymentUid(TypePaymentFbsWildberries::class);
+
+            /** По умолчанию способ оплаты - Наличными при получении */
+            $Payment = new PaymentUid(TypePaymentCache::class);
+
+            if($order['payMode'] === 'prepaid')
+            {
+                /** Способ оплаты FBS Wildberries */
+                $Payment = new PaymentUid(TypePaymentPickupWildberries::class);
+
+            }
+
             $OrderPaymentDTO->setPayment($Payment);
+
+            $deliveryDate = new DateTimeImmutable($order['ddate'] ?? 'now');
+            $OrderDeliveryDTO->setDeliveryDate($deliveryDate);
+
         }
 
-        // Доставка Магазином (DBS)
-        if($order['deliveryType'] === 'dbs')
+        if(true === isset($order['deliveryType']))
         {
-            /** Тип профиля DBS Wildberries */
-            $Profile = new TypeProfileUid(TypeProfileDbsWildberries::class);
-            $OrderProfileDTO?->setType($Profile);
+            // Доставка Wildberries (FBS)
+            if($order['deliveryType'] === 'fbs')
+            {
+                /** Тип профиля FBS Wildberries */
+                $Profile = new TypeProfileUid(TypeProfileFbsWildberries::class);
+                $OrderProfileDTO?->setType($Profile);
 
-            /** Способ доставки Магазином (DBS Wildberries) */
-            $Delivery = new DeliveryUid(TypeDeliveryDbsWildberries::class);
-            $OrderDeliveryDTO->setDelivery($Delivery);
+                /** Способ доставки Wildberries (FBS Wildberries) */
+                $Delivery = new DeliveryUid(TypeDeliveryFbsWildberries::class);
+                $OrderDeliveryDTO->setDelivery($Delivery);
 
-            /** Способ оплаты DBS Wildberries  */
-            $Payment = new PaymentUid(TypePaymentDbsWildberries::class);
-            $OrderPaymentDTO->setPayment($Payment);
+                /** Способ оплаты FBS Wildberries */
+                $Payment = new PaymentUid(TypePaymentFbsWildberries::class);
+                $OrderPaymentDTO->setPayment($Payment);
+            }
+
+            // Доставка Магазином (DBS)
+            if($order['deliveryType'] === 'dbs')
+            {
+                /** Тип профиля DBS Wildberries */
+                $Profile = new TypeProfileUid(TypeProfileDbsWildberries::class);
+                $OrderProfileDTO?->setType($Profile);
+
+                /** Способ доставки Магазином (DBS Wildberries) */
+                $Delivery = new DeliveryUid(TypeDeliveryDbsWildberries::class);
+                $OrderDeliveryDTO->setDelivery($Delivery);
+
+                /** Способ оплаты DBS Wildberries  */
+                $Payment = new PaymentUid(TypePaymentDbsWildberries::class);
+                $OrderPaymentDTO->setPayment($Payment);
+            }
+
+
+            //    fbs - доставка на склад Wildberries (FBS)
+            //    dbs - доставка силами продавца (DBS)
+            //    edbs - экспресс-доставка силами продавца (EDBS)
+            //    wbgo - доставка курьером WB (DBW)
+
+            $deliveryDate = match ($order['deliveryType'])
+            {
+                'fbs' => $NewOrderInvariable->getCreated()->modify('+1 day'),
+                'dbs' => new DateTimeImmutable('now'),
+                'edbs', 'wbgo' => new DateTimeImmutable($order['ddate'] ?? 'now'),
+                default => $NewOrderInvariable->getCreated(),
+            };
+
+            $OrderDeliveryDTO->setDeliveryDate($deliveryDate);
+
+            /**
+             * Координаты доставки
+             */
+
+            if(isset($order['address']['latitude']))
+            {
+                $OrderDeliveryDTO->setLatitude(new GpsLatitude($order['address']['latitude']));
+            }
+
+            if(isset($order['address']['longitude']))
+            {
+                $OrderDeliveryDTO->setLongitude(new GpsLongitude($order['address']['longitude']));
+            }
         }
 
-
-        //    fbs - доставка на склад Wildberries (FBS)
-        //    dbs - доставка силами продавца (DBS)
-        //    edbs - экспресс-доставка силами продавца (EDBS)
-        //    wbgo - доставка курьером WB (DBW)
-
-        $deliveryDate = match ($order['deliveryType'])
-        {
-            'fbs' => $NewOrderInvariable->getCreated()->modify('+1 day'),
-            'dbs' => new DateTimeImmutable('now'),
-            'edbs', 'wbgo' => new DateTimeImmutable($order['ddate'] ?? 'now'),
-            default => $NewOrderInvariable->getCreated(),
-        };
-
-        $OrderDeliveryDTO->setDeliveryDate($deliveryDate);
-
-        /** Адрес доставки */
-        // false === isset($order['address']) ?: $deliveryAddress[] = $order['address'];
-        // false === isset($order['offices']) ?: $deliveryAddress[] = implode(', ', str_replace('_', ' ', $order['offices']));
-
-        //        if(false === empty($deliveryAddress))
-        //        {
-        //            $OrderDeliveryDTO->setAddress(implode(', ', $deliveryAddress));
-        //        }
-
-        /**
-         * Координаты доставки
-         */
-
-        if(isset($order['address']['latitude']))
-        {
-            $OrderDeliveryDTO->setLatitude(new GpsLatitude($order['address']['latitude']));
-        }
-
-        if(isset($order['address']['longitude']))
-        {
-            $OrderDeliveryDTO->setLongitude(new GpsLongitude($order['address']['longitude']));
-        }
 
         $deliveryComment[] = null;
+
+        if(isset($order['orderCode']))
+        {
+            $deliveryComment[] = 'код заказа: '.$order['orderCode'];
+        }
 
         /** Указываем адрес доставки  */
         if(isset($order['address']['fullAddress']))

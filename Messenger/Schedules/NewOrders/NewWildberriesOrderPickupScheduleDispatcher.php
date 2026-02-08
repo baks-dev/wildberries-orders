@@ -29,10 +29,8 @@ use BaksDev\Core\Deduplicator\DeduplicatorInterface;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Orders\Order\Entity\Order;
 use BaksDev\Wildberries\Orders\Api\ClientInfo\ClientWildberriesOrdersDTO;
-use BaksDev\Wildberries\Orders\Api\ClientInfo\FindClientWildberriesOrderDbsRequest;
-use BaksDev\Wildberries\Orders\Api\Dbs\DeliveryDateTime\GetWbOrdersDbsDeliveryDateTimeRequest;
-use BaksDev\Wildberries\Orders\Api\Dbs\DeliveryDateTime\WildberriesOrdersDbsDeliveryDateTimeDTO;
-use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersNewDbsRequest;
+use BaksDev\Wildberries\Orders\Api\ClientInfo\FindClientWildberriesOrderPickupRequest;
+use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersNewPickupRequest;
 use BaksDev\Wildberries\Orders\Schedule\NewOrders\UpdateWildberriesOrdersNewSchedules;
 use BaksDev\Wildberries\Orders\Type\DeliveryType\TypeDeliveryDbsWildberries;
 use BaksDev\Wildberries\Orders\UseCase\New\WildberriesNewOrderDTO;
@@ -47,20 +45,17 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
-/** Получает список новых сборочных заданий DBS */
+/** Получает список новых сборочных заданий Самовывоз */
 #[AsMessageHandler]
-final readonly class NewWildberriesOrderDbsScheduleDispatcher
+final readonly class NewWildberriesOrderPickupScheduleDispatcher
 {
     public function __construct(
         #[Target('wildberriesOrdersLogger')] private LoggerInterface $logger,
-        private FindAllWildberriesOrdersNewDbsRequest $wildberriesOrdersNew,
+        private FindAllWildberriesOrdersNewPickupRequest $wildberriesOrdersNew,
         private DeduplicatorInterface $deduplicator,
         private WildberriesNewOrderHandler $WildberriesOrderHandler,
         private AllWbTokensByProfileInterface $AllWbTokensByProfileRepository,
-        private FindClientWildberriesOrderDbsRequest $FindClientWildberriesOrdersRequest,
-        private GetWbOrdersDbsDeliveryDateTimeRequest $GetWildberriesOrdersDbsDeliveryDateTimeRequest
-
-
+        private FindClientWildberriesOrderPickupRequest $FindClientWildberriesOrdersRequest
     ) {}
 
     public function __invoke(NewWildberriesOrdersScheduleMessage $message): void
@@ -156,25 +151,6 @@ final readonly class NewWildberriesOrderDbsScheduleDispatcher
                 if($ClientWildberriesOrdersDTO instanceof ClientWildberriesOrdersDTO)
                 {
                     $WildberriesOrderDTO->setClientInfo($ClientWildberriesOrdersDTO);
-                }
-
-                /**
-                 * Получаем дату и время доставки
-                 */
-
-                $WildberriesOrdersDbsDeliveryDateTimeDTO = $this->GetWildberriesOrdersDbsDeliveryDateTimeRequest
-                    ->forTokenIdentifier($WbTokenUid)
-                    ->find($WildberriesOrderDTO->getInvariable()->getNumber());
-
-                if($WildberriesOrdersDbsDeliveryDateTimeDTO instanceof WildberriesOrdersDbsDeliveryDateTimeDTO)
-                {
-                    $WildberriesOrderDTO->getUsr()->getDelivery()
-                        ->setDeliveryDate($WildberriesOrdersDbsDeliveryDateTimeDTO->getDate());
-
-                    if($WildberriesOrdersDbsDeliveryDateTimeDTO->getTime())
-                    {
-                        $WildberriesOrderDTO->addComment($WildberriesOrdersDbsDeliveryDateTimeDTO->getTime());
-                    }
                 }
             }
 

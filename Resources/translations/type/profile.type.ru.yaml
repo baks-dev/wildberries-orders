@@ -24,6 +24,24 @@ wildberries:
     desc: 'Склад Wildberries'
 
 
+  pickup:
+
+    name: 'WB: Самовывоз'
+    desc: 'Самовывоз из магазина'
+
+    section:
+      contact:
+        name: 'Контактные данные'
+        desc: 'Данные для связи менеджерами магазина с покупателем.'
+
+        field:
+
+          name:
+            name: 'Контактное лицо'
+            desc: 'ФИО пользователя'
+
+
+
 
 
   dbs:

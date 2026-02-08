@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Wildberries\Orders\Api\Dbs\ClientInfo;
+namespace BaksDev\Wildberries\Orders\Api\ClientInfo;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -31,18 +31,37 @@ use Symfony\Component\Validator\Constraints as Assert;
 final class ClientWildberriesOrdersDTO
 {
 
-    public function __construct(
-        $orderID, // " => 4309055910
-        private readonly int|string|null $replacementPhone, // " => "79295413398"
-        private readonly int|string|null $phone, // " => "+74957755501"
-        private readonly int|string|null $phoneCode, // " => 1491153
+    private int $orderID;
 
-        private readonly ?string $firstName, // " => "Константин"
-        private readonly ?string $fullName, // " => ""
-        private readonly ?array $additionalPhones, // " => []
-        private readonly ?array $additionalPhoneCodes, // " => []
+    private string|int|null $phone;
 
-    ) {}
+    private string|int|null $phoneCode;
+
+    private ?string $firstName;
+
+    private ?string $fullName;
+
+    private ?string $replacementPhone;
+
+    private ?string $additionalPhones;
+
+    private ?string $additionalPhoneCodes;
+
+    public function __construct(array $client)
+    {
+        $this->orderID = $client['orderID'];
+
+        $this->firstName = $client['firstName'];
+        $this->fullName = isset($client['fullName']) ? $client['fullName'] : null;
+
+        $this->phoneCode = $client['phoneCode'];
+        $this->phone = $client['phone'];
+
+        $this->replacementPhone = isset($client['replacementPhone']) ? $client['replacementPhone'] : null;
+        $this->additionalPhones = isset($client['additionalPhones']) ? $client['additionalPhones'] : null;
+        $this->additionalPhoneCodes = isset($client['additionalPhoneCodes']) ? $client['additionalPhoneCodes'] : null;
+
+    }
 
     /**
      * Подменный номер для связи с покупателем.
@@ -50,7 +69,7 @@ final class ClientWildberriesOrdersDTO
      */
     public function getPhone(): ?string
     {
-        return '+'.str_replace('+', '', $this->replacementPhone);
+        return '+'.str_replace('+', '', $this->phone);
     }
 
     /** Имя покупателя */

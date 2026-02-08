@@ -26,7 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Wildberries\Orders\Api\Dbs\DeliveryDateTime\Tests;
 
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
-use BaksDev\Wildberries\Orders\Api\Dbs\DeliveryDateTime\GetWildberriesOrdersDbsDeliveryDateTimeRequest;
+use BaksDev\Wildberries\Orders\Api\Dbs\DeliveryDateTime\GetWbOrdersDbsDeliveryDateTimeRequest;
 use BaksDev\Wildberries\Orders\Api\Dbs\DeliveryDateTime\WildberriesOrdersDbsDeliveryDateTimeDTO;
 use BaksDev\Wildberries\Orders\UseCase\New\WildberriesNewOrderHandler;
 use BaksDev\Wildberries\Type\Authorization\WbAuthorizationToken;
@@ -59,8 +59,8 @@ class GetWildberriesOrdersDbsDeliveryDateTimeRequestTest extends KernelTestCase
     {
         self::assertTrue(true);
 
-        /** @var GetWildberriesOrdersDbsDeliveryDateTimeRequest $GetWildberriesOrdersDbsDeliveryDateTimeRequest */
-        $GetWildberriesOrdersDbsDeliveryDateTimeRequest = self::getContainer()->get(GetWildberriesOrdersDbsDeliveryDateTimeRequest::class);
+        /** @var GetWbOrdersDbsDeliveryDateTimeRequest $GetWildberriesOrdersDbsDeliveryDateTimeRequest */
+        $GetWildberriesOrdersDbsDeliveryDateTimeRequest = self::getContainer()->get(GetWbOrdersDbsDeliveryDateTimeRequest::class);
         $GetWildberriesOrdersDbsDeliveryDateTimeRequest->TokenHttpClient(self::$Authorization);
 
         /** @var WildberriesNewOrderHandler $WildberriesOrderHandler */

@@ -77,7 +77,7 @@ final readonly class NewWildberriesOrderFbsScheduleDispatcher
              */
 
             $Deduplicator = $this->deduplicator
-                ->namespace('yandex-market-orders')
+                ->namespace('wildberries-orders')
                 ->expiresAfter(UpdateWildberriesOrdersNewSchedules::INTERVAL)
                 ->deduplication([self::class, (string) $WbTokenUid]);
 
