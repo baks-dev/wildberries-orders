@@ -59,8 +59,6 @@ final readonly class NewWildberriesOrderDbsScheduleDispatcher
         private AllWbTokensByProfileInterface $AllWbTokensByProfileRepository,
         private FindClientWildberriesOrderDbsRequest $FindClientWildberriesOrdersRequest,
         private GetWbOrdersDbsDeliveryDateTimeRequest $GetWildberriesOrdersDbsDeliveryDateTimeRequest
-
-
     ) {}
 
     public function __invoke(NewWildberriesOrdersScheduleMessage $message): void
