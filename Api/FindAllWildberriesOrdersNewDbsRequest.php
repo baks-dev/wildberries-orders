@@ -76,26 +76,6 @@ final class FindAllWildberriesOrdersNewDbsRequest extends Wildberries
                 continue;
             }
 
-            /** Сразу отправляем заказ на сборку для получения информации о клиенте */
-            if($this->isExecuteEnvironment() !== false)
-            {
-                $response = $this
-                    ->marketplace()
-                    ->TokenHttpClient()
-                    ->request(
-                        method: 'PATCH',
-                        url: sprintf('/api/v3/dbs/orders/%s/confirm', $order['id']),
-                    );
-
-                /** Пробуем добавить заказ позже */
-                if($response->getStatusCode() !== 204)
-                {
-                    continue;
-                }
-
-                sleep(1);
-            }
-
             yield new WildberriesNewOrderDTO($order, $this->getProfile(), $this->getTokenIdentifier());
         }
     }

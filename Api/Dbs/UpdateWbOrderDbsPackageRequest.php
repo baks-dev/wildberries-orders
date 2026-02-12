@@ -33,7 +33,7 @@ final class UpdateWbOrderDbsPackageRequest extends Wildberries
     /**
      * Перевести на сборку
      *
-     * @see https://dev.wildberries.ru/openapi/orders-dbs#tag/Sborochnye-zadaniya-DBS/paths/~1api~1v3~1dbs~1orders~1%7BorderId%7D~1confirm/patch
+     * @see https://dev.wildberries.ru/docs/openapi/orders-dbs#tag/Sborochnye-zadaniya-DBS/paths/~1api~1marketplace~1v3~1dbs~1orders~1status~1confirm/post
      */
     public function update(int|string $order): bool
     {
@@ -54,11 +54,12 @@ final class UpdateWbOrderDbsPackageRequest extends Wildberries
             ->marketplace()
             ->TokenHttpClient()
             ->request(
-                method: 'PATCH',
-                url: sprintf('/api/v3/dbs/orders/%s/confirm', $order),
+                method: 'POST',
+                url: '/api/marketplace/v3/dbs/orders/status/confirm',
+                options: ['json' => ['ordersIds' => [(int) $order['id']]]],
             );
 
-        if($response->getStatusCode() !== 204)
+        if($response->getStatusCode() !== 200)
         {
             $content = $response->toArray(false);
 
@@ -67,6 +68,7 @@ final class UpdateWbOrderDbsPackageRequest extends Wildberries
                 [$content, self::class.':'.__LINE__, $this->getTokenIdentifier()],
             );
 
+            /** Пробуем добавить заказ позже */
             return false;
         }
 

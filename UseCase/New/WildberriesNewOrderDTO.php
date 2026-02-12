@@ -127,16 +127,16 @@ final class WildberriesNewOrderDTO implements OrderEventInterface
             /** Склад самовывоза */
 
             /** Тип профиля заказа Pickup Wildberries */
-            $Profile = new TypeProfileUid(TypeProfilePickupWildberries::class);
+            $Profile = new TypeProfileUid(TypeProfilePickupWildberries::TYPE);
             $OrderProfileDTO?->setType($Profile);
 
             /** Способ доставки - Самовывоз */
-            $Delivery = new DeliveryUid(TypeDeliveryPickup::class);
+            $Delivery = new DeliveryUid(TypeDeliveryPickup::TYPE);
             $OrderDeliveryDTO->setDelivery($Delivery);
 
 
             /** По умолчанию способ оплаты - Наличными при получении */
-            $Payment = new PaymentUid(TypePaymentCache::class);
+            $Payment = new PaymentUid(TypePaymentCache::TYPE);
 
             if($order['payMode'] === 'prepaid')
             {
@@ -158,15 +158,15 @@ final class WildberriesNewOrderDTO implements OrderEventInterface
             if($order['deliveryType'] === 'fbs')
             {
                 /** Тип профиля FBS Wildberries */
-                $Profile = new TypeProfileUid(TypeProfileFbsWildberries::class);
+                $Profile = new TypeProfileUid(TypeProfileFbsWildberries::TYPE);
                 $OrderProfileDTO?->setType($Profile);
 
                 /** Способ доставки Wildberries (FBS Wildberries) */
-                $Delivery = new DeliveryUid(TypeDeliveryFbsWildberries::class);
+                $Delivery = new DeliveryUid(TypeDeliveryFbsWildberries::TYPE);
                 $OrderDeliveryDTO->setDelivery($Delivery);
 
                 /** Способ оплаты FBS Wildberries */
-                $Payment = new PaymentUid(TypePaymentFbsWildberries::class);
+                $Payment = new PaymentUid(TypePaymentFbsWildberries::TYPE);
                 $OrderPaymentDTO->setPayment($Payment);
             }
 
@@ -174,15 +174,15 @@ final class WildberriesNewOrderDTO implements OrderEventInterface
             if($order['deliveryType'] === 'dbs')
             {
                 /** Тип профиля DBS Wildberries */
-                $Profile = new TypeProfileUid(TypeProfileDbsWildberries::class);
+                $Profile = new TypeProfileUid(TypeProfileDbsWildberries::TYPE);
                 $OrderProfileDTO?->setType($Profile);
 
                 /** Способ доставки Магазином (DBS Wildberries) */
-                $Delivery = new DeliveryUid(TypeDeliveryDbsWildberries::class);
+                $Delivery = new DeliveryUid(TypeDeliveryDbsWildberries::TYPE);
                 $OrderDeliveryDTO->setDelivery($Delivery);
 
                 /** Способ оплаты DBS Wildberries  */
-                $Payment = new PaymentUid(TypePaymentDbsWildberries::class);
+                $Payment = new PaymentUid(TypePaymentDbsWildberries::TYPE);
                 $OrderPaymentDTO->setPayment($Payment);
             }
 

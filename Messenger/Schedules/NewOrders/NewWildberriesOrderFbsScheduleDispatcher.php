@@ -27,9 +27,11 @@ namespace BaksDev\Wildberries\Orders\Messenger\Schedules\NewOrders;
 
 use BaksDev\Core\Deduplicator\DeduplicatorInterface;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
+use BaksDev\Delivery\Type\Id\DeliveryUid;
 use BaksDev\Orders\Order\Entity\Order;
 use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersNewFbsRequest;
 use BaksDev\Wildberries\Orders\Schedule\NewOrders\UpdateWildberriesOrdersNewSchedules;
+use BaksDev\Wildberries\Orders\Type\DeliveryType\TypeDeliveryFbsWildberries;
 use BaksDev\Wildberries\Orders\UseCase\New\WildberriesNewOrderDTO;
 use BaksDev\Wildberries\Orders\UseCase\New\WildberriesNewOrderHandler;
 use BaksDev\Wildberries\Products\Api\Cards\FindAllWildberriesCardsRequest;
@@ -89,6 +91,7 @@ final readonly class NewWildberriesOrderFbsScheduleDispatcher
             /** Добавляем дедубликатор обновления (удалям в конце данного процесса) */
             $Deduplicator->save();
 
+
             /**
              * Получаем список НОВЫХ сборочных заданий
              */
@@ -115,6 +118,18 @@ final readonly class NewWildberriesOrderFbsScheduleDispatcher
                     ->deduplication([$WildberriesOrderDTO->getNumber(), self::class]);
 
                 if($message->isDeduplicator() && $Deduplicator->isExecuted())
+                {
+                    continue;
+                }
+
+                $DeliveryUid = $WildberriesOrderDTO->getUsr()->getDelivery()->getDelivery();
+
+                if(false === ($DeliveryUid instanceof DeliveryUid))
+                {
+                    continue;
+                }
+
+                if(false === $DeliveryUid->equals(TypeDeliveryFbsWildberries::TYPE))
                 {
                     continue;
                 }

@@ -27,11 +27,13 @@ namespace BaksDev\Wildberries\Orders\Messenger\Schedules\NewOrders;
 
 use BaksDev\Core\Deduplicator\DeduplicatorInterface;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
+use BaksDev\Delivery\Type\Id\DeliveryUid;
 use BaksDev\Orders\Order\Entity\Order;
 use BaksDev\Wildberries\Orders\Api\ClientInfo\ClientWildberriesOrdersDTO;
 use BaksDev\Wildberries\Orders\Api\ClientInfo\FindClientWildberriesOrderDbsRequest;
 use BaksDev\Wildberries\Orders\Api\Dbs\DeliveryDateTime\GetWbOrdersDbsDeliveryDateTimeRequest;
 use BaksDev\Wildberries\Orders\Api\Dbs\DeliveryDateTime\WildberriesOrdersDbsDeliveryDateTimeDTO;
+use BaksDev\Wildberries\Orders\Api\Dbs\UpdateWbOrderDbsPackageRequest;
 use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersNewDbsRequest;
 use BaksDev\Wildberries\Orders\Schedule\NewOrders\UpdateWildberriesOrdersNewSchedules;
 use BaksDev\Wildberries\Orders\Type\DeliveryType\TypeDeliveryDbsWildberries;
@@ -58,7 +60,8 @@ final readonly class NewWildberriesOrderDbsScheduleDispatcher
         private WildberriesNewOrderHandler $WildberriesOrderHandler,
         private AllWbTokensByProfileInterface $AllWbTokensByProfileRepository,
         private FindClientWildberriesOrderDbsRequest $FindClientWildberriesOrdersRequest,
-        private GetWbOrdersDbsDeliveryDateTimeRequest $GetWildberriesOrdersDbsDeliveryDateTimeRequest
+        private GetWbOrdersDbsDeliveryDateTimeRequest $GetWildberriesOrdersDbsDeliveryDateTimeRequest,
+        private UpdateWbOrderDbsPackageRequest $UpdateWbOrderDbsPackageRequest
     ) {}
 
     public function __invoke(NewWildberriesOrdersScheduleMessage $message): void
@@ -138,43 +141,63 @@ final readonly class NewWildberriesOrderDbsScheduleDispatcher
                 continue;
             }
 
-            if(true === $WildberriesOrderDTO->getUsr()->getDelivery()->getDelivery()?->getTypeDelivery()->equals(TypeDeliveryDbsWildberries::TYPE))
+            $DeliveryUid = $WildberriesOrderDTO->getUsr()->getDelivery()->getDelivery();
+
+            if(false === ($DeliveryUid instanceof DeliveryUid))
             {
-                /** Делаем задержку для получения информации о клиенте в 3 сек */
-                sleep(3);
+                continue;
+            }
 
-                /**
-                 * Получаем информацию о клиенте
-                 */
+            if(false === $DeliveryUid->equals(TypeDeliveryDbsWildberries::TYPE))
+            {
+                continue;
+            }
 
-                $ClientWildberriesOrdersDTO = $this->FindClientWildberriesOrdersRequest
-                    ->forTokenIdentifier($WbTokenUid)
-                    ->find($WildberriesOrderDTO->getInvariable()->getNumber());
+            /** Отправляем заказ на сборку для получения информации о клиенте  */
+            $isConfirm = $this->UpdateWbOrderDbsPackageRequest
+                ->forTokenIdentifier($WbTokenUid)
+                ->update($WildberriesOrderDTO->getInvariable()->getNumber());
 
-                if($ClientWildberriesOrdersDTO instanceof ClientWildberriesOrdersDTO)
+            if(false === $isConfirm)
+            {
+                continue;
+            }
+
+            /** Делаем задержку для получения информации о клиенте */
+            sleep(5);
+
+            /**
+             * Получаем информацию о клиенте
+             */
+
+            $ClientWildberriesOrdersDTO = $this->FindClientWildberriesOrdersRequest
+                ->forTokenIdentifier($WbTokenUid)
+                ->find($WildberriesOrderDTO->getInvariable()->getNumber());
+
+            if($ClientWildberriesOrdersDTO instanceof ClientWildberriesOrdersDTO)
+            {
+                $WildberriesOrderDTO->setClientInfo($ClientWildberriesOrdersDTO);
+            }
+
+            /**
+             * Получаем дату и время доставки
+             */
+
+            $WildberriesOrdersDbsDeliveryDateTimeDTO = $this->GetWildberriesOrdersDbsDeliveryDateTimeRequest
+                ->forTokenIdentifier($WbTokenUid)
+                ->find($WildberriesOrderDTO->getInvariable()->getNumber());
+
+            if($WildberriesOrdersDbsDeliveryDateTimeDTO instanceof WildberriesOrdersDbsDeliveryDateTimeDTO)
+            {
+                $WildberriesOrderDTO->getUsr()->getDelivery()
+                    ->setDeliveryDate($WildberriesOrdersDbsDeliveryDateTimeDTO->getDate());
+
+                if($WildberriesOrdersDbsDeliveryDateTimeDTO->getTime())
                 {
-                    $WildberriesOrderDTO->setClientInfo($ClientWildberriesOrdersDTO);
-                }
-
-                /**
-                 * Получаем дату и время доставки
-                 */
-
-                $WildberriesOrdersDbsDeliveryDateTimeDTO = $this->GetWildberriesOrdersDbsDeliveryDateTimeRequest
-                    ->forTokenIdentifier($WbTokenUid)
-                    ->find($WildberriesOrderDTO->getInvariable()->getNumber());
-
-                if($WildberriesOrdersDbsDeliveryDateTimeDTO instanceof WildberriesOrdersDbsDeliveryDateTimeDTO)
-                {
-                    $WildberriesOrderDTO->getUsr()->getDelivery()
-                        ->setDeliveryDate($WildberriesOrdersDbsDeliveryDateTimeDTO->getDate());
-
-                    if($WildberriesOrdersDbsDeliveryDateTimeDTO->getTime())
-                    {
-                        $WildberriesOrderDTO->addComment($WildberriesOrdersDbsDeliveryDateTimeDTO->getTime());
-                    }
+                    $WildberriesOrderDTO->addComment($WildberriesOrdersDbsDeliveryDateTimeDTO->getTime());
                 }
             }
+
 
             $Order = $this->WildberriesOrderHandler->handle($WildberriesOrderDTO);
 

@@ -27,12 +27,12 @@ namespace BaksDev\Wildberries\Orders\Messenger\Schedules\NewOrders;
 
 use BaksDev\Core\Deduplicator\DeduplicatorInterface;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
+use BaksDev\Delivery\Type\Id\Choice\TypeDeliveryPickup;
+use BaksDev\Delivery\Type\Id\DeliveryUid;
 use BaksDev\Orders\Order\Entity\Order;
-use BaksDev\Wildberries\Orders\Api\ClientInfo\ClientWildberriesOrdersDTO;
 use BaksDev\Wildberries\Orders\Api\ClientInfo\FindClientWildberriesOrderPickupRequest;
 use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersNewPickupRequest;
 use BaksDev\Wildberries\Orders\Schedule\NewOrders\UpdateWildberriesOrdersNewSchedules;
-use BaksDev\Wildberries\Orders\Type\DeliveryType\TypeDeliveryDbsWildberries;
 use BaksDev\Wildberries\Orders\UseCase\New\WildberriesNewOrderDTO;
 use BaksDev\Wildberries\Orders\UseCase\New\WildberriesNewOrderHandler;
 use BaksDev\Wildberries\Products\Api\Cards\FindAllWildberriesCardsRequest;
@@ -135,23 +135,16 @@ final readonly class NewWildberriesOrderPickupScheduleDispatcher
                 continue;
             }
 
-            if(true === $WildberriesOrderDTO->getUsr()->getDelivery()->getDelivery()?->getTypeDelivery()->equals(TypeDeliveryDbsWildberries::TYPE))
+            $DeliveryUid = $WildberriesOrderDTO->getUsr()->getDelivery()->getDelivery();
+
+            if(false === ($DeliveryUid instanceof DeliveryUid))
             {
-                /** Делаем задержку для получения информации о клиенте в 3 сек */
-                sleep(3);
+                continue;
+            }
 
-                /**
-                 * Получаем информацию о клиенте
-                 */
-
-                $ClientWildberriesOrdersDTO = $this->FindClientWildberriesOrdersRequest
-                    ->forTokenIdentifier($WbTokenUid)
-                    ->find($WildberriesOrderDTO->getInvariable()->getNumber());
-
-                if($ClientWildberriesOrdersDTO instanceof ClientWildberriesOrdersDTO)
-                {
-                    $WildberriesOrderDTO->setClientInfo($ClientWildberriesOrdersDTO);
-                }
+            if(false === $DeliveryUid->equals(TypeDeliveryPickup::TYPE))
+            {
+                continue;
             }
 
             $Order = $this->WildberriesOrderHandler->handle($WildberriesOrderDTO);
