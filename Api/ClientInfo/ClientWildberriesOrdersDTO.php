@@ -43,9 +43,9 @@ final class ClientWildberriesOrdersDTO
 
     private ?string $replacementPhone;
 
-    private ?string $additionalPhones;
+    private ?array $additionalPhones;
 
-    private ?string $additionalPhoneCodes;
+    private ?array $additionalPhoneCodes;
 
     public function __construct(array $client)
     {
@@ -58,6 +58,8 @@ final class ClientWildberriesOrdersDTO
         $this->phone = $client['phone'];
 
         $this->replacementPhone = isset($client['replacementPhone']) ? $client['replacementPhone'] : null;
+
+        /** Доп. номера */
         $this->additionalPhones = isset($client['additionalPhones']) ? $client['additionalPhones'] : null;
         $this->additionalPhoneCodes = isset($client['additionalPhoneCodes']) ? $client['additionalPhoneCodes'] : null;
 

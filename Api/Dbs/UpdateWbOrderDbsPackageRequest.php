@@ -56,7 +56,7 @@ final class UpdateWbOrderDbsPackageRequest extends Wildberries
             ->request(
                 method: 'POST',
                 url: '/api/marketplace/v3/dbs/orders/status/confirm',
-                options: ['json' => ['ordersIds' => [(int) $order['id']]]],
+                options: ['json' => ['ordersIds' => [(int) $order]]],
             );
 
         if($response->getStatusCode() !== 200)
