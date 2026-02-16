@@ -58,7 +58,7 @@ use BaksDev\Wildberries\Orders\UseCase\New\User\Delivery\Field\OrderDeliveryFiel
 use BaksDev\Wildberries\Orders\UseCase\New\User\UserProfile\Value\ValueDTO;
 use Doctrine\ORM\EntityManagerInterface;
 
-final class WildberriesNewOrderHandler extends AbstractHandler
+final class NewWildberriesOrderHandler extends AbstractHandler
 {
     public function __construct(
         private readonly UserProfileHandler $profileHandler,
@@ -82,7 +82,7 @@ final class WildberriesNewOrderHandler extends AbstractHandler
         parent::__construct($entityManager, $messageDispatch, $validatorCollection, $imageUpload, $fileUpload);
     }
 
-    public function handle(WildberriesNewOrderDTO $command): Order|string|bool
+    public function handle(NewWildberriesOrderDTO $command): Order|string|bool
     {
         if(false === $command->getStatusEquals(OrderStatusNew::class))
         {
@@ -224,7 +224,7 @@ final class WildberriesNewOrderHandler extends AbstractHandler
     }
 
 
-    public function fillProfile(WildberriesNewOrderDTO $command): void
+    public function fillProfile(NewWildberriesOrderDTO $command): void
     {
         if(false === ($command->getClient() instanceof ClientWildberriesOrdersDTO))
         {
@@ -298,7 +298,7 @@ final class WildberriesNewOrderHandler extends AbstractHandler
     }
 
 
-    public function fillDelivery(WildberriesNewOrderDTO $command): void
+    public function fillDelivery(NewWildberriesOrderDTO $command): void
     {
         /* Идентификатор свойства адреса доставки */
         $OrderDeliveryDTO = $command->getUsr()->getDelivery();

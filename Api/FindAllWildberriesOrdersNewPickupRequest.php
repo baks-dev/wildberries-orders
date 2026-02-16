@@ -26,7 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Wildberries\Orders\Api;
 
 use BaksDev\Wildberries\Api\Wildberries;
-use BaksDev\Wildberries\Orders\UseCase\New\WildberriesNewOrderDTO;
+use BaksDev\Wildberries\Orders\UseCase\New\NewWildberriesOrderDTO;
 use Generator;
 
 final class FindAllWildberriesOrdersNewPickupRequest extends Wildberries
@@ -37,7 +37,7 @@ final class FindAllWildberriesOrdersNewPickupRequest extends Wildberries
      *
      * @see https://dev.wildberries.ru/docs/openapi/in-store-pickup#tag/Sborochnye-zadaniya-Samovyvoz/paths/~1api~1v3~1click-collect~1orders~1new/get
      *
-     * @return Generator<WildberriesNewOrderDTO>|false
+     * @return Generator<NewWildberriesOrderDTO>|false
      */
     public function findAll(): Generator|false
     {
@@ -96,7 +96,7 @@ final class FindAllWildberriesOrdersNewPickupRequest extends Wildberries
                 sleep(1);
             }
 
-            yield new WildberriesNewOrderDTO($order, $this->getProfile(), $this->getTokenIdentifier());
+            yield new NewWildberriesOrderDTO($order, $this->getProfile(), $this->getTokenIdentifier());
         }
     }
 }

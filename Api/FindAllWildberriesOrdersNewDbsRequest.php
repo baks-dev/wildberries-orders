@@ -26,7 +26,7 @@ declare(strict_types=1);
 namespace BaksDev\Wildberries\Orders\Api;
 
 use BaksDev\Wildberries\Api\Wildberries;
-use BaksDev\Wildberries\Orders\UseCase\New\WildberriesNewOrderDTO;
+use BaksDev\Wildberries\Orders\UseCase\New\NewWildberriesOrderDTO;
 use Generator;
 
 final class FindAllWildberriesOrdersNewDbsRequest extends Wildberries
@@ -37,7 +37,7 @@ final class FindAllWildberriesOrdersNewDbsRequest extends Wildberries
      *
      * @see https://dev.wildberries.ru/openapi/orders-dbs#tag/Sborochnye-zadaniya-DBS/paths/~1api~1v3~1dbs~1orders~1new/get
      *
-     * @return Generator<WildberriesNewOrderDTO>|false
+     * @return Generator<NewWildberriesOrderDTO>|false
      */
     public function findAll(): Generator|false
     {
@@ -76,7 +76,7 @@ final class FindAllWildberriesOrdersNewDbsRequest extends Wildberries
                 continue;
             }
 
-            yield new WildberriesNewOrderDTO($order, $this->getProfile(), $this->getTokenIdentifier());
+            yield new NewWildberriesOrderDTO($order, $this->getProfile(), $this->getTokenIdentifier());
         }
     }
 }

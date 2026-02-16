@@ -28,7 +28,7 @@ namespace BaksDev\Wildberries\Orders\Api\Dbs\DeliveryDateTime\Tests;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Wildberries\Orders\Api\Dbs\DeliveryDateTime\GetWbOrdersDbsDeliveryDateTimeRequest;
 use BaksDev\Wildberries\Orders\Api\Dbs\DeliveryDateTime\WildberriesOrdersDbsDeliveryDateTimeDTO;
-use BaksDev\Wildberries\Orders\UseCase\New\WildberriesNewOrderHandler;
+use BaksDev\Wildberries\Orders\UseCase\New\NewWildberriesOrderHandler;
 use BaksDev\Wildberries\Type\Authorization\WbAuthorizationToken;
 use PHPUnit\Framework\Attributes\Group;
 use ReflectionClass;
@@ -63,7 +63,7 @@ class GetWildberriesOrdersDbsDeliveryDateTimeRequestTest extends KernelTestCase
         $GetWildberriesOrdersDbsDeliveryDateTimeRequest = self::getContainer()->get(GetWbOrdersDbsDeliveryDateTimeRequest::class);
         $GetWildberriesOrdersDbsDeliveryDateTimeRequest->TokenHttpClient(self::$Authorization);
 
-        /** @var WildberriesNewOrderHandler $WildberriesOrderHandler */
+        /** @var NewWildberriesOrderHandler $WildberriesOrderHandler */
 
         $WildberriesOrdersDbsDeliveryDateTimeDTO = $GetWildberriesOrdersDbsDeliveryDateTimeRequest
             ->find('W-4367157483');

@@ -50,6 +50,8 @@ use BaksDev\Wildberries\Orders\Type\PaymentType\TypePaymentPickupWildberries;
 use BaksDev\Wildberries\Orders\Type\ProfileType\TypeProfileDbsWildberries;
 use BaksDev\Wildberries\Orders\Type\ProfileType\TypeProfileFbsWildberries;
 use BaksDev\Wildberries\Orders\Type\ProfileType\TypeProfilePickupWildberries;
+use BaksDev\Wildberries\Orders\UseCase\New\Invariable\NewWildberriesOrderInvariableDTO;
+use BaksDev\Wildberries\Orders\UseCase\New\Posting\NewWildberriesOrderPostingDTO;
 use BaksDev\Wildberries\Orders\UseCase\New\Products\WildberriesOrderProductDTO;
 use BaksDev\Wildberries\Type\id\WbTokenUid;
 use DateTimeImmutable;
@@ -57,18 +59,20 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /** @see OrderEvent */
-final class WildberriesNewOrderDTO implements OrderEventInterface
+final class NewWildberriesOrderDTO implements OrderEventInterface
 {
     /** Идентификатор события */
     #[Assert\Uuid]
     private ?OrderEventUid $id = null;
 
-    /** Идентификатор заказа Wildberries */
-    private string $number;
-
     /** Постоянная величина */
     #[Assert\Valid]
-    private Invariable\NewOrderInvariable $invariable;
+    private NewWildberriesOrderInvariableDTO $invariable;
+
+    /** Отправление */
+    #[Assert\Valid]
+    private NewWildberriesOrderPostingDTO $posting;
+
 
     /** Дата заказа */
     #[Assert\NotBlank]
@@ -94,28 +98,25 @@ final class WildberriesNewOrderDTO implements OrderEventInterface
     {
         $this->client = false;
 
-
         /** Постоянная величина */
-        $NewOrderInvariable = new Invariable\NewOrderInvariable();
-
-        $NewOrderInvariable
+        $NewOrderInvariable = new NewWildberriesOrderInvariableDTO()
             ->setCreated(new DateTimeImmutable($order['createdAt'] ?: 'now'))
             ->setProfile($profile) // идентификатор профиля склада
             ->setToken($identifier) // идентификатор токена
-            ->setNumber('W-'.$order['id']); // помечаем заказ префиксом W
+            ->setNumber($order['orderUid']);
 
         $this->invariable = $NewOrderInvariable;
 
-        /** @deprecated переносится в Invariable */
-        $this->number = 'W-'.$order['id']; // помечаем заказ префиксом Y
-        $this->created = new DateTimeImmutable($order['createdAt'] ?: 'now');
+        /** Отправление */
+        $this->posting = new NewWildberriesOrderPostingDTO()
+            ->setValue('W-'.$order['id']);
 
+        $this->created = new DateTimeImmutable($order['createdAt'] ?: 'now');
 
         $this->status = new OrderStatus(OrderStatusNew::class);
 
         $this->product = new ArrayCollection();
         $this->usr = new User\OrderUserDTO();
-
 
         $OrderDeliveryDTO = $this->usr->getDelivery();
         $OrderPaymentDTO = $this->usr->getPayment();
@@ -319,7 +320,7 @@ final class WildberriesNewOrderDTO implements OrderEventInterface
      */
     public function getNumber(): string
     {
-        return $this->number;
+        return $this->posting->getValue();
     }
 
 
@@ -382,11 +383,16 @@ final class WildberriesNewOrderDTO implements OrderEventInterface
         return $this;
     }
 
+    public function getPostingNumber(): ?string
+    {
+        return $this->posting->getValue();
+    }
+
 
     /**
      * Invariable
      */
-    public function getInvariable(): Invariable\NewOrderInvariable
+    public function getInvariable(): Invariable\NewWildberriesOrderInvariableDTO
     {
         return $this->invariable;
     }

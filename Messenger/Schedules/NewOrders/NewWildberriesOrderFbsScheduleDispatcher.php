@@ -32,8 +32,8 @@ use BaksDev\Orders\Order\Entity\Order;
 use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersNewFbsRequest;
 use BaksDev\Wildberries\Orders\Schedule\NewOrders\UpdateWildberriesOrdersNewSchedules;
 use BaksDev\Wildberries\Orders\Type\DeliveryType\TypeDeliveryFbsWildberries;
-use BaksDev\Wildberries\Orders\UseCase\New\WildberriesNewOrderDTO;
-use BaksDev\Wildberries\Orders\UseCase\New\WildberriesNewOrderHandler;
+use BaksDev\Wildberries\Orders\UseCase\New\NewWildberriesOrderDTO;
+use BaksDev\Wildberries\Orders\UseCase\New\NewWildberriesOrderHandler;
 use BaksDev\Wildberries\Products\Api\Cards\FindAllWildberriesCardsRequest;
 use BaksDev\Wildberries\Products\Api\Cards\WildberriesCardDTO;
 use BaksDev\Wildberries\Products\Messenger\Cards\CardNew\WildberriesCardNewMassage;
@@ -52,7 +52,7 @@ final readonly class NewWildberriesOrderFbsScheduleDispatcher
         private FindAllWildberriesOrdersNewFbsRequest $wildberriesOrdersNew,
         private FindAllWildberriesCardsRequest $WildberriesCardsRequest,
         private DeduplicatorInterface $deduplicator,
-        private WildberriesNewOrderHandler $WildberriesOrderHandler,
+        private NewWildberriesOrderHandler $WildberriesOrderHandler,
         private MessageDispatchInterface $messageDispatch,
         private AllWbTokensByProfileInterface $AllWbTokensByProfileRepository,
 
@@ -109,7 +109,7 @@ final readonly class NewWildberriesOrderFbsScheduleDispatcher
             /**
              * Добавляем новые заказы Wildberries
              */
-            /** @var WildberriesNewOrderDTO $WildberriesOrderDTO */
+            /** @var NewWildberriesOrderDTO $WildberriesOrderDTO */
             foreach($orders as $WildberriesOrderDTO)
             {
                 $Deduplicator = $this->deduplicator

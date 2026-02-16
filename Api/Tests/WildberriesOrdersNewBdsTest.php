@@ -31,8 +31,8 @@ use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Users\Profile\UserProfile\UseCase\Admin\NewEdit\Tests\NewUserProfileHandlerTest;
 use BaksDev\Users\Profile\UserProfile\UseCase\User\NewEdit\Tests\UserNewUserProfileHandleTest;
 use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersNewDbsRequest;
-use BaksDev\Wildberries\Orders\UseCase\New\WildberriesNewOrderDTO;
-use BaksDev\Wildberries\Orders\UseCase\New\WildberriesNewOrderHandler;
+use BaksDev\Wildberries\Orders\UseCase\New\NewWildberriesOrderDTO;
+use BaksDev\Wildberries\Orders\UseCase\New\NewWildberriesOrderHandler;
 use BaksDev\Wildberries\Type\Authorization\WbAuthorizationToken;
 use PHPUnit\Framework\Attributes\Group;
 use ReflectionClass;
@@ -69,8 +69,8 @@ class WildberriesOrdersNewBdsTest extends KernelTestCase
         $FindAllWildberriesOrdersNewDbsRequest = self::getContainer()->get(FindAllWildberriesOrdersNewDbsRequest::class);
         $FindAllWildberriesOrdersNewDbsRequest->TokenHttpClient(self::$Authorization);
 
-        /** @var WildberriesNewOrderHandler $WildberriesOrderHandler */
-        $WildberriesOrderHandler = self::getContainer()->get(WildberriesNewOrderHandler::class);
+        /** @var NewWildberriesOrderHandler $WildberriesOrderHandler */
+        $WildberriesOrderHandler = self::getContainer()->get(NewWildberriesOrderHandler::class);
 
         $data = $FindAllWildberriesOrdersNewDbsRequest->findAll();
 
@@ -87,7 +87,7 @@ class WildberriesOrdersNewBdsTest extends KernelTestCase
         foreach($data as $WildberriesNewOrderDTO)
         {
             // Вызываем все геттеры
-            $reflectionClass = new ReflectionClass(WildberriesNewOrderDTO::class);
+            $reflectionClass = new ReflectionClass(NewWildberriesOrderDTO::class);
             $methods = $reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC);
 
             foreach($methods as $method)

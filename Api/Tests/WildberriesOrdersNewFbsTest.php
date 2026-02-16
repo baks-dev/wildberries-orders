@@ -31,8 +31,8 @@ use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Users\Profile\UserProfile\UseCase\Admin\NewEdit\Tests\NewUserProfileHandlerTest;
 use BaksDev\Users\Profile\UserProfile\UseCase\User\NewEdit\Tests\UserNewUserProfileHandleTest;
 use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersNewFbsRequest;
-use BaksDev\Wildberries\Orders\UseCase\New\WildberriesNewOrderDTO;
-use BaksDev\Wildberries\Orders\UseCase\New\WildberriesNewOrderHandler;
+use BaksDev\Wildberries\Orders\UseCase\New\NewWildberriesOrderDTO;
+use BaksDev\Wildberries\Orders\UseCase\New\NewWildberriesOrderHandler;
 use BaksDev\Wildberries\Type\Authorization\WbAuthorizationToken;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
@@ -67,8 +67,8 @@ class WildberriesOrdersNewFbsTest extends KernelTestCase
         $WildberriesOrdersNewRequest = self::getContainer()->get(FindAllWildberriesOrdersNewFbsRequest::class);
         $WildberriesOrdersNewRequest->TokenHttpClient(self::$Authorization);
 
-        /** @var WildberriesNewOrderHandler $WildberriesOrderHandler */
-        $WildberriesOrderHandler = self::getContainer()->get(WildberriesNewOrderHandler::class);
+        /** @var NewWildberriesOrderHandler $WildberriesOrderHandler */
+        $WildberriesOrderHandler = self::getContainer()->get(NewWildberriesOrderHandler::class);
 
         $data = $WildberriesOrdersNewRequest->findAll();
 
@@ -81,7 +81,7 @@ class WildberriesOrdersNewFbsTest extends KernelTestCase
 
         foreach($data as $order)
         {
-            self::assertInstanceOf(WildberriesNewOrderDTO::class, $order);
+            self::assertInstanceOf(NewWildberriesOrderDTO::class, $order);
 
             $handle = $WildberriesOrderHandler->handle($order);
 

@@ -37,8 +37,8 @@ use BaksDev\Wildberries\Orders\Api\Dbs\UpdateWbOrderDbsPackageRequest;
 use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersNewDbsRequest;
 use BaksDev\Wildberries\Orders\Schedule\NewOrders\UpdateWildberriesOrdersNewSchedules;
 use BaksDev\Wildberries\Orders\Type\DeliveryType\TypeDeliveryDbsWildberries;
-use BaksDev\Wildberries\Orders\UseCase\New\WildberriesNewOrderDTO;
-use BaksDev\Wildberries\Orders\UseCase\New\WildberriesNewOrderHandler;
+use BaksDev\Wildberries\Orders\UseCase\New\NewWildberriesOrderDTO;
+use BaksDev\Wildberries\Orders\UseCase\New\NewWildberriesOrderHandler;
 use BaksDev\Wildberries\Products\Api\Cards\FindAllWildberriesCardsRequest;
 use BaksDev\Wildberries\Products\Api\Cards\WildberriesCardDTO;
 use BaksDev\Wildberries\Products\Messenger\Cards\CardNew\WildberriesCardNewMassage;
@@ -57,7 +57,7 @@ final readonly class NewWildberriesOrderDbsScheduleDispatcher
         #[Target('wildberriesOrdersLogger')] private LoggerInterface $logger,
         private FindAllWildberriesOrdersNewDbsRequest $wildberriesOrdersNew,
         private DeduplicatorInterface $deduplicator,
-        private WildberriesNewOrderHandler $WildberriesOrderHandler,
+        private NewWildberriesOrderHandler $WildberriesOrderHandler,
         private AllWbTokensByProfileInterface $AllWbTokensByProfileRepository,
         private FindClientWildberriesOrderDbsRequest $FindClientWildberriesOrdersRequest,
         private GetWbOrdersDbsDeliveryDateTimeRequest $GetWildberriesOrdersDbsDeliveryDateTimeRequest,
@@ -128,7 +128,7 @@ final readonly class NewWildberriesOrderDbsScheduleDispatcher
         WbTokenUid $WbTokenUid
     ): void
     {
-        /** @var WildberriesNewOrderDTO $WildberriesOrderDTO */
+        /** @var NewWildberriesOrderDTO $WildberriesOrderDTO */
         foreach($orders as $WildberriesOrderDTO)
         {
             $Deduplicator = $this->deduplicator
@@ -156,7 +156,7 @@ final readonly class NewWildberriesOrderDbsScheduleDispatcher
             /** Отправляем заказ на сборку для получения информации о клиенте  */
             $isConfirm = $this->UpdateWbOrderDbsPackageRequest
                 ->forTokenIdentifier($WbTokenUid)
-                ->update($WildberriesOrderDTO->getInvariable()->getNumber());
+                ->update($WildberriesOrderDTO->getPostingNumber());
 
             if(false === $isConfirm)
             {
@@ -172,7 +172,7 @@ final readonly class NewWildberriesOrderDbsScheduleDispatcher
 
             $ClientWildberriesOrdersDTO = $this->FindClientWildberriesOrdersRequest
                 ->forTokenIdentifier($WbTokenUid)
-                ->find($WildberriesOrderDTO->getInvariable()->getNumber());
+                ->find($WildberriesOrderDTO->getPostingNumber());
 
             if($ClientWildberriesOrdersDTO instanceof ClientWildberriesOrdersDTO)
             {
@@ -185,7 +185,7 @@ final readonly class NewWildberriesOrderDbsScheduleDispatcher
 
             $WildberriesOrdersDbsDeliveryDateTimeDTO = $this->GetWildberriesOrdersDbsDeliveryDateTimeRequest
                 ->forTokenIdentifier($WbTokenUid)
-                ->find($WildberriesOrderDTO->getInvariable()->getNumber());
+                ->find($WildberriesOrderDTO->getPostingNumber());
 
             if($WildberriesOrdersDbsDeliveryDateTimeDTO instanceof WildberriesOrdersDbsDeliveryDateTimeDTO)
             {
