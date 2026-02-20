@@ -227,6 +227,11 @@ final class NewWildberriesOrderDTO implements OrderEventInterface
         }
 
         /** Указываем адрес доставки  */
+
+        // По умолчанию адрес доставки - Москва
+        $OrderDeliveryDTO->setAddress('Москва');
+
+        /** Адрес клиента в случае доставки DBS */
         if(isset($order['address']['fullAddress']))
         {
             // пробуем определить в адресе домофон и этаж
@@ -251,11 +256,18 @@ final class NewWildberriesOrderDTO implements OrderEventInterface
             $OrderDeliveryDTO->setAddress(implode(', ', $address));
         }
 
+        /** Адрес доставки при самовывозе - склад */
+        else if(isset($order['warehouseAddress']))
+        {
+            $OrderDeliveryDTO->setAddress($order['warehouseAddress']);
+        }
+
         else if(isset($order['offices']))
         {
             $OrderDeliveryDTO->setAddress(implode(', ', str_replace('_', ' ', $order['offices'])));
 
         }
+
 
         /** Добавляем комментарий при наличии */
         empty($order['comment']) ?: $deliveryComment[] = $order['comment'];
