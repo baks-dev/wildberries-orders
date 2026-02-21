@@ -28,7 +28,7 @@ namespace BaksDev\Wildberries\Orders\UseCase\New\Posting;
 use BaksDev\Orders\Order\Entity\Event\Posting\OrderPostingInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/** @see NewWildberriesOrderPosting */
+/** @see OrderPosting */
 final class NewWildberriesOrderPostingDTO implements OrderPostingInterface
 {
     /** Значение свойства */

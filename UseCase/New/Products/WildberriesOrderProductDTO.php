@@ -32,6 +32,7 @@ use BaksDev\Products\Product\Type\Offers\Id\ProductOfferUid;
 use BaksDev\Products\Product\Type\Offers\Variation\Id\ProductVariationUid;
 use BaksDev\Products\Product\Type\Offers\Variation\Modification\Id\ProductModificationUid;
 use BaksDev\Wildberries\Orders\UseCase\New\Products\Items\WildberriesOrderProductItemDTO;
+use BaksDev\Wildberries\Orders\UseCase\New\Products\Price\WildberriesNewOrderPriceDTO;
 use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -66,7 +67,7 @@ final class WildberriesOrderProductDTO implements OrderProductInterface
 
     /** Стоимость и количество */
     #[Assert\Valid]
-    private Price\NewOrderPriceDTO $price;
+    private Price\WildberriesNewOrderPriceDTO $price;
 
     /**
      * Коллекция единиц товара
@@ -80,7 +81,7 @@ final class WildberriesOrderProductDTO implements OrderProductInterface
     {
         $this->article = $article;
         $this->barcode = $barcode;
-        $this->price = new Price\NewOrderPriceDTO();
+        $this->price = new WildberriesNewOrderPriceDTO();
         $this->item = new ArrayCollection();
 
     }
@@ -175,12 +176,12 @@ final class WildberriesOrderProductDTO implements OrderProductInterface
     }
 
     /** Стоимость и количество */
-    public function getPrice(): Price\NewOrderPriceDTO
+    public function getPrice(): WildberriesNewOrderPriceDTO
     {
         return $this->price;
     }
 
-    public function setPrice(Price\NewOrderPriceDTO $price): void
+    public function setPrice(WildberriesNewOrderPriceDTO $price): void
     {
         $this->price = $price;
     }

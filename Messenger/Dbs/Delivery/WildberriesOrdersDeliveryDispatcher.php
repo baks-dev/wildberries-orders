@@ -68,7 +68,7 @@ final readonly class WildberriesOrdersDeliveryDispatcher
          */
         $isDelivery = $this->UpdateWildberriesOrdersDeliverRequest
             ->forTokenIdentifier($WbTokenUid)
-            ->update($OrderEvent->getOrderNumber());
+            ->update($OrderEvent->getPostingNumber());
 
         /** Пробуем обновить через минуту */
         if(false === $isDelivery)

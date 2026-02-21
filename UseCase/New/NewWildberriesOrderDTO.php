@@ -111,6 +111,7 @@ final class NewWildberriesOrderDTO implements OrderEventInterface
         $this->posting = new NewWildberriesOrderPostingDTO()
             ->setValue('W-'.$order['id']);
 
+
         $this->created = new DateTimeImmutable($order['createdAt'] ?: 'now');
 
         $this->status = new OrderStatus(OrderStatusNew::class);
@@ -418,5 +419,10 @@ final class NewWildberriesOrderDTO implements OrderEventInterface
     public function getClient(): false|ClientWildberriesOrdersDTO
     {
         return $this->client;
+    }
+
+    public function getPosting(): NewWildberriesOrderPostingDTO
+    {
+        return $this->posting;
     }
 }

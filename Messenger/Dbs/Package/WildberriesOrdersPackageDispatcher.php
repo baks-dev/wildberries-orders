@@ -71,7 +71,7 @@ final readonly class WildberriesOrdersPackageDispatcher
          */
         $isPackage = $this->UpdateWildberriesOrdersPackageRequest
             ->forTokenIdentifier($WbTokenUid)
-            ->update($OrderEvent->getOrderNumber());
+            ->update($OrderEvent->getPostingNumber());
 
         /** Пробуем обновить через минуту */
         if(false === $isPackage)
