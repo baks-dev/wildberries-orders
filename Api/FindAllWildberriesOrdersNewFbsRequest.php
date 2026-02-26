@@ -70,6 +70,12 @@ final class FindAllWildberriesOrdersNewFbsRequest extends Wildberries
 
         foreach($content['orders'] as $order)
         {
+            /** Пропускаем, если заказ на другой склад */
+            if((string) $order['warehouseId'] !== $this->getWarehouse())
+            {
+                continue;
+            }
+
             yield new NewWildberriesOrderDTO($order, $this->getProfile(), $this->getTokenIdentifier());
         }
     }

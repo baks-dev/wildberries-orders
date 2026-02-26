@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,7 @@ namespace BaksDev\Wildberries\Orders\Repository\AllWbOrdersNew;
 
 use BaksDev\Core\Doctrine\DBALQueryBuilder;
 use BaksDev\Orders\Order\Entity\Event\OrderEvent;
+use BaksDev\Orders\Order\Entity\Event\Posting\OrderPosting;
 use BaksDev\Orders\Order\Entity\Invariable\OrderInvariable;
 use BaksDev\Orders\Order\Entity\Order;
 use BaksDev\Orders\Order\Entity\User\Delivery\OrderDelivery;
@@ -84,7 +85,6 @@ final class AllWbOrdersNewRepository implements AllWbOrdersNewInterface
             ->from(Order::class, 'ord');
 
         $dbal
-            ->addSelect('invariable.number AS attr')
             ->join(
                 'ord',
                 OrderInvariable::class,
@@ -94,7 +94,16 @@ final class AllWbOrdersNewRepository implements AllWbOrdersNewInterface
             ->setParameter(
                 key: 'profile',
                 value: $this->profile,
-                type: UserProfileUid::TYPE
+                type: UserProfileUid::TYPE,
+            );
+
+
+        $dbal->addSelect('orders_posting.value AS attr')
+            ->join(
+                'ord',
+                OrderPosting::class,
+                'orders_posting',
+                'orders_posting.main = ord.id',
             );
 
         $dbal
@@ -102,16 +111,16 @@ final class AllWbOrdersNewRepository implements AllWbOrdersNewInterface
                 'ord',
                 OrderEvent::class,
                 'event',
-                'event.id = ord.event AND event.status IN (:status)'
+                'event.id = ord.event AND event.status IN (:status)',
             )
             ->setParameter(
                 key: 'status',
                 value: [
                     OrderStatusNew::STATUS,
                     OrderStatusUnpaid::STATUS,
-                    OrderStatusPackage::STATUS
+                    OrderStatusPackage::STATUS,
                 ],
-                type: ArrayParameterType::STRING
+                type: ArrayParameterType::STRING,
             );
 
         $dbal
@@ -119,7 +128,7 @@ final class AllWbOrdersNewRepository implements AllWbOrdersNewInterface
                 'event',
                 OrderUser::class,
                 'usr',
-                'usr.event = event.id'
+                'usr.event = event.id',
             );
 
         $dbal
@@ -129,11 +138,11 @@ final class AllWbOrdersNewRepository implements AllWbOrdersNewInterface
                 'order_delivery',
                 'order_delivery.usr = usr.id AND 
                     order_delivery.delivery IN (:delivery)
-                '
+                ',
             )->setParameter(
                 key: 'delivery',
                 value: [TypeDeliveryDbsWildberries::TYPE, TypeDeliveryFbsWildberries::TYPE],
-                type: ArrayParameterType::STRING
+                type: ArrayParameterType::STRING,
             );
 
 
