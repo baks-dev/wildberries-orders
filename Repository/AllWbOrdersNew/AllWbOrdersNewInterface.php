@@ -1,6 +1,6 @@
 <?php
 /*
- *  Copyright 2025.  Baks.dev <admin@baks.dev>
+ *  Copyright 2026.  Baks.dev <admin@baks.dev>
  *  
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
@@ -21,6 +21,8 @@
  *  THE SOFTWARE.
  */
 
+declare(strict_types=1);
+
 namespace BaksDev\Wildberries\Orders\Repository\AllWbOrdersNew;
 
 use BaksDev\Users\Profile\UserProfile\Entity\UserProfile;
@@ -35,5 +37,4 @@ interface AllWbOrdersNewInterface
      * Метод возвращает идентификаторы системных заказов и идентификаторы заказа Wildberries качестве атрибута
      */
     public function findAll(): Generator|false;
-
 }

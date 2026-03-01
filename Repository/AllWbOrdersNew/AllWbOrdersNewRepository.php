@@ -44,7 +44,6 @@ use Doctrine\DBAL\ArrayParameterType;
 use Generator;
 use InvalidArgumentException;
 
-
 final class AllWbOrdersNewRepository implements AllWbOrdersNewInterface
 {
     private UserProfileUid|false $profile;
@@ -144,7 +143,6 @@ final class AllWbOrdersNewRepository implements AllWbOrdersNewInterface
                 value: [TypeDeliveryDbsWildberries::TYPE, TypeDeliveryFbsWildberries::TYPE],
                 type: ArrayParameterType::STRING,
             );
-
 
         return $dbal->fetchAllHydrate(OrderUid::class);
     }
