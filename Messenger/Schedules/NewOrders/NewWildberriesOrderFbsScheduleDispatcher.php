@@ -44,7 +44,7 @@ use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 /** Получает список новых сборочных заданий FBS */
-#[AsMessageHandler]
+#[AsMessageHandler(priority: 0)]
 final readonly class NewWildberriesOrderFbsScheduleDispatcher
 {
     public function __construct(

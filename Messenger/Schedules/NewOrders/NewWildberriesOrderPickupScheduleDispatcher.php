@@ -46,7 +46,7 @@ use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 /** Получает список новых сборочных заданий Самовывоз */
-#[AsMessageHandler]
+#[AsMessageHandler(priority: 0)]
 final readonly class NewWildberriesOrderPickupScheduleDispatcher
 {
     public function __construct(

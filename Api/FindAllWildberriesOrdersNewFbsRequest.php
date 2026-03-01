@@ -28,7 +28,9 @@ namespace BaksDev\Wildberries\Orders\Api;
 use BaksDev\Wildberries\Api\Wildberries;
 use BaksDev\Wildberries\Orders\UseCase\New\NewWildberriesOrderDTO;
 use Generator;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 
+#[Autoconfigure(public: true)]
 final class FindAllWildberriesOrdersNewFbsRequest extends Wildberries
 {
     /**

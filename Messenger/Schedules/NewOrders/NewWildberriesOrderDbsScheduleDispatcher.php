@@ -50,7 +50,7 @@ use Symfony\Component\DependencyInjection\Attribute\Target;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 /** Получает список новых сборочных заданий DBS */
-#[AsMessageHandler]
+#[AsMessageHandler(priority: 0)]
 final readonly class NewWildberriesOrderDbsScheduleDispatcher
 {
     public function __construct(

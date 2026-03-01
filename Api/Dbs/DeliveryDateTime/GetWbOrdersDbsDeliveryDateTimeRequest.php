@@ -26,7 +26,9 @@ declare(strict_types=1);
 namespace BaksDev\Wildberries\Orders\Api\Dbs\DeliveryDateTime;
 
 use BaksDev\Wildberries\Api\Wildberries;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 
+#[Autoconfigure(public: true)]
 final class GetWbOrdersDbsDeliveryDateTimeRequest extends Wildberries
 {
     /**

@@ -57,7 +57,9 @@ use BaksDev\Wildberries\Orders\UseCase\New\Products\Items\WildberriesOrderProduc
 use BaksDev\Wildberries\Orders\UseCase\New\User\Delivery\Field\OrderDeliveryFieldDTO;
 use BaksDev\Wildberries\Orders\UseCase\New\User\UserProfile\Value\ValueDTO;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 
+#[Autoconfigure(public: true)]
 final class NewWildberriesOrderHandler extends AbstractHandler
 {
     public function __construct(
