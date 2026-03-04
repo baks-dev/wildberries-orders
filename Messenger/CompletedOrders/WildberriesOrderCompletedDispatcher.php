@@ -49,7 +49,6 @@ use BaksDev\Products\Sign\Repository\ProductSignByOrder\ProductSignByOrderInterf
 use BaksDev\Products\Sign\UseCase\Admin\Status\ProductSignDoneDTO;
 use BaksDev\Products\Sign\UseCase\Admin\Status\ProductSignStatusHandler;
 use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersStatusFbsRequest;
-use BaksDev\Wildberries\Orders\Commands\UpdateWildberriesOrdersCompletedCommand;
 use BaksDev\Wildberries\Orders\Type\DeliveryType\TypeDeliveryFbsWildberries;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Target;
