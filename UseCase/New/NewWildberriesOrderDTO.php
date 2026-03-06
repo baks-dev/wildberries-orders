@@ -311,6 +311,7 @@ final class NewWildberriesOrderDTO implements OrderEventInterface
     /**
      * Status
      */
+
     public function getStatus(): OrderStatus
     {
         return $this->status;
@@ -331,11 +332,16 @@ final class NewWildberriesOrderDTO implements OrderEventInterface
     /**
      * Number
      */
-    public function getNumber(): string
+
+    public function getOrderNumber(): string
+    {
+        return $this->invariable->getNumber();
+    }
+
+    public function getPostingNumber(): string
     {
         return $this->posting->getValue();
     }
-
 
     /**
      * Коллекция продукции в заказе
@@ -394,11 +400,6 @@ final class NewWildberriesOrderDTO implements OrderEventInterface
         }
 
         return $this;
-    }
-
-    public function getPostingNumber(): ?string
-    {
-        return $this->posting->getValue();
     }
 
 

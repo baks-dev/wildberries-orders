@@ -91,7 +91,7 @@ final class NewWildberriesOrderHandler extends AbstractHandler
             return 'Заказ не является в статусе New «Новый»';
         }
 
-        $isExists = $this->existsOrderNumber->isExists($command->getNumber());
+        $isExists = $this->existsOrderNumber->isExists($command->getPostingNumber());
 
         if($isExists)
         {

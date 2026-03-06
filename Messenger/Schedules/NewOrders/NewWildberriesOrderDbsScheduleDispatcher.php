@@ -134,7 +134,7 @@ final readonly class NewWildberriesOrderDbsScheduleDispatcher
             $Deduplicator = $this->deduplicator
                 ->namespace('wildberries-orders')
                 ->expiresAfter('1 week')
-                ->deduplication([$WildberriesOrderDTO->getNumber(), self::class]);
+                ->deduplication([$WildberriesOrderDTO->getPostingNumber(), self::class]);
 
             if($message->isDeduplicator() && $Deduplicator->isExecuted())
             {
@@ -204,7 +204,7 @@ final readonly class NewWildberriesOrderDbsScheduleDispatcher
             if($Order === true)
             {
                 $this->logger->info(
-                    sprintf('Новый заказ %s уже добавлен в систему', $WildberriesOrderDTO->getNumber()),
+                    sprintf('Новый заказ %s уже добавлен в систему', $WildberriesOrderDTO->getPostingNumber()),
                     [self::class.':'.__LINE__],
                 );
 
@@ -215,7 +215,7 @@ final readonly class NewWildberriesOrderDbsScheduleDispatcher
 
 
             $this->logger->info(
-                sprintf('Добавили новый заказ %s', $WildberriesOrderDTO->getNumber()),
+                sprintf('Добавили новый заказ %s', $WildberriesOrderDTO->getPostingNumber()),
                 [self::class.':'.__LINE__],
             );
 
