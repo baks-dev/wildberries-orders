@@ -71,7 +71,7 @@ final class GetWildberriesOrdersStickerRequest extends Wildberries
      * Возвращает файл с этикеткой на указанное сборочное задание
      * Можно запросить этикетку в формате svg, zplv (вертикальный), zplh (горизонтальный), png.
      *
-     * @see https://dev.wildberries.ru/openapi/orders-fbs/#tag/Sborochnye-zadaniya/paths/~1api~1v3~1orders~1stickers/post
+     * @see https://dev.wildberries.ru/docs/openapi/orders-fbs#tag/Sborochnye-zadaniya-FBS/paths/~1api~1v3~1orders~1stickers/post
      *
      * @note По умолчанию стикер в формате SVG 40x30
      *
@@ -105,6 +105,12 @@ final class GetWildberriesOrdersStickerRequest extends Wildberries
 
             $content = $response->toArray(false);
 
+            /** Слишком много запросов */
+            if($response->getStatusCode() === 429)
+            {
+                sleep(1);
+            }
+
             if($response->getStatusCode() !== 200)
             {
                 $this->logger->critical(
@@ -131,7 +137,7 @@ final class GetWildberriesOrdersStickerRequest extends Wildberries
 
             $file = base64_decode($sticker['file']);
 
-            usleep(100);
+            usleep(100000);
 
             return str_replace(['width="400"', 'height="300"'], ['width="180"', ''], $file);
         });

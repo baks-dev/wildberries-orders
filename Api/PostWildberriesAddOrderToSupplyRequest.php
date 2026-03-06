@@ -102,6 +102,12 @@ final class PostWildberriesAddOrderToSupplyRequest extends Wildberries
             ['json' => ['orders' => [(int) $this->order]]],
         );
 
+        /** Слишком много запросов */
+        if($response->getStatusCode() === 429)
+        {
+            sleep(1);
+        }
+
         if($response->getStatusCode() !== 204)
         {
             $this->logger->critical(
@@ -114,6 +120,8 @@ final class PostWildberriesAddOrderToSupplyRequest extends Wildberries
 
         // Сбрасываем идентификатор сборочного задания
         $this->order = false;
+
+        usleep(100000);
 
         return true;
     }
