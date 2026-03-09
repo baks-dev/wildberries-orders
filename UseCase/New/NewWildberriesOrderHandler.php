@@ -122,7 +122,9 @@ final class NewWildberriesOrderHandler extends AbstractHandler
          */
         foreach($command->getProduct() as $product)
         {
-            $ProductData = $this->ProductConstByBarcode->find($product->getBarcode());
+            $ProductData = $this
+                ->ProductConstByBarcode
+                ->find($product->getBarcode());
 
             /** Если по штрихкоду не найден - пробуем найти по артикулу */
             //$ProductData ?: $ProductData = $this->ProductConstByArticle->find($product->getArticle());

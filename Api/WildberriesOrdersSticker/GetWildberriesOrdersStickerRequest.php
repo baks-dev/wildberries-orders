@@ -137,7 +137,7 @@ final class GetWildberriesOrdersStickerRequest extends Wildberries
 
             $file = base64_decode($sticker['file']);
 
-            usleep(100000);
+            usleep(300000);
 
             return str_replace(['width="400"', 'height="300"'], ['width="180"', ''], $file);
         });

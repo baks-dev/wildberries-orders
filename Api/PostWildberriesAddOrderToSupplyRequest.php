@@ -121,7 +121,7 @@ final class PostWildberriesAddOrderToSupplyRequest extends Wildberries
         // Сбрасываем идентификатор сборочного задания
         $this->order = false;
 
-        usleep(100000);
+        usleep(300000);
 
         return true;
     }
