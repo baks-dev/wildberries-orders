@@ -29,7 +29,7 @@ use BaksDev\Wildberries\Api\Wildberries;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 
 /** Перевести на сборку */
-#[Autoconfigure(public: true)]
+// #[Autoconfigure(public: true)]
 final class FindClientWildberriesOrderDbsRequest extends Wildberries
 {
     /**

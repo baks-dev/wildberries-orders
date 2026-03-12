@@ -26,7 +26,7 @@ namespace BaksDev\Wildberries\Orders\Repository\WbOrdersAnalog;
 use BaksDev\Products\Product\Type\Event\ProductEventUid;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 
-#[Autoconfigure(public: true)]
+// #[Autoconfigure(public: true)]
 interface WbOrdersAnalogInterface
 {
     /**
