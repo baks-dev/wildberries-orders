@@ -218,7 +218,9 @@ final class NewWildberriesOrderHandler extends AbstractHandler
         $this->flush();
 
         /* Отправляем сообщение в шину */
-        $this->messageDispatch->dispatch(
+        $this->messageDispatch
+            ->addClearCacheOther('wildberries-manufacture')
+            ->dispatch(
             message: new OrderMessage($this->main->getId(), $this->main->getEvent(), $command->getEvent()),
             transport: 'orders-order',
         );
