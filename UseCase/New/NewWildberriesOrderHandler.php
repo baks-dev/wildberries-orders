@@ -221,9 +221,9 @@ final class NewWildberriesOrderHandler extends AbstractHandler
         $this->messageDispatch
             ->addClearCacheOther('wildberries-manufacture')
             ->dispatch(
-            message: new OrderMessage($this->main->getId(), $this->main->getEvent(), $command->getEvent()),
-            transport: 'orders-order',
-        );
+                message: new OrderMessage($this->main->getId(), $this->main->getEvent(), $command->getEvent()),
+                transport: 'orders-order',
+            );
 
 
         return $this->main;

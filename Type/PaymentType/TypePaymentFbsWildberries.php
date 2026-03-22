@@ -39,6 +39,11 @@ final class TypePaymentFbsWildberries implements TypePaymentInterface
         return 410;
     }
 
+    public static function equals(mixed $uid): bool
+    {
+        return self::TYPE === (string) $uid;
+    }
+
     public function __toString(): string
     {
         return self::TYPE;
@@ -48,10 +53,5 @@ final class TypePaymentFbsWildberries implements TypePaymentInterface
     public function getValue(): string
     {
         return self::TYPE;
-    }
-
-    public static function equals(mixed $uid): bool
-    {
-        return self::TYPE === (string) $uid;
     }
 }

@@ -53,7 +53,7 @@ final readonly class UpdateStatisticsAnalogHandler
             'Обновляем статистику аналогов продукции заказов Wildberries',
             [
                 'ProductUid' => $message->getProduct(),
-                self::class.':'.__LINE__
+                self::class.':'.__LINE__,
             ]);
 
         /**
@@ -83,7 +83,7 @@ final readonly class UpdateStatisticsAnalogHandler
                 [
                     'code' => $StatisticsHandler,
                     'ProductUid' => $message->getProduct(),
-                    self::class.':'.__LINE__
+                    self::class.':'.__LINE__,
                 ]);
         }
     }

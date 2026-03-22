@@ -39,6 +39,11 @@ final class TypeProfileDbsWildberries implements TypeProfileInterface
         return 411;
     }
 
+    public static function equals(mixed $uid): bool
+    {
+        return self::TYPE === (string) $uid;
+    }
+
     public function __toString(): string
     {
         return self::TYPE;
@@ -48,10 +53,5 @@ final class TypeProfileDbsWildberries implements TypeProfileInterface
     public function getValue(): string
     {
         return self::TYPE;
-    }
-
-    public static function equals(mixed $uid): bool
-    {
-        return self::TYPE === (string) $uid;
     }
 }

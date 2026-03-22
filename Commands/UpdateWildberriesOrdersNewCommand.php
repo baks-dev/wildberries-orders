@@ -84,7 +84,7 @@ class UpdateWildberriesOrdersNewCommand extends Command
         $question = new ChoiceQuestion(
             'Профиль пользователя (Ctrl+C чтобы выйти)',
             $questions,
-            '0'
+            '0',
         );
 
         $key = $helper->ask($input, $output, $question);
@@ -152,7 +152,7 @@ class UpdateWildberriesOrdersNewCommand extends Command
         /* Отправляем сообщение в шину профиля */
         $this->messageDispatch->dispatch(
             message: new NewWildberriesOrdersScheduleMessage($profile)->disableDeduplicator(),
-            transport: $async === true ? (string) $profile : null
+            transport: $async === true ? (string) $profile : null,
         );
     }
 

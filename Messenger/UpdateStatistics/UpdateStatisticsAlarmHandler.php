@@ -53,8 +53,8 @@ final readonly class UpdateStatisticsAlarmHandler
             'Обновляем статистику срочных заказов Wildberries',
             [
                 'ProductUid' => $message->getProduct(),
-                self::class.':'.__LINE__
-            ]
+                self::class.':'.__LINE__,
+            ],
         );
 
         /**
@@ -84,7 +84,7 @@ final readonly class UpdateStatisticsAlarmHandler
                 [
                     'code' => $StatisticsHandler,
                     'ProductUid' => $message->getProduct(),
-                    self::class.':'.__LINE__
+                    self::class.':'.__LINE__,
                 ]);
         }
     }

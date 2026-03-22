@@ -55,6 +55,26 @@ final class FindAllWildberriesOrdersStatusFbsRequest extends Wildberries
         return $this;
     }
 
+    public function findOrderCancel(): array|false
+    {
+        $request = $this->request();
+
+        if(empty($request))
+        {
+            return false;
+        }
+
+        $orders = array_filter($request, static function($item) {
+            return in_array($item['wbStatus'], ['declined_by_client', 'canceled']);
+        });
+
+        return empty($orders) ? false :
+
+            array_map(static function($item) {
+                return 'W-'.$item['id'];
+            }, $orders);
+    }
+
     /**
      * Получить статусы сборочных заданий
      *
@@ -131,27 +151,6 @@ final class FindAllWildberriesOrdersStatusFbsRequest extends Wildberries
         }
 
         return $result;
-    }
-
-
-    public function findOrderCancel(): array|false
-    {
-        $request = $this->request();
-
-        if(empty($request))
-        {
-            return false;
-        }
-
-        $orders = array_filter($request, static function($item) {
-            return in_array($item['wbStatus'], ['declined_by_client', 'canceled']);
-        });
-
-        return empty($orders) ? false :
-
-            array_map(static function($item) {
-                return 'W-'.$item['id'];
-            }, $orders);
     }
 
     /**

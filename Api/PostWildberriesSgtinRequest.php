@@ -87,7 +87,7 @@ final class PostWildberriesSgtinRequest extends Wildberries
         {
             $this->logger->warning(
                 sprintf('%s: Отсутствуют честные знаки на заказ', $this->order),
-                [self::class.':'.__LINE__]
+                [self::class.':'.__LINE__],
             );
 
             return false;
@@ -98,7 +98,7 @@ final class PostWildberriesSgtinRequest extends Wildberries
         $response = $this->marketplace()->TokenHttpClient()->request(
             'PUT',
             sprintf('/api/v3/orders/%s/meta/sgtin', $this->order),
-            ['json' => $data]
+            ['json' => $data],
         );
 
         if($response->getStatusCode() !== 204)
@@ -107,7 +107,7 @@ final class PostWildberriesSgtinRequest extends Wildberries
 
             $this->logger->critical(
                 'wildberries-orders: Ошибка при передаче честных заказов',
-                [$content, self::class.':'.__LINE__]
+                [$content, self::class.':'.__LINE__],
             );
 
             return false;

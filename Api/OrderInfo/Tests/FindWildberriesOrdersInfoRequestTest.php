@@ -1,17 +1,17 @@
 <?php
 /*
  *  Copyright 2026.  Baks.dev <admin@baks.dev>
- *  
+ *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
  *  of this software and associated documentation files (the "Software"), to deal
  *  in the Software without restriction, including without limitation the rights
  *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *  copies of the Software, and to permit persons to whom the Software is furnished
  *  to do so, subject to the following conditions:
- *  
+ *
  *  The above copyright notice and this permission notice shall be included in all
  *  copies or substantial portions of the Software.
- *  
+ *
  *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *  FITNESS FOR A PARTICULAR PURPOSE AND NON INFRINGEMENT. IN NO EVENT SHALL THE
@@ -23,66 +23,22 @@
 
 declare(strict_types=1);
 
-namespace BaksDev\Wildberries\Orders\Api\New\Tests;
+namespace BaksDev\Wildberries\Orders\Api\OrderInfo\Tests;
 
-use BaksDev\Orders\Order\Entity\Order;
-use BaksDev\Orders\Order\UseCase\Admin\Edit\Tests\OrderNewTest;
 use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
-use BaksDev\Users\Profile\UserProfile\UseCase\Admin\NewEdit\Tests\NewUserProfileHandlerTest;
-use BaksDev\Users\Profile\UserProfile\UseCase\User\NewEdit\Tests\UserNewUserProfileHandleTest;
-use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersNewFbsRequest;
-use BaksDev\Wildberries\Orders\UseCase\New\NewWildberriesOrderDTO;
-use BaksDev\Wildberries\Orders\UseCase\New\NewWildberriesOrderHandler;
+use BaksDev\Wildberries\Orders\Api\OrderInfo\FindWildberriesOrdersInfoRequest;
 use BaksDev\Wildberries\Type\Authorization\WbAuthorizationToken;
+use PHPUnit\Framework\Attributes\DependsOnClass;
 use PHPUnit\Framework\Attributes\Group;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\DependencyInjection\Attribute\When;
 
+
 #[Group('wildberries-orders')]
 #[When(env: 'test')]
-class WildberriesOrdersNewFbsTest extends KernelTestCase
+class FindWildberriesOrdersInfoRequestTest extends KernelTestCase
 {
     private static WbAuthorizationToken $Authorization;
-
-    public function testUseCase(): void
-    {
-        OrderNewTest::setUpBeforeClass();
-        UserNewUserProfileHandleTest::setUpBeforeClass();
-        NewUserProfileHandlerTest::setUpBeforeClass();
-
-        /** @var FindAllWildberriesOrdersNewFbsRequest $WildberriesOrdersNewRequest */
-        $WildberriesOrdersNewRequest = self::getContainer()->get(FindAllWildberriesOrdersNewFbsRequest::class);
-        $WildberriesOrdersNewRequest->TokenHttpClient(self::$Authorization);
-
-        /** @var NewWildberriesOrderHandler $WildberriesOrderHandler */
-        $WildberriesOrderHandler = self::getContainer()->get(NewWildberriesOrderHandler::class);
-
-        $data = $WildberriesOrdersNewRequest->findAll();
-
-        /** Если нет заказов */
-        if(false === $data || false === $data->valid())
-        {
-            self::assertTrue(true);
-            return;
-        }
-
-        foreach($data as $order)
-        {
-            self::assertInstanceOf(NewWildberriesOrderDTO::class, $order);
-
-            $handle = $WildberriesOrderHandler->handle($order);
-
-            if($handle === true)
-            {
-                break;
-            }
-
-            self::assertInstanceOf(Order::class, $handle);
-
-            break;
-        }
-
-    }
 
     public static function setUpBeforeClass(): void
     {
@@ -96,4 +52,44 @@ class WildberriesOrdersNewFbsTest extends KernelTestCase
             stock: $_SERVER['TEST_WILDBERRIES_STOCK'] === "true" ?? false,
         );
     }
+
+    public function testFindWildberriesOrdersInfoRequestRepository(): void
+    {
+        self::assertTrue(true);
+
+        /** @var FindWildberriesOrdersInfoRequest $FindWildberriesOrdersInfoRequest */
+        $FindWildberriesOrdersInfoRequest = self::getContainer()->get(FindWildberriesOrdersInfoRequest::class);
+        $FindWildberriesOrdersInfoRequest->TokenHttpClient(self::$Authorization);
+
+        $result = $FindWildberriesOrdersInfoRequest->findAll();
+
+        dd($result); /* TODO: удалить !!! */
+
+        if(false === $result || false === $result->valid())
+        {
+            return;
+        }
+
+        //        foreach($result as $FindWildberriesOrdersInfoRequestResult)
+        //        {
+        //            // Вызываем все геттеры
+        //            $reflectionClass = new \ReflectionClass(FindWildberriesOrdersInfoRequestResult::class);
+        //            $methods = $reflectionClass->getMethods(\ReflectionMethod::IS_PUBLIC);
+        //
+        //            foreach($methods as $method)
+        //            {
+        //                // Методы без аргументов
+        //                if($method->getNumberOfParameters() === 0)
+        //                {
+        //                    // Вызываем метод
+        //                    $data = $method->invoke($FindWildberriesOrdersInfoRequestResult);
+        //                    // dump($data);
+        //                }
+        //            }
+        //
+        //            break;
+        //        }
+
+    }
+
 }

@@ -56,7 +56,7 @@ final readonly class WbOrdersAnalogRepository implements WbOrdersAnalogInterface
         $dbal->join('orders_product',
             Order::class,
             'orders',
-            'orders.event = orders_product.event'
+            'orders.event = orders_product.event',
         );
 
         $dbal
@@ -66,26 +66,26 @@ final readonly class WbOrdersAnalogRepository implements WbOrdersAnalogInterface
                 '
                 orders_event.id = orders.event AND
                 orders_event.status = :status
-            '
+            ',
             )
             ->setParameter(
                 key: 'status',
                 value: OrderStatusNew::class,
-                type: OrderStatus::TYPE
+                type: OrderStatus::TYPE,
             );
 
         $dbal
             ->leftJoin('orders',
                 OrderUser::class,
                 'orders_user',
-                'orders_user.event = orders.event'
+                'orders_user.event = orders.event',
             );
 
         $dbal
             ->join('orders_user',
                 OrderDelivery::class,
                 'orders_delivery',
-                'orders_delivery.usr = orders_user.id'
+                'orders_delivery.usr = orders_user.id',
             );
 
 

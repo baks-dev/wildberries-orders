@@ -53,6 +53,31 @@ final class FindAllWildberriesOrdersStatusDbsRequest extends Wildberries
         return $this;
     }
 
+    public function findOrderCancel(): array|false
+    {
+        $request = $this->request();
+
+        if(empty($request))
+        {
+            return false;
+        }
+
+        $orders = array_filter($request, static function($item) {
+            return in_array($item['wbStatus'], [
+                'canceled', // отмена сборочного задания
+                'canceled_by_client', // покупатель отменил заказ при получении
+                'declined_by_client', // покупатель отменил заказ в первый чаc
+                'canceled_by_missed_call', // отмена по причине недозвона
+            ]);
+        });
+
+        return empty($orders) ? false :
+
+            array_map(static function($item) {
+                return 'W-'.$item['id'];
+            }, $orders);
+    }
+
     /**
      * Получить статусы сборочных заданий
      *
@@ -130,32 +155,6 @@ final class FindAllWildberriesOrdersStatusDbsRequest extends Wildberries
         }
 
         return $result;
-    }
-
-
-    public function findOrderCancel(): array|false
-    {
-        $request = $this->request();
-
-        if(empty($request))
-        {
-            return false;
-        }
-
-        $orders = array_filter($request, static function($item) {
-            return in_array($item['wbStatus'], [
-                'canceled', // отмена сборочного задания
-                'canceled_by_client', // покупатель отменил заказ при получении
-                'declined_by_client', // покупатель отменил заказ в первый чаc
-                'canceled_by_missed_call', // отмена по причине недозвона
-            ]);
-        });
-
-        return empty($orders) ? false :
-
-            array_map(static function($item) {
-                return 'W-'.$item['id'];
-            }, $orders);
     }
 
     /**

@@ -295,6 +295,17 @@ final class NewWildberriesOrderDTO implements OrderEventInterface
         $this->addProduct($NewOrderProductDTO);
     }
 
+    public function addProduct(Products\WildberriesOrderProductDTO $product): void
+    {
+        $filter = $this->product->filter(function(Products\WildberriesOrderProductDTO $element) use ($product) {
+            return $element->getArticle() === $product->getArticle();
+        });
+
+        if($filter->isEmpty())
+        {
+            $this->product->add($product);
+        }
+    }
 
     /** @see OrderEvent */
     public function getEvent(): ?OrderEventUid
@@ -317,17 +328,16 @@ final class NewWildberriesOrderDTO implements OrderEventInterface
         return $this->status;
     }
 
-    public function getStatusEquals(mixed $status): bool
-    {
-        return $this->status->equals($status);
-    }
-
     public function setStatus(OrderStatus|OrderStatusInterface|string $status): self
     {
         $this->status = new OrderStatus($status);
         return $this;
     }
 
+    public function getStatusEquals(mixed $status): bool
+    {
+        return $this->status->equals($status);
+    }
 
     /**
      * Number
@@ -357,18 +367,6 @@ final class NewWildberriesOrderDTO implements OrderEventInterface
     public function setProduct(ArrayCollection $product): void
     {
         $this->product = $product;
-    }
-
-    public function addProduct(Products\WildberriesOrderProductDTO $product): void
-    {
-        $filter = $this->product->filter(function(Products\WildberriesOrderProductDTO $element) use ($product) {
-            return $element->getArticle() === $product->getArticle();
-        });
-
-        if($filter->isEmpty())
-        {
-            $this->product->add($product);
-        }
     }
 
     public function removeProduct(Products\WildberriesOrderProductDTO $product): void
