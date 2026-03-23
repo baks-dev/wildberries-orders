@@ -63,8 +63,6 @@ class FindWildberriesOrdersInfoRequestTest extends KernelTestCase
 
         $result = $FindWildberriesOrdersInfoRequest->findAll();
 
-        dd($result); /* TODO: удалить !!! */
-
         if(false === $result || false === $result->valid())
         {
             return;

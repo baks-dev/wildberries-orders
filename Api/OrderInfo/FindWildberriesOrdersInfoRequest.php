@@ -26,10 +26,8 @@ declare(strict_types=1);
 namespace BaksDev\Wildberries\Orders\Api\OrderInfo;
 
 use BaksDev\Wildberries\Api\Wildberries;
-use BaksDev\Wildberries\Orders\UseCase\New\NewWildberriesOrderDTO;
 use DateInterval;
 use DateTimeImmutable;
-use Generator;
 use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 use Symfony\Contracts\Cache\ItemInterface;
 use function Symfony\Component\String\s;
@@ -52,11 +50,10 @@ final class FindWildberriesOrdersInfoRequest extends Wildberries
      *
      * @see https://dev.wildberries.ru/openapi/orders-dbs#tag/Sborochnye-zadaniya-DBS/paths/~1api~1v3~1dbs~1orders~1new/get
      *
-     * @return Generator<NewWildberriesOrderDTO>|false
+     * //return array|false
      */
-    public function findAll()
+    public function findAll(): array|false
     {
-
         $cache = $this->getCacheInit('wildberries-orders');
 
         $key = md5($this->getTokenIdentifier().self::class);
@@ -65,7 +62,6 @@ final class FindWildberriesOrdersInfoRequest extends Wildberries
         $orders = $cache->get($key, function(ItemInterface $item) {
 
             $item->expiresAfter(DateInterval::createFromDateString('1 second'));
-
 
             $response = $this->statistics()->TokenHttpClient()->request(
                 'GET',
@@ -98,9 +94,6 @@ final class FindWildberriesOrdersInfoRequest extends Wildberries
 
         });
 
-
-        dd($orders); /* TODO: удалить !!! */
-
-
+        return $orders;
     }
 }
