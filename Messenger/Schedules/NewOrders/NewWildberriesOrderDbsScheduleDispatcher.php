@@ -170,14 +170,52 @@ final readonly class NewWildberriesOrderDbsScheduleDispatcher
              * Получаем информацию о клиенте
              */
 
-            $ClientWildberriesOrdersDTO = $this->FindClientWildberriesOrdersRequest
-                ->forTokenIdentifier($WbTokenUid)
-                ->find($WildberriesOrderDTO->getPostingNumber());
+            $attempt = 1;
 
-            if($ClientWildberriesOrdersDTO instanceof ClientWildberriesOrdersDTO)
+            while(true)
             {
-                $WildberriesOrderDTO->setClientInfo($ClientWildberriesOrdersDTO);
+                $ClientWildberriesOrdersDTO = $this->FindClientWildberriesOrdersRequest
+                    ->forTokenIdentifier($WbTokenUid)
+                    ->find($WildberriesOrderDTO->getPostingNumber());
+
+                /** Если не получили информацию о клиенте - делаем задержку */
+                if(false === ($ClientWildberriesOrdersDTO instanceof ClientWildberriesOrdersDTO))
+                {
+                    sleep(($attempt * 3));
+                }
+
+                /** Если получили информацию о клиенте - выходим из цикла и присваиваем значение */
+                if(true === ($ClientWildberriesOrdersDTO instanceof ClientWildberriesOrdersDTO))
+                {
+                    $WildberriesOrderDTO->setClientInfo($ClientWildberriesOrdersDTO);
+
+                    break;
+                }
+
+                /** Если количество попыток больше 10 - присваиваем по умолчанию */
+                if($attempt >= 10)
+                {
+                    $this->logger->error(
+                        sprintf('%s: ошибка при получении информации о клиенте', $WildberriesOrderDTO->getPostingNumber()),
+                        [self::class.':'.__LINE__],
+                    );
+
+                    /** Пользователь по умолчанию */
+                    $ClientWildberriesOrdersDTO = new ClientWildberriesOrdersDTO([
+                        'orderID' => $WildberriesOrderDTO->getPostingNumber(),
+                        'firstName' => 'Не определен',
+                        'phone' => '+79991234567',
+                        'phoneCode' => 'нет',
+                    ]);
+
+                    $WildberriesOrderDTO->setClientInfo($ClientWildberriesOrdersDTO);
+
+                    break;
+                }
+
+                ++$attempt;
             }
+
 
             /**
              * Получаем дату и время доставки
@@ -202,6 +240,19 @@ final readonly class NewWildberriesOrderDbsScheduleDispatcher
             $Order = $this->WildberriesOrderHandler->handle($WildberriesOrderDTO);
 
             if($Order === true)
+            {
+                $this->logger->info(
+                    sprintf('Новый заказ %s уже добавлен в систему', $WildberriesOrderDTO->getPostingNumber()),
+                    [self::class.':'.__LINE__],
+                );
+
+                $Deduplicator->save();
+
+                continue;
+            }
+
+
+            if(false === ($Order instanceof Order))
             {
                 $this->logger->info(
                     sprintf('Новый заказ %s уже добавлен в систему', $WildberriesOrderDTO->getPostingNumber()),

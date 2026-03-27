@@ -49,7 +49,7 @@ final class ClientWildberriesOrdersDTO
 
     public function __construct(array $client)
     {
-        $this->orderID = $client['orderID'];
+        $this->orderID = (int) str_replace('W-', '', (string) $client['orderID']);
 
         $this->firstName = $client['firstName'];
         $this->fullName = isset($client['fullName']) ? $client['fullName'] : null;
