@@ -254,8 +254,10 @@ final readonly class NewWildberriesOrderDbsScheduleDispatcher
 
             if(false === ($Order instanceof Order))
             {
-                $this->logger->info(
-                    sprintf('Новый заказ %s уже добавлен в систему', $WildberriesOrderDTO->getPostingNumber()),
+                $this->logger->critical(
+                    sprintf('wildberries-orders: ошибка "%s" при создании заказа %s',
+                        $WildberriesOrderDTO->getPostingNumber(), $Order,
+                    ),
                     [self::class.':'.__LINE__],
                 );
 
