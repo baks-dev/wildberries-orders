@@ -25,6 +25,7 @@ declare(strict_types=1);
 
 namespace BaksDev\Wildberries\Orders\Schedule\NewOrders;
 
+use BaksDev\Core\Messenger\MessageDelay;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Wildberries\Orders\Messenger\Schedules\NewOrders\NewWildberriesOrdersScheduleMessage;
 use BaksDev\Wildberries\Repository\AllProfileToken\AllProfileWildberriesTokenInterface;
@@ -59,6 +60,7 @@ final class UpdateWildberriesOrdersNewSchedulesHandler
         {
             $this->messageDispatch->dispatch(
                 message: new NewWildberriesOrdersScheduleMessage($profile),
+                stamps: [new MessageDelay(sprintf(UpdateWildberriesOrdersNewSchedules::INTERVAL))],
                 transport: (string) $profile,
             );
         }

@@ -25,6 +25,7 @@ declare(strict_types=1);
 
 namespace BaksDev\Wildberries\Orders\Schedule\UpdateOrdersStatus;
 
+use BaksDev\Core\Messenger\MessageDelay;
 use BaksDev\Core\Messenger\MessageDispatchInterface;
 use BaksDev\Wildberries\Orders\Messenger\Schedules\CancelOrders\CancelWildberriesOrdersScheduleMessage;
 use BaksDev\Wildberries\Repository\AllProfileToken\AllProfileWildberriesTokenInterface;
@@ -60,7 +61,8 @@ final class UpdateWildberriesOrdersCancelSchedulesHandler
             /* Отправляем сообщение в шину профиля */
             $this->messageDispatch->dispatch(
                 message: new CancelWildberriesOrdersScheduleMessage($profile),
-                transport: (string) $profile,
+                stamps: [new MessageDelay(sprintf(UpdateWildberriesOrdersCancelSchedules::INTERVAL))],
+                transport: $profile.'-low',
             );
         }
     }
