@@ -78,7 +78,6 @@ final class GetWildberriesOrdersStickerRequest extends Wildberries
      */
     public function getOrderSticker(): string|false
     {
-
         if(false === $this->order)
         {
             throw new InvalidArgumentException(
@@ -86,12 +85,9 @@ final class GetWildberriesOrdersStickerRequest extends Wildberries
             );
         }
 
+        $cache = $this->getCacheInit('order-sticker');
 
-        $cache = $this->getCacheInit('wildberries-orders');
-        $key = md5($this->getTokenIdentifier().$this->order.$this->type.$this->width.$this->height.self::class);
-        //$cache->deleteItem($key);
-
-        $file = $cache->get($key, function(ItemInterface $item): string|false {
+        $file = $cache->get('W-'.$this->order, function(ItemInterface $item): string|false {
 
             $item->expiresAfter(DateInterval::createFromDateString('1 second'));
 
