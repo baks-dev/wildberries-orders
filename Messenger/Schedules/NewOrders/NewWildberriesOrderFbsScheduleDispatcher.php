@@ -55,8 +55,6 @@ final readonly class NewWildberriesOrderFbsScheduleDispatcher
         private NewWildberriesOrderHandler $WildberriesOrderHandler,
         private MessageDispatchInterface $messageDispatch,
         private AllWbTokensByProfileInterface $AllWbTokensByProfileRepository,
-
-
     ) {}
 
     public function __invoke(NewWildberriesOrdersScheduleMessage $message): void
@@ -173,6 +171,7 @@ final readonly class NewWildberriesOrderFbsScheduleDispatcher
                         /** Передаем на обновление найденный артикул */
                         $WildberriesCardNewMassage = new WildberriesCardNewMassage(
                             profile: $message->getProfile(),
+                            token: $WbTokenUid,
                             article: $WildberriesCardDTO->getArticle(),
                         );
 
