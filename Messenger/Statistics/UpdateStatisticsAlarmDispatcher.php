@@ -25,6 +25,7 @@ declare(strict_types=1);
 
 namespace BaksDev\Wildberries\Orders\Messenger\Statistics;
 
+use BaksDev\Core\Deduplicator\DeduplicatorInterface;
 use BaksDev\Wildberries\Orders\Entity\Alarm\WbOrdersStatisticsAlarm;
 use BaksDev\Wildberries\Orders\Repository\WbOrdersAlarm\WbOrdersAlarmInterface;
 use BaksDev\Wildberries\Orders\UseCase\Alarm\WbOrdersAlarmDTO;
@@ -39,11 +40,11 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 #[AsMessageHandler(priority: 10)]
 final readonly class UpdateStatisticsAlarmDispatcher
 {
-
     public function __construct(
         #[Target('wildberriesOrdersLogger')] private LoggerInterface $logger,
         private WbOrdersAlarmInterface $ordersAlarm,
-        private WbOrdersAlarmHandler $ordersAlarmHandler
+        private WbOrdersAlarmHandler $ordersAlarmHandler,
+        private DeduplicatorInterface $deduplicator,
     ) {}
 
     /**
@@ -51,6 +52,18 @@ final readonly class UpdateStatisticsAlarmDispatcher
      */
     public function __invoke(UpdateStatisticMessage $message): void
     {
+        $Deduplicator = $this->deduplicator
+            ->namespace('warmup')
+            ->expiresAfter('1 minute')
+            ->deduplication([self::class, $message]);
+
+        if($Deduplicator->isExecuted())
+        {
+            return;
+        }
+
+        $Deduplicator->save();
+
         $this->logger->info(
             'Обновляем статистику срочных заказов Wildberries',
             [
@@ -74,6 +87,8 @@ final readonly class UpdateStatisticsAlarmDispatcher
         );
 
         $WbOrdersStatisticsAlarm = $this->ordersAlarmHandler->handle($WbOrdersAlarmDTO);
+
+        $Deduplicator->delete();
 
         if(false === ($WbOrdersStatisticsAlarm instanceof WbOrdersStatisticsAlarm))
         {

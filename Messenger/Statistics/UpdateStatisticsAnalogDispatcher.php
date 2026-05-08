@@ -25,6 +25,7 @@ declare(strict_types=1);
 
 namespace BaksDev\Wildberries\Orders\Messenger\Statistics;
 
+use BaksDev\Core\Deduplicator\DeduplicatorInterface;
 use BaksDev\Wildberries\Orders\Entity\Analog\WbOrdersStatisticsAnalog;
 use BaksDev\Wildberries\Orders\Repository\WbOrdersAnalog\WbOrdersAnalogInterface;
 use BaksDev\Wildberries\Orders\UseCase\Analog\WbOrdersAnalogDTO;
@@ -43,7 +44,8 @@ final readonly class UpdateStatisticsAnalogDispatcher
     public function __construct(
         #[Target('wildberriesOrdersLogger')] private LoggerInterface $logger,
         private WbOrdersAnalogInterface $ordersAnalog,
-        private WbOrdersAnalogHandler $ordersAnalogHandler
+        private WbOrdersAnalogHandler $ordersAnalogHandler,
+        private DeduplicatorInterface $deduplicator,
     ) {}
 
     /**
@@ -51,6 +53,18 @@ final readonly class UpdateStatisticsAnalogDispatcher
      */
     public function __invoke(UpdateStatisticMessage $message): void
     {
+        $Deduplicator = $this->deduplicator
+            ->namespace('warmup')
+            ->expiresAfter('1 minute')
+            ->deduplication([self::class, $message]);
+
+        if($Deduplicator->isExecuted())
+        {
+            return;
+        }
+
+        $Deduplicator->save();
+
         $this->logger->info(
             'Обновляем статистику аналогичных заказов Wildberries',
             [
@@ -69,6 +83,8 @@ final readonly class UpdateStatisticsAnalogDispatcher
         );
 
         $WbOrdersStatisticsAnalog = $this->ordersAnalogHandler->handle($WbOrdersAnalogDTO);
+
+        $Deduplicator->delete();
 
         if(false === ($WbOrdersStatisticsAnalog instanceof WbOrdersStatisticsAnalog))
         {
