@@ -35,6 +35,9 @@ use BaksDev\Wildberries\Orders\Api\Dbs\UpdateWbOrderDbsDeliverRequest;
 use BaksDev\Wildberries\Type\id\WbTokenUid;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+/**
+ * Обновляет статус заказ DBS Wildberries в селлере нa Delivery «Доставляется»
+ */
 #[AsMessageHandler(priority: 0)]
 final readonly class WildberriesOrdersDeliveryDispatcher
 {
@@ -70,7 +73,7 @@ final readonly class WildberriesOrdersDeliveryDispatcher
             ->forTokenIdentifier($WbTokenUid)
             ->update($OrderEvent->getPostingNumber());
 
-        /** Пробуем обновить через минуту */
+        /** В случае ошибки, пробуем обновить через минуту */
         if(false === $isDelivery)
         {
             $this->messageDispatch->dispatch(
