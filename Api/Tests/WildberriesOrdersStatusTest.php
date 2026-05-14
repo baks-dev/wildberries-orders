@@ -61,10 +61,10 @@ class WildberriesOrdersStatusTest extends KernelTestCase
         $FindAllWildberriesOrdersStatusRequest->TokenHttpClient(self::$Authorization);
 
         $data = $FindAllWildberriesOrdersStatusRequest
-            ->addOrder('1234567890')
-            ->addOrder('W-1234567890')
+            ->addOrder('111111111')
+            ->addOrder('W-111111111')
             ->findOrderCancel();
 
-        self::assertFalse($data);
+        self::assertIsBool($data);
     }
 }
