@@ -44,6 +44,7 @@ use BaksDev\Orders\Order\Repository\ExistsOrderNumber\ExistsOrderNumberInterface
 use BaksDev\Orders\Order\Repository\FieldByDeliveryChoice\FieldByDeliveryChoiceInterface;
 use BaksDev\Orders\Order\Type\Status\OrderStatus\Collection\OrderStatusNew;
 use BaksDev\Products\Product\Repository\CurrentProductByArticle\CurrentProductByBarcodeResult;
+use BaksDev\Products\Product\Repository\CurrentProductByArticle\ProductConstByArticleInterface;
 use BaksDev\Products\Product\Repository\CurrentProductByArticle\ProductConstByBarcodeInterface;
 use BaksDev\Users\Address\Services\GeocodeAddressParser;
 use BaksDev\Users\Profile\UserProfile\Entity\UserProfile;
@@ -73,6 +74,7 @@ final class NewWildberriesOrderHandler extends AbstractHandler
         private readonly PickupByGeolocationInterface $pickupByGeolocation,
         private readonly FieldValueFormInterface $fieldValue,
         private readonly UserProfileGpsInterface $userProfileGps,
+        private readonly ProductConstByArticleInterface $ProductConstByArticle,
 
         EntityManagerInterface $entityManager,
         MessageDispatchInterface $messageDispatch,
@@ -127,12 +129,15 @@ final class NewWildberriesOrderHandler extends AbstractHandler
                 ->find($product->getBarcode());
 
             /** Если по штрихкоду не найден - пробуем найти по артикулу */
-            //$ProductData ?: $ProductData = $this->ProductConstByArticle->find($product->getArticle());
+            if(false === ($ProductData instanceof CurrentProductByBarcodeResult))
+            {
+                $ProductData = $this->ProductConstByArticle->find($product->getArticle());
+            }
 
+            /** Если товар по штрихкоду либо артикулу не найден  */
             if(false === ($ProductData instanceof CurrentProductByBarcodeResult))
             {
                 $error = sprintf('%s: Артикул товара не найден (%s)', $product->getArticle(), $product->getBarcode());
-                //throw new InvalidArgumentException($error);
                 return $error;
             }
 
