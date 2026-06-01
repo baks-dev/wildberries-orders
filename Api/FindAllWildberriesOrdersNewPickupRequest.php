@@ -57,7 +57,7 @@ final class FindAllWildberriesOrdersNewPickupRequest extends Wildberries
         {
             $this->logger->critical(
                 'wildberries-orders: Ошибка при получении новых заказов',
-                [$content, self::class.':'.__LINE__],
+                [$content, $this->getTokenIdentifier(), self::class.':'.__LINE__],
             );
 
             return false;
