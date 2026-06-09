@@ -19,6 +19,7 @@
  *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
+ *
  */
 
 declare(strict_types=1);
@@ -26,9 +27,7 @@ declare(strict_types=1);
 namespace BaksDev\Wildberries\Orders\Api;
 
 use BaksDev\Wildberries\Api\Wildberries;
-use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 
-// #[Autoconfigure(public: true)]
 final class FindAllWildberriesOrdersStatusFbsRequest extends Wildberries
 {
     /**
