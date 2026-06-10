@@ -36,16 +36,25 @@ final class WildberriesOrdersDbsDeliveryDateTimeDTO
     private ?string $time = null;
 
     public function __construct(
-        $dTimeFrom,
-        $dTimeTo,
-        $dTimeFromOld,
-        $dTimeToOld,
-        $dDateOld,
-        $dDate,
-        $id
+        int $id, // ID сборочного задания
+        string $dDate, // Актуальная дата доставки, указанная покупателем
+
+        ?string $dTimeFrom, // Актуальное время доставки "с"
+        ?string $dTimeTo, // Актуальное время доставки "по"
+        ?string $dTimeFromOld, // Прежнее время доставки "с". Доступно первые сутки после изменения
+        ?string $dTimeToOld, // Прежнее время доставки "по". Доступно первые сутки после изменения
+        ?string $dDateOld, // Прежняя дата доставки. Доступна первые сутки после изменения
+
+        ?string $dDateFrom, // Дата начала интервала для доставки, если указана покупателем
+        ?string $dDateTo, // Дата окончания интервала для доставки, если указана покупателем
     )
     {
         $this->date = new DateTimeImmutable($dDate); // "dDate": "2025-02-20",
+
+        if(false === empty($dDateFrom))
+        {
+            $this->date = new DateTimeImmutable($dDateFrom);
+        }
 
         if(false === empty($dTimeFrom) && empty($dTimeTo))
         {
