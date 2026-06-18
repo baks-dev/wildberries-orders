@@ -19,6 +19,7 @@
  *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
+ *
  */
 
 declare(strict_types=1);
@@ -31,7 +32,7 @@ use BaksDev\Users\Profile\UserProfile\Type\Id\UserProfileUid;
 use BaksDev\Users\Profile\UserProfile\UseCase\Admin\NewEdit\Tests\NewUserProfileHandlerTest;
 use BaksDev\Users\Profile\UserProfile\UseCase\User\NewEdit\Tests\UserNewUserProfileHandleTest;
 use BaksDev\Wildberries\Orders\Api\FindAllWildberriesOrdersNewDbsRequest;
-use BaksDev\Wildberries\Orders\UseCase\New\NewWildberriesOrderDTO;
+use BaksDev\Wildberries\Orders\UseCase\New\AddTokenToOrderDTO;
 use BaksDev\Wildberries\Orders\UseCase\New\NewWildberriesOrderHandler;
 use BaksDev\Wildberries\Type\Authorization\WbAuthorizationToken;
 use PHPUnit\Framework\Attributes\Group;
@@ -42,7 +43,7 @@ use Symfony\Component\DependencyInjection\Attribute\When;
 
 #[Group('wildberries-orders')]
 #[When(env: 'test')]
-class WildberriesOrdersNewBdsTest extends KernelTestCase
+class WildberriesOrdersNewDbsTest extends KernelTestCase
 {
     private static WbAuthorizationToken $Authorization;
 
@@ -61,9 +62,6 @@ class WildberriesOrdersNewBdsTest extends KernelTestCase
 
         $data = $FindAllWildberriesOrdersNewDbsRequest->findAll();
 
-        iterator_to_array($data);
-
-
         /** Если нет заказов */
         if(false === $data || false === $data->valid())
         {
@@ -74,7 +72,7 @@ class WildberriesOrdersNewBdsTest extends KernelTestCase
         foreach($data as $WildberriesNewOrderDTO)
         {
             // Вызываем все геттеры
-            $reflectionClass = new ReflectionClass(NewWildberriesOrderDTO::class);
+            $reflectionClass = new ReflectionClass(AddTokenToOrderDTO::class);
             $methods = $reflectionClass->getMethods(ReflectionMethod::IS_PUBLIC);
 
             foreach($methods as $method)

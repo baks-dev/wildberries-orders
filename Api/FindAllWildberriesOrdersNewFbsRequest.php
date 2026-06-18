@@ -19,6 +19,7 @@
  *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  *  THE SOFTWARE.
+ *
  */
 
 declare(strict_types=1);
@@ -28,9 +29,7 @@ namespace BaksDev\Wildberries\Orders\Api;
 use BaksDev\Wildberries\Api\Wildberries;
 use BaksDev\Wildberries\Orders\UseCase\New\NewWildberriesOrderDTO;
 use Generator;
-use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
 
-// #[Autoconfigure(public: true)]
 final class FindAllWildberriesOrdersNewFbsRequest extends Wildberries
 {
     /**
@@ -39,7 +38,7 @@ final class FindAllWildberriesOrdersNewFbsRequest extends Wildberries
      *
      * @see https://dev.wildberries.ru/openapi/orders-fbs/#tag/Sborochnye-zadaniya/paths/~1api~1v3~1orders~1new/get
      *
-     * @return Generator<NewWildberriesOrderDTO>|false
+     * @return Generator<int, NewWildberriesOrderDTO>|false
      */
     public function findAll(): Generator|false
     {
