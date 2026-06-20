@@ -129,7 +129,7 @@ final class GetWildberriesOrdersStickerRequest extends Wildberries
                 return false;
             }
 
-            $item->expiresAfter(DateInterval::createFromDateString('1 day'));
+            $item->expiresAfter(DateInterval::createFromDateString('1 month'));
 
             $file = base64_decode($sticker['file']);
 
